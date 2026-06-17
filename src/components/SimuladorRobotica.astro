@@ -1,19 +1,23 @@
 ---
-// Componente modular para la simulación interactiva de Robótica 2DOF
+// Componente modular premium de Robótica 2DOF con física de control y osciloscopio dinámico
 ---
 
 <div class="w-full h-full flex flex-col">
-  <div class="pb-3 flex justify-between items-center shrink-0 border-b border-bio-text/5">
-    <span class="font-code text-[10px] text-bio-green font-bold">[LAB_01] CONTROLADOR ROBÓTICO 2DOF</span>
+  <div class="pb-3 flex justify-between items-center shrink-0 border-b border-bio-text/5 bg-white/40 px-4 rounded-t-2xl">
+    <div class="flex items-center gap-2">
+      <span class="font-code text-[10px] px-2 py-0.5 bg-bio-green text-white rounded font-bold">PID-CTRL</span>
+      <span class="font-code text-[10px] text-bio-green font-bold">SISTEMA MECATRÓNICO DE 2 GRADOS DE LIBERTAD</span>
+    </div>
     <div class="flex gap-2">
-      <button id="btn-robot-auto" class="px-2.5 py-1 text-[9px] font-code bg-bio-green text-white rounded-md font-bold transition-all">AUTO</button>
+      <button id="btn-robot-auto" class="px-2.5 py-1 text-[9px] font-code bg-bio-green text-white rounded-md font-bold transition-all shadow-sm">AUTO</button>
       <button id="btn-robot-manual" class="px-2.5 py-1 text-[9px] font-code bg-bio-text/10 text-bio-text rounded-md transition-all">MANUAL</button>
     </div>
   </div>
-  <div class="flex-grow bg-bio-bg/40 border border-bio-text/10 rounded-xl overflow-hidden relative min-h-[380px] mt-4">
+  <div class="flex-grow bg-bio-bg/40 border border-bio-text/10 rounded-b-2xl overflow-hidden relative min-h-[410px] w-full">
     <canvas id="canvas-robotica" class="w-full h-full cursor-pointer block outline-none" tabindex="0"></canvas>
-    <div id="robot-control-hint" class="absolute bottom-3 right-3 bg-white/95 px-3 py-1.5 rounded-lg border border-bio-text/10 shadow-sm text-[9px] font-code text-bio-text pointer-events-none hidden max-w-[210px] leading-relaxed">
-      Haz clic para enfocar.<br>Mueve el gripper con <strong class="text-bio-green">W,A,S,D</strong> o <strong class="text-bio-green">Flechas</strong>.
+    <!-- Leyenda interactiva -->
+    <div id="robot-control-hint" class="absolute bottom-3 right-3 bg-white/95 px-3 py-2 rounded-lg border border-bio-text/10 shadow-md text-[9px] font-code text-bio-text pointer-events-none hidden max-w-[210px] leading-relaxed">
+      Haz clic en el lienzo.<br>Controla el efector final con <strong class="text-bio-green">W,A,S,D</strong> o <strong class="text-bio-green">Flechas</strong>.
     </div>
     <div class="absolute bottom-3 left-3 text-[9px] font-code text-bio-text/45 pointer-events-none" id="robot-status-text">
       STATUS: AUTOMATIC MODE
@@ -30,40 +34,112 @@
 
     const ctx = canvas.getContext('2d')!;
     let isAuto = true;
-    let W = canvas.width = canvas.parentElement!.clientWidth;
-    let H = canvas.height = canvas.parentElement!.clientHeight;
+    
+    // Variables de dimensiones lógicas y físicas de pantalla
+    let W = 0, H = 0;
+    let dpr = 1;
 
-    // Eslabones del brazo acortados y balanceados para evitar singularidades
-    const L1 = H * 0.2; 
-    const L2 = H * 0.2; 
-    const basex = W * 0.40; // Base ligeramente desplazada a la izquierda para alcanzar estantes
-    const basey = H - 40;
+    // --- PARÁMETROS GEOMÉTRICOS DEL ROBOT (AUMENTADOS) ---
+    let L1 = 0; // Longitud primer eslabón
+    let L2 = 0; // Longitud segundo eslabón
+    let basex = 0;
+    let basey = 0;
 
-    // Variables cinemáticas articulares
-    let t1 = -Math.PI / 4, t2 = Math.PI / 2;
-    let targetX = basex + 70, targetY = basey - 90;
+    // --- VARIABLES DE ESTADO ARTICULAR (ÁNGULOS DE CONTROL REALES) ---
+    let theta1 = Math.PI / 3;
+    let theta2 = -Math.PI / 2; // Configurado negativo para forzar siempre la pose codo-arriba
 
-    // Pelota y estantería sintonizadas en distancias operacionales óptimas
-    const grabPoint = basex - 90; // Punto estático de recogida en banda
-    let ball = { x: 0, y: H - 52, active: true, radius: 8 };
+    // --- COORDENADAS OPERACIONALES CLAVE ---
+    let xHome = 0, yHome = 0;
+    let xGrab = 0, yGrab = 0;
+    let shelfX = 0;
+    const maxShelf = 5;
+
+    // --- SETPOINT VS VARIABLE DE PROCESO (FÍSICA DE SEGUNDO ORDEN) ---
+    let targetX = 0, targetY = 0; // Setpoint cartesiano deseado (Rojo)
+    let currentX = 0, currentY = 0; // Variable de proceso real del efector final (Filtro mecánico)
+    
+    // Velocidades para simular inercia (Modelo masa-resorte-amortiguador bajo sintonización)
+    let vx = 0, vy = 0;
+    const k_spring = 0.045; // Rigidez del controlador proporcional
+    const c_damping = 0.25; // Coeficiente de amortiguamiento (Sutilmente subamortiguado para mostrar sobreimpulso)
+
+    // Historial para el osciloscopio técnico
+    const historyLength = 100;
+    const setpointHistory: number[] = Array(historyLength).fill(0);
+    const responseHistory: number[] = Array(historyLength).fill(0);
+
+    // --- ESTADO DE LA PELOTA ---
+    let ball = {
+      x: 0,
+      y: 0,
+      radius: 9,
+      active: true,
+      isStaticAtGrab: false
+    };
+
     let grabbed = false;
     let shelfBalls: {x: number, y: number}[] = []; 
-    const maxShelf = 5;
-    const shelfX = basex + 100; // Estantería más cercana
+    
+    // --- MÁQUINA DE ESTADOS INDUSTRIAL ---
+    const STATE_HOME = 0;       
+    const STATE_APPROACH = 1;   
+    const STATE_DELIVER = 2;    
+    const STATE_GO_HOME = 3;    
+    let currentState = STATE_HOME;
 
-    // Captura de entrada de teclado
+    // --- CAPTURA DE TECLADO ---
     const keysPressed: Record<string, boolean> = {};
     canvas.addEventListener('keydown', (e) => {
       keysPressed[e.key.toLowerCase()] = true;
       if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(e.key.toLowerCase())) {
-        e.preventDefault();
+        e.preventDefault(); 
       }
     });
     canvas.addEventListener('keyup', (e) => {
       keysPressed[e.key.toLowerCase()] = false;
     });
 
-    // Control de modo AUTO/MANUAL
+    // --- ADAPTACIÓN DE TAMAÑO Y CRISPNESS (ELIMINA EL PIXELADO) ---
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      dpr = window.devicePixelRatio || 1;
+      
+      // Dimensiones de buffer adaptadas al pixel ratio del dispositivo
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      
+      // Escalar contexto para usar píxeles lógicos en el código de dibujo
+      ctx.resetTransform();
+      ctx.scale(dpr, dpr);
+      
+      W = rect.width;
+      H = rect.height;
+
+      // Escalar proporciones para hacer el robot mucho más imponente
+      L1 = H * 0.40; // 40% del alto de la pantalla (Más grande)
+      L2 = H * 0.32; // 32% del alto de la pantalla
+      basex = W * 0.48;
+      basey = H - 55;
+
+      xHome = basex;
+      yHome = basey - H * 0.35;
+
+      xGrab = basex + W * 0.18; // Pelota se detiene a la derecha del robot
+      yGrab = basey - 12;
+
+      shelfX = basex - W * 0.20; // Estantería se ubica a la izquierda del robot
+
+      if (currentState === STATE_HOME && isAuto) {
+        targetX = xHome; targetY = yHome;
+        if (!grabbed) {
+          ball.x = W;
+          ball.y = yGrab;
+        }
+      }
+    }
+
+    // --- INTERRUPTOR DE MODOS ---
     document.getElementById('btn-robot-auto')?.addEventListener('click', (e) => {
       isAuto = true;
       document.getElementById('robot-control-hint')?.classList.add('hidden');
@@ -72,7 +148,15 @@
       document.getElementById('btn-robot-manual')?.classList.replace('bg-bio-green', 'bg-bio-text/10');
       document.getElementById('btn-robot-manual')?.classList.remove('text-white');
       document.getElementById('robot-status-text')!.innerText = "STATUS: AUTOMATIC MODE";
-      grabbed = false; ball.x = 0; ball.active = true;
+      
+      grabbed = false; 
+      ball.x = W; 
+      ball.active = true; 
+      ball.isStaticAtGrab = false;
+      currentState = STATE_HOME;
+      targetX = xHome; targetY = yHome;
+      currentX = xHome; currentY = yHome;
+      vx = 0; vy = 0;
     });
 
     document.getElementById('btn-robot-manual')?.addEventListener('click', (e) => {
@@ -83,183 +167,329 @@
       document.getElementById('btn-robot-auto')?.classList.replace('bg-bio-green', 'bg-bio-text/10');
       document.getElementById('btn-robot-auto')?.classList.remove('text-white');
       document.getElementById('robot-status-text')!.innerText = "STATUS: KEYBOARD MANUAL MODE [WASD / ARROWS]";
-      grabbed = false; ball.x = grabPoint; ball.active = true;
+      
+      grabbed = false;
+      ball.x = xGrab;
+      ball.active = true;
+      ball.isStaticAtGrab = true;
+      targetX = xHome; targetY = yHome;
+      currentX = xHome; currentY = yHome;
+      vx = 0; vy = 0;
     });
 
-    // Cinemática Inversa Planar 2DOF (Codo abajo)
-    function solveIK(x: number, y: number) {
-      const px = x - basex;
-      const py = basey - y;
-      
-      let D = (px*px + py*py - L1*L1 - L2*L2) / (2 * L1 * L2);
-      D = Math.max(-0.99, Math.min(0.99, D)); // Clampar para prevenir errores matemáticos
-      
-      const t2Target = Math.acos(D);
-      const t1Target = Math.atan2(py, px) - Math.atan2(L2 * Math.sin(t2Target), L1 + L2 * Math.cos(t2Target));
-      
-      // Control sutil para sintonización transitoria suave (amortiguación física)
-      t1 += (-t1Target - t1) * 0.16;
-      t2 += (t2Target - t2) * 0.16;
+    // --- MATEMÁTICAS DE CINEMÁTICA ---
+    
+    // Cinemática Directa local del robot
+    function getDirectKinematics(t1Val: number, t2Val: number) {
+      const xLocal = L1 * Math.cos(t1Val) + L2 * Math.cos(t1Val + t2Val);
+      const yLocal = L1 * Math.sin(t1Val) + L2 * Math.sin(t1Val + t2Val);
+      return { x: basex + xLocal, y: basey - yLocal };
     }
 
+    // Cinemática Inversa Sintonizada (Pose de Codo Arriba Constante)
+    function solveInverseKinematics(xd: number, yd: number) {
+      const px = xd - basex;
+      const py = basey - yd; // py positivo hacia arriba
+
+      let cosTheta2 = (px * px + py * py - L1 * L1 - L2 * L2) / (2 * L1 * L2);
+      cosTheta2 = Math.max(-0.9999, Math.min(0.9999, cosTheta2));
+      
+      // Sintonía: theta2 negativo fuerza la pose de "codo arriba" evitando dipping antinatural
+      const t2Target = -Math.acos(cosTheta2);
+      const t1Target = Math.atan2(py, px) - Math.atan2(L2 * Math.sin(t2Target), L1 + L2 * Math.cos(t2Target));
+
+      // Filtro proporcional de articulaciones
+      theta1 += (t1Target - theta1) * 0.15;
+      theta2 += (t2Target - theta2) * 0.15;
+    }
+
+    // --- BUCLE DE SIMULACIÓN ---
     function draw() {
       ctx.clearRect(0, 0, W, H);
 
-      // --- 1. DIBUJAR ESTANTERÍA ELEVADA ---
-      ctx.strokeStyle = '#8C7870'; ctx.lineWidth = 3;
+      // --- 1. FONDO ESTÉTICO E INDUSTRIAL (PLANOS TÉCNICOS) ---
+      // Grilla sutil de ingeniería
+      ctx.strokeStyle = 'rgba(18, 19, 20, 0.03)'; ctx.lineWidth = 1;
+      const stepGrid = 25;
+      for (let x = 0; x < W; x += stepGrid) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+      }
+      for (let y = 0; y < H; y += stepGrid) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+      }
+
+      // Envolvente radial de rango máximo operacional
+      ctx.strokeStyle = 'rgba(143, 169, 196, 0.08)'; ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
       ctx.beginPath();
-      ctx.moveTo(shelfX, H - 40); ctx.lineTo(shelfX, H - 170); // Soporte vertical
+      ctx.arc(basex, basey, L1 + L2, Math.PI, 0);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Dibujar sombras decorativas de maquinaria industrial de fondo
+      ctx.fillStyle = 'rgba(78, 94, 82, 0.025)';
+      ctx.fillRect(W * 0.05, H - 180, 50, 140); // Silueta de panel eléctrico
+      ctx.fillRect(W * 0.05 + 15, H - 210, 20, 30); // Baliza de status
+
+      // --- 2. MODELADO DE RESPUESTA EN FRECUENCIA (FÍSICA DE SEGUNDO ORDEN) ---
+      // Dinámica de masas: ax = k*(setpoint - actual) - c*velocidad
+      const ax = k_spring * (targetX - currentX) - c_damping * vx;
+      const ay = k_spring * (targetY - currentY) - c_damping * vy;
+      
+      vx += ax;
+      vy += ay;
+      currentX += vx;
+      currentY += vy;
+
+      // Almacenar datos para el osciloscopio en tiempo real
+      setpointHistory.push(targetX); setpointHistory.shift();
+      responseHistory.push(currentX); responseHistory.shift();
+
+      // --- 3. PROCESAR LÓGICA AUTOMÁTICA VS MANUAL ---
+      const currentGripper = getDirectKinematics(theta1, theta2);
+
+      if (isAuto) {
+        switch (currentState) {
+          case STATE_HOME:
+            targetX = xHome;
+            targetY = yHome;
+            ball.isStaticAtGrab = false;
+
+            // La pelota llega rodando desde el extremo derecho
+            if (ball.active) {
+              if (ball.x > xGrab) {
+                ball.x -= 1.8; // Velocidad suave de banda
+              } else {
+                ball.x = xGrab;
+                ball.isStaticAtGrab = true; // Se detiene exótica en posición de recolección
+                currentState = STATE_APPROACH;
+              }
+            }
+            break;
+
+          case STATE_APPROACH:
+            // Pelota quieta. El robot inicia la trayectoria elegante
+            targetX = xGrab;
+            targetY = yGrab;
+
+            // Detección de acople mecánico sutil
+            const dToBall = Math.sqrt(Math.pow(currentGripper.x - ball.x, 2) + Math.pow(currentGripper.y - ball.y, 2));
+            if (dToBall < 6) {
+              grabbed = true;
+              currentState = STATE_DELIVER;
+            }
+            break;
+
+          case STATE_DELIVER:
+            // Llevar al estante libre de la izquierda
+            const targetShelfY = H - 62 - (shelfBalls.length * 22);
+            targetX = shelfX + 15;
+            targetY = targetShelfY;
+
+            ball.x = currentGripper.x;
+            ball.y = currentGripper.y;
+
+            const dToShelf = Math.sqrt(Math.pow(ball.x - targetX, 2) + Math.pow(ball.y - targetY, 2));
+            if (dToShelf < 6) {
+              shelfBalls.push({ x: targetX, y: targetY });
+              grabbed = false;
+              ball.active = false;
+
+              if (shelfBalls.length >= maxShelf) {
+                setTimeout(() => { shelfBalls = []; }, 800);
+              }
+              currentState = STATE_GO_HOME;
+            }
+            break;
+
+          case STATE_GO_HOME:
+            targetX = xHome;
+            targetY = yHome;
+
+            const dToHome = Math.sqrt(Math.pow(currentGripper.x - xHome, 2) + Math.pow(currentGripper.y - yHome, 2));
+            if (dToHome < 6) {
+              setTimeout(() => {
+                ball.x = W;
+                ball.y = yGrab;
+                ball.active = true;
+                ball.isStaticAtGrab = false;
+                currentState = STATE_HOME;
+              }, 400);
+            }
+            break;
+        }
+      } else {
+        // --- CONTROL MANUAL DE COORDENADAS ---
+        const step = 5;
+        if (keysPressed['w'] || keysPressed['arrowup']) targetY -= step;
+        if (keysPressed['s'] || keysPressed['arrowdown']) targetY += step;
+        if (keysPressed['a'] || keysPressed['arrowleft']) targetX -= step;
+        if (keysPressed['d'] || keysPressed['arrowright']) targetX += step;
+
+        // Clampar límites operacionales para prevenir quiebres mecánicos
+        const distFromBase = Math.sqrt(Math.pow(targetX - basex, 2) + Math.pow(targetY - basey, 2));
+        const maxRange = (L1 + L2) - 6;
+        const minRange = Math.abs(L1 - L2) + 16;
+
+        if (distFromBase > maxRange) {
+          const angle = Math.atan2(targetY - basey, targetX - basex);
+          targetX = basex + maxRange * Math.cos(angle);
+          targetY = basey + maxRange * Math.sin(angle);
+        } else if (distFromBase < minRange) {
+          const angle = Math.atan2(targetY - basey, targetX - basex);
+          targetX = basex + minRange * Math.cos(angle);
+          targetY = basey + minRange * Math.sin(angle);
+        }
+
+        if (targetY > yGrab) targetY = yGrab;
+
+        // Agarre manual al tocar
+        const dToBallManual = Math.sqrt(Math.pow(currentGripper.x - ball.x, 2) + Math.pow(currentGripper.y - ball.y, 2));
+        if (dToBallManual < 12 && ball.active && !grabbed) {
+          grabbed = true;
+        }
+
+        if (grabbed) {
+          ball.x = currentGripper.x;
+          ball.y = currentGripper.y;
+
+          // Autodepósito en estante izquierdo
+          if (ball.x < shelfX + 20 && ball.y < H - 48) {
+            shelfBalls.push({ x: shelfX + 15, y: ball.y });
+            grabbed = false;
+            ball.active = false;
+
+            if (shelfBalls.length >= maxShelf) {
+              setTimeout(() => { shelfBalls = []; }, 800);
+            }
+            setTimeout(() => {
+              ball.x = xGrab; ball.y = yGrab; ball.active = true;
+            }, 1000);
+          }
+        }
+
+        // Puntero de consigna
+        ctx.strokeStyle = 'rgba(216, 164, 153, 0.45)'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(targetX, targetY, 7, 0, Math.PI * 2); ctx.stroke();
+      }
+
+      solveInverseKinematics(currentX, currentY);
+
+      // --- 4. RENDERIZADO DE LA ESTANTERÍA Y BANDAS (IZQUIERDA) ---
+      ctx.strokeStyle = '#8C7870'; ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(shelfX, H - 40); ctx.lineTo(shelfX, H - 165); 
       ctx.stroke();
 
       for (let i = 0; i < maxShelf; i++) {
         const sy = H - 54 - (i * 22);
         ctx.beginPath();
-        ctx.moveTo(shelfX - 8, sy); ctx.lineTo(shelfX + 40, sy); // Bandejas
+        ctx.moveTo(shelfX - 35, sy); ctx.lineTo(shelfX + 6, sy); 
         ctx.stroke();
       }
 
-      // Pelotas en el estante
       shelfBalls.forEach((b, idx) => {
         ctx.fillStyle = '#D8A499';
         ctx.beginPath();
-        ctx.arc(shelfX + 16, H - 62 - (idx * 22), ball.radius, 0, Math.PI * 2);
+        ctx.arc(shelfX - 15, H - 62 - (idx * 22), ball.radius, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      // Banda transportadora inferior
-      ctx.fillStyle = '#E5E7EB'; ctx.fillRect(0, H - 40, W, 25);
-      ctx.strokeStyle = 'rgba(18, 19, 20, 0.1)'; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(0, H - 40); ctx.lineTo(W, H - 40); ctx.stroke();
-
-      // --- 2. GESTIÓN DE LA PELOTA EN LA BANDA ---
-      if (ball.active) {
-        if (isAuto) {
-          if (!grabbed) {
-            if (ball.x < grabPoint) ball.x += 1.8;
-            else ball.x = grabPoint; // Pausa en punto estático de recogida
-            targetX = ball.x; targetY = ball.y;
-          }
-        } else {
-          ball.x = grabPoint;
-        }
+      // Dibujar la pelota
+      if (ball.active && (!grabbed || !isAuto)) {
         ctx.fillStyle = '#D8A499';
         ctx.beginPath();
         ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // --- 3. LOGICAS OPERACIONALES ---
-      if (isAuto) {
-        if (ball.active && Math.abs(ball.x - grabPoint) < 2 && !grabbed) {
-          if (Math.abs(targetX - ball.x) < 4) {
-            grabbed = true;
-          }
+      // --- 5. RENDERIZADO DEL BRAZO CON CONFIGURACIÓN CODO ARRIBA ---
+      const j1x = basex + L1 * Math.cos(theta1);
+      const j1y = basey - L1 * Math.sin(theta1); // py invertido para canvas
+      
+      const j2x = j1x + L2 * Math.cos(theta1 + theta2);
+      const j2y = j1y - L2 * Math.sin(theta1 + theta2);
+
+      // Eslabón 1 (Verde salvia)
+      ctx.lineWidth = 13; ctx.lineCap = 'round';
+      ctx.strokeStyle = '#4E5E52';
+      ctx.beginPath(); ctx.moveTo(basex, basey); ctx.lineTo(j1x, j1y); ctx.stroke();
+
+      // Eslabón 2 (Azul glaciar)
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = '#8FA9C4';
+      ctx.beginPath(); ctx.moveTo(j1x, j1y); ctx.lineTo(j2x, j2y); ctx.stroke();
+
+      // Juntas articulares (Puntos de pivote)
+      ctx.fillStyle = '#F4F1EA';
+      ctx.beginPath(); ctx.arc(j1x, j1y, 4.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(j2x, j2y, 4.5, 0, Math.PI * 2); ctx.fill();
+
+      // Base estructural
+      ctx.fillStyle = '#4E5E52';
+      ctx.beginPath(); ctx.arc(basex, basey, 14, Math.PI, 0); ctx.fill();
+
+      // Efector final / Gripper (Sombra activa al agarrar)
+      ctx.strokeStyle = grabbed ? '#D8A499' : '#121314'; 
+      ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(j2x, j2y); ctx.lineTo(j2x, j2y + 12); ctx.stroke();
+
+      // --- 6. OSCILOSCOPIO DINÁMICO TÉCNICO (SINTONIZACIÓN PID) ---
+      const plotX = W - 300;
+      const plotY = 75;
+      const plotW = 250;
+      const plotH = 100;
+
+      ctx.fillStyle = 'rgba(18, 19, 20, 0.02)'; ctx.fillRect(plotX, plotY, plotW, plotH);
+      ctx.strokeStyle = 'rgba(18, 19, 20, 0.1)'; ctx.lineWidth = 1;
+      ctx.strokeRect(plotX, plotY, plotW, plotH);
+
+      // Trazar rejilla de scope
+      ctx.strokeStyle = 'rgba(18, 19, 20, 0.03)';
+      ctx.beginPath();
+      ctx.moveTo(plotX + plotW/2, plotY); ctx.lineTo(plotX + plotW/2, plotY + plotH);
+      ctx.moveTo(plotX, plotY + plotH/2); ctx.lineTo(plotX + plotW, plotY + plotH/2);
+      ctx.stroke();
+
+      // Dibujar curvas de telemetría de control
+      const drawScopeCurve = (history: number[], color: string, thickness: number) => {
+        ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = thickness;
+        ctx.lineJoin = 'round';
+        
+        // Mapeo automático de escala
+        const minVal = basex - 250;
+        const maxVal = basex + 120;
+        const range = maxVal - minVal;
+
+        for (let i = 0; i < history.length; i++) {
+          const cx = plotX + (i / (history.length - 1)) * plotW;
+          const norm = (history[i] - minVal) / range;
+          const cy = plotY + plotH - (norm * plotH);
+          if (i === 0) ctx.moveTo(cx, cy);
+          else ctx.lineTo(cx, cy);
         }
-        if (grabbed) {
-          // Destino en la estantería actual libre
-          const targetShelfY = H - 62 - (shelfBalls.length * 22);
-          targetX = shelfX + 16;
-          targetY = targetShelfY;
-          ball.x = basex + L1 * Math.cos(t1) + L2 * Math.cos(t1 + t2);
-          ball.y = basey + L1 * Math.sin(t1) + L2 * Math.sin(t1 + t2);
-
-          // Soltar pelota al alcanzar la coordenada
-          if (Math.abs(ball.x - targetX) < 8 && Math.abs(ball.y - targetY) < 8) {
-            shelfBalls.push({ x: targetX, y: targetY });
-            grabbed = false;
-            ball.active = false;
-
-            // Vaciar estantería si está completa
-            if (shelfBalls.length >= maxShelf) {
-              setTimeout(() => { shelfBalls = []; }, 800);
-            }
-
-            // Reposicionar nueva bola tras retardo
-            setTimeout(() => {
-              ball.x = 0; ball.y = H - 52; ball.active = true;
-            }, 1000);
-          }
-        }
-      } else {
-        // Control manual sintonizado con teclas
-        const speed = 4;
-        if (keysPressed['w'] || keysPressed['arrowup']) targetY -= speed;
-        if (keysPressed['s'] || keysPressed['arrowdown']) targetY += speed;
-        if (keysPressed['a'] || keysPressed['arrowleft']) targetX -= speed;
-        if (keysPressed['d'] || keysPressed['arrowright']) targetX += speed;
-
-        // Limitar mecánicamente el alcance operacional para prevenir tirones
-        const dist = Math.sqrt(Math.pow(targetX - basex, 2) + Math.pow(targetY - basey, 2));
-        if (dist > (L1 + L2) - 4) {
-          const angle = Math.atan2(targetY - basey, targetX - basex);
-          targetX = basex + ((L1 + L2) - 4) * Math.cos(angle);
-          targetY = basey + ((L1 + L2) - 4) * Math.sin(angle);
-        }
-
-        // Detección de colisión manual para recoger la bola
-        const dToBall = Math.sqrt(Math.pow(targetX - ball.x, 2) + Math.pow(targetY - ball.y, 2));
-        if (dToBall < 12 && ball.active && !grabbed) {
-          grabbed = true;
-        }
-
-        if (grabbed) {
-          ball.x = targetX; ball.y = targetY;
-          // Soltar automáticamente al arrastrarla cerca del estante
-          if (ball.x > shelfX && ball.y < H - 50) {
-            shelfBalls.push({ x: shelfX + 16, y: ball.y });
-            grabbed = false;
-            ball.active = false;
-            if (shelfBalls.length >= maxShelf) {
-              setTimeout(() => { shelfBalls = []; }, 800);
-            }
-            setTimeout(() => { ball.x = grabPoint; ball.y = H - 52; ball.active = true; }, 1200);
-          }
-        }
-
-        // Retícula de puntero manual
-        ctx.strokeStyle = 'rgba(216, 164, 153, 0.4)'; ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.arc(targetX, targetY, 8, 0, Math.PI * 2); ctx.stroke();
+        ctx.stroke();
       }
 
-      solveIK(targetX, targetY);
+      drawScopeCurve(setpointHistory, 'rgba(143, 169, 196, 0.5)', 1.5); // Setpoint en Azul sutil
+      drawScopeCurve(responseHistory, '#4E5E52', 1.8); // Respuesta de proceso en Verde Salvia
 
-      // --- 4. RENDERIZADO DEL BRAZO ROBÓTICO ---
-      const j1x = basex + L1 * Math.cos(t1);
-      const j1y = basey + L1 * Math.sin(t1);
-      const j2x = j1x + L2 * Math.cos(t1 + t2);
-      const j2y = j1y + L2 * Math.sin(t1 + t2);
-
-      // Eslabones
-      ctx.lineWidth = 11; ctx.lineCap = 'round';
-      ctx.strokeStyle = '#4E5E52'; ctx.beginPath(); ctx.moveTo(basex, basey); ctx.lineTo(j1x, j1y); ctx.stroke();
-      ctx.strokeStyle = '#8FA9C4'; ctx.beginPath(); ctx.moveTo(j1x, j1y); ctx.lineTo(j2x, j2y); ctx.stroke();
-
-      // Juntas
-      ctx.fillStyle = '#F4F1EA';
-      ctx.beginPath(); ctx.arc(j1x, j1y, 4, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(j2x, j2y, 4, 0, Math.PI * 2); ctx.fill();
-
-      // Base rotacional
-      ctx.fillStyle = '#4E5E52'; ctx.beginPath(); ctx.arc(basex, basey, 12, Math.PI, 0); ctx.fill();
-
-      // Pinza terminal
-      ctx.strokeStyle = '#121314'; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.moveTo(j2x, j2y); ctx.lineTo(j2x, j2y + 12); ctx.stroke();
+      ctx.fillStyle = '#121314'; ctx.font = "8px Azeret Mono"; ctx.textAlign = "left";
+      ctx.fillText("X-AXIS STEP RESPONSE", plotX, plotY - 6);
 
       robotAnimationId = requestAnimationFrame(draw);
     }
 
-    // Gestionar resize del contenedor de forma dinámica
-    function handleResize() {
-      W = canvas.width = canvas.parentElement!.clientWidth;
-      H = canvas.height = canvas.parentElement!.clientHeight;
-    }
-    window.addEventListener('resize', handleResize);
-
+    // Adaptar y re-escalar de forma síncrona ante eventos de redimensión de pantalla
+    window.addEventListener('resize', resize);
+    resize();
+    
+    // Posición inicial de telemetría amortiguada
+    currentX = xHome; currentY = yHome;
     draw();
   }
 
-  // Escuchar evento del controlador de pestañas para iniciar o detener bucle de renderizado
+  // Suspender renderizado cuando la pestaña no es la activa
   window.addEventListener('tab-changed', (e: any) => {
     if (e.detail.activeTab === 'robotica') {
       if (robotAnimationId === null) initRobotSimulator();
@@ -272,6 +502,8 @@
   });
 
   document.addEventListener('astro:page-load', () => {
-    if (activeSimulation === 'robotica') initRobotSimulator();
+    if ((window as any).activeSimulation === 'robotica') {
+      initRobotSimulator();
+    }
   });
 </script>

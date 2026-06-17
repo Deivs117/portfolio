@@ -1,220 +1,404 @@
 ---
-// Componente modular para el circuito neuronal integrador de derivada
+// Componente modular de Neuro-Simulación con doble estímulo e instrumentación vectorial
 ---
 
 <div class="w-full h-full flex flex-col">
-  <div class="pb-3 flex justify-between items-center shrink-0 border-b border-bio-text/5">
-    <span class="font-code text-[10px] text-bio-rose font-bold">[LAB_02] CIRCUITO INTEGRADOR DE DERIVADA NEURONAL</span>
-    <span class="text-[9px] font-code text-bio-text/60">Haz clic para enfocar. Mantén pulsado o usa la Barra Espaciadora</span>
+  <div class="pb-3 flex justify-between items-center shrink-0 border-b border-bio-text/5 bg-white/40 px-4 rounded-t-2xl">
+    <div class="flex items-center gap-2">
+      <span class="font-code text-[10px] px-2 py-0.5 bg-bio-rose text-white rounded font-bold">NEURO_BIOMIMETIC</span>
+      <span class="font-code text-[10px] text-bio-rose font-bold">CIRCUITO DISPARADOR TRANSITORIO DE PRIMERA DERIVADA</span>
+    </div>
+    <!-- Indicador dinámico de entrada activa -->
+    <div class="flex items-center gap-2">
+      <span id="stimulus-badge" class="font-code text-[9px] px-2 py-0.5 bg-bio-text/10 text-bio-text/70 rounded font-bold transition-all">ESTÍMULO: REPOSO</span>
+    </div>
   </div>
-  <div class="flex-grow bg-bio-bg/40 border border-bio-text/10 rounded-xl overflow-hidden relative min-h-[380px] mt-4">
+  <div class="flex-grow bg-bio-bg/40 border border-bio-text/10 rounded-b-2xl overflow-hidden relative min-h-[410px] w-full">
     <canvas id="canvas-neuro" class="w-full h-full cursor-pointer block outline-none" tabindex="0"></canvas>
+    <!-- Leyenda técnica -->
     <div class="absolute top-3 right-3 text-[9px] font-code text-bio-text bg-white/95 px-2.5 py-1.5 rounded-lg border border-bio-text/10 shadow-sm flex gap-3">
       <span class="text-bio-blue font-bold">■ Entrada r(t)</span>
-      <span class="text-neutral-800 font-bold">■ Unidad 3 (Pos)</span>
-      <span class="text-bio-rose font-bold">■ Unidad 5 (Neg)</span>
+      <span class="text-neutral-900 font-bold">■ Unidad 3 (Derivada +)</span>
+      <span class="text-bio-rose font-bold">■ Unidad 5 (Derivada -)</span>
+    </div>
+    <!-- Instrucciones de estimulación -->
+    <div class="absolute bottom-3 left-3 bg-white/90 px-3 py-1.5 rounded-lg border border-bio-text/10 shadow-sm text-[9px] font-code text-bio-text/70 pointer-events-none max-w-[340px] leading-relaxed">
+      💡 <strong class="text-bio-rose">Click / Mantener ratón:</strong> Inyectar Escalón • <strong class="text-bio-rose">Barra Espaciadora:</strong> Inyectar Onda Triangular
     </div>
   </div>
 </div>
 
 <script>
   let neuroAnimationId: number | null = null;
+  let isRunning = false;
+  let canvas: HTMLCanvasElement | null = null;
+  let ctx: CanvasRenderingContext2D | null = null;
 
-  function initNeuroSimulator() {
-    const canvas = document.getElementById('canvas-neuro') as HTMLCanvasElement;
-    if (!canvas) return;
+  // --- PARÁMETROS CIENTÍFICOS Y CONSTANTES CORREGIDAS POR DEIVS117 ---
+  const tau = 0.035; // Constante de tiempo sintonizada
+  const a = 1, b = 1, c = 1, M = 500, sigma = 30; 
+  const dt = 0.001; // Paso de integración de Euler
 
-    const ctx = canvas.getContext('2d')!;
-    let W = canvas.width = canvas.parentElement!.clientWidth;
-    let H = canvas.height = canvas.parentElement!.clientHeight;
+  // Variables de estado del modelo de conductancia sináptica
+  let E1 = 0, E2 = 0, E3 = 0, E4 = 0, E5 = 0;
+  let r = 0;
 
-    // Variables de estado del modelo de conductancia sináptica (Euler)
-    let E1=0, E2=0, E3=0, E4=0, E5=0;
-    let r = 0;
-    let isInputActive = false;
+  // Control de estímulo e interacción
+  let isMouseActive = false;
+  let isSpaceActive = false;
+  let t_stimulus = 0; // Tiempo local del generador de funciones
 
-    const tau = 0.01; // constante de tiempo 10ms
-    const a=1, b=1, c=1, M=30, sigma=30; 
-    const dt = 0.001; 
+  // Parámetros de dimensiones y Retina Display
+  let W = 0, H = 0;
+  let dpr = 1;
 
-    // Buffer de trazado acotado al tamaño real
-    const W_plot = Math.floor(W * 0.52);
-    let plotR = Array(W_plot).fill(0);
-    let plotE3 = Array(W_plot).fill(0);
-    let plotE5 = Array(W_plot).fill(0);
+  // Buffers de trazado del osciloscopio
+  let plotW = 0;
+  let plotR: number[] = [];
+  let plotE3: number[] = [];
+  let plotE5: number[] = [];
 
-    // Eventos de interacción de estímulo
-    canvas.addEventListener('keydown', (e) => {
-      if (e.code === 'Space') {
-        isInputActive = true;
-        e.preventDefault();
-      }
-    });
-    canvas.addEventListener('keyup', (e) => {
-      if (e.code === 'Space') {
-        isInputActive = false;
-        e.preventDefault();
-      }
-    });
-    canvas.addEventListener('mousedown', () => { isInputActive = true; });
-    canvas.addEventListener('mouseup', () => { isInputActive = false; });
-    canvas.addEventListener('mouseleave', () => { isInputActive = false; });
+  // Captura del teclado
+  const keysPressed: Record<string, boolean> = {};
 
-    // Integración de ecuaciones diferenciales por diferencia de Euler
-    function solvePhysics() {
-      for (let step = 0; step < 10; step++) {
-        let noise = (Math.random() - 0.5) * 1.5;
-        let target_r = isInputActive ? 22 + noise : Math.max(0, noise * 0.1);
-        r += (target_r - r) * 0.15; // Suavizado de transitorio de entrada r(t)
-
-        // Ecuaciones diferenciales ordinarias de tu investigación
-        E1 += dt * (-E1 + r) / tau;
-        E2 += dt * (-E2 + a * E1) / tau;
-        
-        let term3 = Math.max(0, b * E1 - c * E2);
-        E3 += dt * (-E3 + (M * term3 * term3) / (sigma * sigma + term3 * term3)) / tau;
-        
-        E4 += dt * (-E4 + a * E1) / tau;
-        
-        let term5 = Math.max(0, b * E4 - c * E2);
-        E5 += dt * (-E5 + (M * term5 * term5) / (sigma * sigma + term5 * term5)) / tau;
-      }
-
-      plotR.push(r); plotR.shift();
-      plotE3.push(E3); plotE3.shift();
-      plotE5.push(E5); plotE5.shift();
+  function handleKeyDown(e: KeyboardEvent) {
+    if (e.code === 'Space') {
+      isSpaceActive = true;
+      e.preventDefault(); // Impedir scroll vertical
     }
-
-    function draw() {
-      solvePhysics();
-      ctx.clearRect(0, 0, W, H);
-
-      const midX = W * 0.42;
-
-      // --- 1. GRAFO DE LA RED NEURONAL ACTIVA ---
-      const nodeX1 = midX * 0.22;
-      const nodeX2 = midX * 0.54;
-      const nodeX3 = midX * 0.86;
-
-      const nodeY1 = H * 0.5;
-      const nodeY2 = H * 0.26;
-      const nodeY4 = H * 0.74;
-      const nodeY3 = H * 0.35;
-      const nodeY5 = H * 0.65;
-
-      const drawArrow = (x1: number, y1: number, x2: number, y2: number, isInhibitory = false) => {
-        ctx.strokeStyle = '#8C7870'; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-        
-        const angle = Math.atan2(y2 - y1, x2 - x1);
-        if (!isInhibitory) {
-          ctx.fillStyle = '#8C7870';
-          ctx.beginPath();
-          ctx.moveTo(x2 - 12 * Math.cos(angle), y2 - 12 * Math.sin(angle));
-          ctx.lineTo(x2 - 17 * Math.cos(angle - 0.3), y2 - 17 * Math.sin(angle - 0.3));
-          ctx.lineTo(x2 - 17 * Math.cos(angle + 0.3), y2 - 17 * Math.sin(angle + 0.3));
-          ctx.fill();
-        } else {
-          ctx.fillStyle = '#D8A499'; ctx.strokeStyle = '#8C7870';
-          ctx.beginPath();
-          ctx.arc(x2 - 13 * Math.cos(angle), y2 - 13 * Math.sin(angle), 5, 0, Math.PI * 2);
-          ctx.fill(); ctx.stroke();
-        }
-      }
-
-      // Dibujar cables sinápticos
-      drawArrow(10, nodeY1, nodeX1, nodeY1);
-      drawArrow(nodeX1, nodeY1, nodeX2, nodeY2); 
-      drawArrow(nodeX1, nodeY1, nodeX2, nodeY4); 
-      drawArrow(nodeX1, nodeY1, nodeX3, nodeY3); 
-      drawArrow(nodeX1, nodeY1, nodeX3, nodeY5); 
-      drawArrow(nodeX2, nodeY2, nodeX3, nodeY3, true); // Inhibición
-      drawArrow(nodeX2, nodeY4, nodeX3, nodeY5, true); // Inhibición
-
-      // Dibujar nodos con brillo dinámico
-      const drawNode = (x: number, y: number, label: string, val: number, isGreen = false) => {
-        // Normalización respecto al valor máximo esperado de disparo (~25-30)
-        const alpha = Math.min(1.0, Math.max(0.12, val / 25.0));
-        ctx.fillStyle = isGreen ? `rgba(78,94,82, ${alpha})` : `rgba(216,164,153, ${alpha})`;
-        ctx.strokeStyle = '#121314'; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.arc(x, y, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-
-        ctx.fillStyle = '#121314'; ctx.font = "bold 9px Azeret Mono"; ctx.textAlign = "center";
-        ctx.fillText(label, x, y + 3);
-      }
-
-      drawNode(nodeX1, nodeY1, "U1", E1);
-      drawNode(nodeX2, nodeY2, "U2", E2, true);
-      drawNode(nodeX2, nodeY4, "U4", E4, true);
-      drawNode(nodeX3, nodeY3, "U3", E3);
-      drawNode(nodeX3, nodeY5, "U5", E5);
-
-      // --- 2. PLOT DEL OSCILOSCOPIO OPTIMIZADO EN ESCALA ---
-      const ox = midX + 25;
-      const oy = H - 50;
-      const plotWidth = W - ox - 20;
-      const plotHeight = H - 85;
-
-      // Pantalla de osciloscopio
-      ctx.fillStyle = 'rgba(18, 19, 20, 0.02)'; ctx.fillRect(ox, oy - plotHeight, plotWidth, plotHeight);
-      ctx.strokeStyle = 'rgba(18, 19, 20, 0.08)'; ctx.lineWidth = 1.5;
-      ctx.strokeRect(ox, oy - plotHeight, plotWidth, plotHeight);
-
-      // Rejilla de división
-      ctx.strokeStyle = 'rgba(18, 19, 20, 0.04)';
-      for (let i = 1; i < 4; i++) {
-        const gy = oy - (plotHeight * (i / 4));
-        ctx.beginPath(); ctx.moveTo(ox, gy); ctx.lineTo(ox + plotWidth, gy); ctx.stroke();
-      }
-
-      // Escala sintonizada verticalmente (0 a 30)
-      ctx.fillStyle = '#121314'; ctx.font = "8px Azeret Mono"; ctx.textAlign = "right";
-      ctx.fillText("30 E", ox - 6, oy - plotHeight + 3);
-      ctx.fillText("15", ox - 6, oy - plotHeight/2 + 3);
-      ctx.fillText("0", ox - 6, oy + 2);
-
-      // Escala horizontal temporal
-      ctx.textAlign = "center";
-      ctx.fillText("100ms", ox + plotWidth * 0.12, oy + 12);
-      ctx.fillText("600ms", ox + plotWidth * 0.62, oy + 12);
-      ctx.fillText("1000ms", ox + plotWidth * 0.95, oy + 12);
-
-      // Graficar respuestas neuronales de forma estricta
-      const drawCurve = (data: number[], color: string, thickness: number) => {
-        ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = thickness;
-        ctx.lineJoin = 'round';
-        for (let i = 0; i < data.length; i++) {
-          const cx = ox + (i / data.length) * plotWidth;
-          // Clampear para que no se salga de los límites del recuadro
-          const cy = Math.max(oy - plotHeight, Math.min(oy, oy - (data[i] / 30.0) * plotHeight));
-          if (i === 0) ctx.moveTo(cx, cy);
-          else ctx.lineTo(cx, cy);
-        }
-        ctx.stroke();
-      }
-
-      drawCurve(plotE5, '#D8A499', 3); // Unidad 5 (Negativo - Palo de rosa)
-      drawCurve(plotE3, '#121314', 3); // Unidad 3 (Positivo - Obsidian)
-      drawCurve(plotR, '#8FA9C4', 1.5); // Entrada r(t) (Azul glaciar)
-
-      neuroAnimationId = requestAnimationFrame(draw);
-    }
-
-    draw();
   }
 
+  function handleKeyUp(e: KeyboardEvent) {
+    if (e.code === 'Space') {
+      isSpaceActive = false;
+      e.preventDefault();
+    }
+  }
+
+  // --- ARRANQUE SEGURO CON RETRASO DE ACOMODACIÓN ---
+  function startSimulator() {
+    canvas = document.getElementById('canvas-neuro') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    ctx = canvas.getContext('2d')!;
+    isRunning = true;
+
+    setTimeout(() => {
+      if (!isRunning || !canvas) return;
+      
+      resize();
+      
+      // Suscribir eventos del teclado y ratón
+      canvas.removeEventListener('keydown', handleKeyDown);
+      canvas.addEventListener('keydown', handleKeyDown);
+      canvas.removeEventListener('keyup', handleKeyUp);
+      canvas.addEventListener('keyup', handleKeyUp);
+
+      canvas.removeEventListener('mousedown', setMouseDown);
+      canvas.addEventListener('mousedown', setMouseDown);
+      canvas.removeEventListener('mouseup', setMouseUp);
+      canvas.addEventListener('mouseup', setMouseUp);
+      canvas.removeEventListener('mouseleave', setMouseUp);
+      canvas.addEventListener('mouseleave', setMouseUp);
+
+      window.removeEventListener('resize', resize);
+      window.addEventListener('resize', resize);
+
+      if (neuroAnimationId !== null) cancelAnimationFrame(neuroAnimationId);
+      loop();
+    }, 60);
+  }
+
+  function stopSimulator() {
+    isRunning = false;
+    if (neuroAnimationId !== null) {
+      cancelAnimationFrame(neuroAnimationId);
+      neuroAnimationId = null;
+    }
+  }
+
+  function setMouseDown() { isMouseActive = true; }
+  function setMouseUp() { isMouseActive = false; }
+
+  function resize() {
+    if (!canvas || !ctx) return;
+    const rect = canvas.getBoundingClientRect();
+    
+    const width = rect.width || canvas.parentElement?.clientWidth || 600;
+    const height = rect.height || canvas.parentElement?.clientHeight || 410;
+    
+    dpr = window.devicePixelRatio || 1;
+    
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    
+    ctx.resetTransform();
+    ctx.scale(dpr, dpr);
+    
+    W = width;
+    H = height;
+
+    // Redimensionar el buffer del plot (Estará en el flanco derecho)
+    const midX = W * 0.42;
+    plotW = Math.floor(W - midX - 35);
+    
+    plotR = Array(plotW).fill(0);
+    plotE3 = Array(plotW).fill(0);
+    plotE5 = Array(plotW).fill(0);
+  }
+
+  // --- SOLVER DE ECUACIONES DIFERENCIALES ORDINARIAS (EDO EULER) ---
+  function solvePhysics() {
+    // 10 sub-pasos temporales por frame para estabilidad numérica óptima de Euler con dt=0.001
+    for (let step = 0; step < 10; step++) {
+      let noise = (Math.random() - 0.5) * 1.8;
+      let target_r = 0;
+
+      const badge = document.getElementById('stimulus-badge');
+
+      if (isSpaceActive) {
+        // --- SEÑAL TRIANGULAR (CREADA POR DEIVS117 Y GEMINI) ---
+        t_stimulus += dt * 10; // Avanzar tiempo del generador
+        const period = 6.0; // Periodo de 1.6 segundos
+        const phase = (t_stimulus % period) / period; // Fase normalizada [0, 1)
+        const amplitude = 22;
+
+        if (phase < 0.5) {
+          target_r = 2.25 * amplitude * phase; // Pendiente positiva (Subida)
+        } else {
+          target_r = 2.25 * amplitude * (1 - phase); // Pendiente negativa (Bajada)
+        }
+        target_r += noise * 0.45; // Añadir un leve ruido realístico de fondo
+
+        if (badge) {
+          badge.innerText = "ESTÍMULO: ONDA TRIANGULAR";
+          badge.className = "font-code text-[9px] px-2 py-0.5 bg-bio-blue text-white rounded font-bold animate-pulse";
+        }
+      } else if (isMouseActive) {
+        // --- SEÑAL EN ESCALÓN (STEP) ---
+        target_r = 22 + noise; // Escalón de amplitud constante con ruido gaussiano
+        t_stimulus = 0; // Sincronizar fase
+
+        if (badge) {
+          badge.innerText = "ESTÍMULO: ESCALÓN (STEP)";
+          badge.className = "font-code text-[9px] px-2 py-0.5 bg-bio-rose text-white rounded font-bold animate-pulse";
+        }
+      } else {
+        // --- REPOSO ---
+        target_r = Math.max(0, noise * 0.1); // Mínima fluctuación basal
+        t_stimulus = 0;
+
+        if (badge) {
+          badge.innerText = "ESTÍMULO: REPOSO";
+          badge.className = "font-code text-[9px] px-2 py-0.5 bg-bio-text/10 text-bio-text/70 rounded font-bold";
+        }
+      }
+
+      // Filtro de acople transitorio de la señal de entrada r(t)
+      r += (target_r - r) * 0.15;
+
+      // Integración por diferencias de Euler de tu modelo neuronal
+      E1 += dt * (-E1 + r) / tau;
+      E2 += dt * (-E2 + a * E1) / tau;
+      
+      let term3 = Math.max(0, b * E1 - c * E2);
+      E3 += dt * (-E3 + (M * term3 * term3) / (sigma * sigma + term3 * term3)) / tau;
+      
+      E4 += dt * (-E4 + a * E1) / tau;
+      
+      // Ecuación corregida de forma exacta por el desarrollador
+      let term5 = Math.max(0, b * E4 - c * E1);
+      E5 += dt * (-E5 + (M * term5 * term5) / (sigma * sigma + term5 * term5)) / tau;
+    }
+
+    // Insertar en los arreglos de plot y desplazar la cola
+    plotR.push(r); plotR.shift();
+    plotE3.push(E3); plotE3.shift();
+    plotE5.push(E5); plotE5.shift();
+  }
+
+  // --- BUCLE DE SIMULACIÓN Y RENDERIZADO VECTORIAL ---
+  function loop() {
+    if (!isRunning || !ctx) return;
+
+    solvePhysics();
+    ctx.clearRect(0, 0, W, H);
+
+    const midX = W * 0.40;
+
+    // --- 1. GRAFO REDISEÑADO SIN SUPERPOSICIONES ---
+    const nodeRadius = 16;
+    const nodeX1 = midX * 0.22;
+    const nodeX2 = midX * 0.54;
+    const nodeX3 = midX * 0.86;
+
+    const nodeY1 = H * 0.5;
+    const nodeY2 = H * 0.26;
+    const nodeY4 = H * 0.74;
+    const nodeY3 = H * 0.35;
+    const nodeY5 = H * 0.65;
+
+    // Algoritmo geométrico para calcular el borde exacto de la circunferencia
+    const drawSynapse = (x1: number, y1: number, x2: number, y2: number, isInhibitory = false) => {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      
+      if (dist < 2 * nodeRadius) return;
+
+      const ux = dx / dist;
+      const uy = dy / dist;
+
+      // El trazo inicia exactamente en el perímetro del nodo origen
+      const sx = x1 + nodeRadius * ux;
+      const sy = y1 + nodeRadius * uy;
+
+      // El trazo termina exactamente en el perímetro del nodo destino
+      const ex = x2 - nodeRadius * ux;
+      const ey = y2 - nodeRadius * uy;
+
+      ctx!.beginPath();
+      ctx!.moveTo(sx, sy);
+
+      if (isInhibitory) {
+        // Conexión Inhibitoria (Palo de rosa)
+        const dotRadius = 3.5;
+        // Restar espacio del dot para que no quede encima del círculo
+        const lx = ex - dotRadius * ux;
+        const ly = ey - dotRadius * uy;
+        
+        ctx!.lineTo(lx, ly);
+        ctx!.strokeStyle = '#D8A499'; ctx!.lineWidth = 2.0; ctx!.stroke();
+
+        // Pequeño círculo inhibitorio justo afuera de la membrana
+        ctx!.fillStyle = '#D8A499'; ctx!.strokeStyle = '#121314'; ctx!.lineWidth = 1.5;
+        ctx!.beginPath();
+        ctx!.arc(lx, ly, dotRadius, 0, Math.PI * 2);
+        ctx!.fill(); ctx!.stroke();
+      } else {
+        // Conexión Excitatoria (Verde salvia con flecha clásica)
+        ctx!.lineTo(ex, ey);
+        ctx!.strokeStyle = '#4E5E52'; ctx!.lineWidth = 2.0; ctx!.stroke();
+
+        // Cabeza de flecha alineada al vector director ux, uy
+        const arrowLen = 7.5;
+        const angle = Math.atan2(dy, dx);
+        ctx!.fillStyle = '#4E5E52';
+        ctx!.beginPath();
+        ctx!.moveTo(ex, ey);
+        ctx!.lineTo(ex - arrowLen * Math.cos(angle - 0.3), ey - arrowLen * Math.sin(angle - 0.3));
+        ctx!.lineTo(ex - arrowLen * Math.cos(angle + 0.3), ey - arrowLen * Math.sin(angle + 0.3));
+        ctx!.fill();
+      }
+    }
+
+    // Dibujar cableado sináptico con offset calculado
+    drawSynapse(15, nodeY1, nodeX1, nodeY1); // Flecha de entrada basal
+    drawSynapse(nodeX1, nodeY1, nodeX2, nodeY2); // 1 -> 2
+    drawSynapse(nodeX1, nodeY1, nodeX2, nodeY4); // 1 -> 4
+    drawSynapse(nodeX1, nodeY1, nodeX3, nodeY3); // 1 -> 3
+    drawSynapse(nodeX1, nodeY1, nodeX3, nodeY5); // 1 -> 5
+    drawSynapse(nodeX2, nodeY2, nodeX3, nodeY3, true); // 2 -> 3 (Inhibitorio)
+    drawSynapse(nodeX2, nodeY4, nodeX3, nodeY5, true); // 4 -> 5 (Inhibitorio)
+
+    // Renderizado de las neuronas (Nodos con brillo y opacidad proporcionales a su potencial de acción)
+    const drawNeuronNode = (x: number, y: number, name: string, actVal: number, isInhibitory = false) => {
+      // Normalizar la opacidad respecto al rango dinámico esperado de disparo [0 - 25]
+      const intensity = Math.min(1.0, Math.max(0.15, actVal / 25.0));
+      
+      ctx!.fillStyle = isInhibitory ? `rgba(78,94,82, ${intensity})` : `rgba(216,164,153, ${intensity})`;
+      ctx!.strokeStyle = '#121314'; ctx!.lineWidth = 2.5;
+      
+      ctx!.beginPath();
+      ctx!.arc(x, y, nodeRadius, 0, Math.PI * 2);
+      ctx!.fill(); ctx!.stroke();
+
+      // Etiqueta del nodo
+      ctx!.fillStyle = '#121314'; ctx!.font = "bold 9px Azeret Mono"; ctx!.textAlign = "center";
+      ctx!.fillText(name, x, y + 3.5);
+    }
+
+    drawNeuronNode(nodeX1, nodeY1, "U1", E1);
+    drawNeuronNode(nodeX2, nodeY2, "U2", E2, true);
+    drawNeuronNode(nodeX2, nodeY4, "U4", E4, true);
+    drawNeuronNode(nodeX3, nodeY3, "U3", E3*5);
+    drawNeuronNode(nodeX3, nodeY5, "U5", E5*5);
+
+    // --- 2. OSCILOSCOPIO CIENTÍFICO CON ESCALA DELIMITADA ---
+    const ox = midX + 25;
+    const oy = H - 55;
+    const plotHeight = H - 120;
+
+    // Caja de trazado
+    ctx.fillStyle = 'rgba(18, 19, 20, 0.02)'; ctx.fillRect(ox, oy - plotHeight, plotW, plotHeight);
+    ctx.strokeStyle = 'rgba(18, 19, 20, 0.08)'; ctx.lineWidth = 1.5;
+    ctx.strokeRect(ox, oy - plotHeight, plotW, plotHeight);
+
+    // Grilla vertical interna (Estilo osciloscopio analógico)
+    ctx.strokeStyle = 'rgba(18, 19, 20, 0.03)'; ctx.lineWidth = 1;
+    for (let i = 1; i < 4; i++) {
+      const gy = oy - (plotHeight * (i / 4));
+      ctx.beginPath(); ctx.moveTo(ox, gy); ctx.lineTo(ox + plotW, gy); ctx.stroke();
+    }
+
+    // Ticks verticales fijos [0 - 30] correspondientes a tu publicación científica
+    ctx.fillStyle = '#121314'; ctx.font = "8px Azeret Mono"; ctx.textAlign = "right";
+    ctx.fillText("30 E", ox - 6, oy - plotHeight + 3);
+    ctx.fillText("15", ox - 6, oy - plotHeight / 2 + 3);
+    ctx.fillText("0", ox - 6, oy + 2.5);
+
+    // Escala horizontal temporal (ms)
+    ctx.textAlign = "center";
+    ctx.fillText("-1000ms", ox + plotW * 0.12, oy + 12);
+    ctx.fillText("-600ms", ox + plotW * 0.62, oy + 12);
+    ctx.fillText("-100ms", ox + plotW * 0.95, oy + 12);
+
+    // Renderizar curvas vectoriales analíticas
+    const drawTrace = (data: number[], color: string, thick: number) => {
+      ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = thick;
+      ctx.lineJoin = 'round';
+      
+      for (let i = 0; i < data.length; i++) {
+        const cx = ox + (i / (data.length - 1)) * plotW;
+        // Clampar para evitar desbordes visuales fuera de la grilla
+        const cy = Math.max(oy - plotHeight, Math.min(oy, oy - (data[i] / 30.0) * plotHeight));
+        
+        if (i === 0) ctx.moveTo(cx, cy);
+        else ctx.lineTo(cx, cy);
+      }
+      ctx.stroke();
+    }
+
+    // Trazar señales
+    drawTrace(plotE5, '#D8A499', 3.0); // Unidad 5 (Palo de rosa - Derivada negativa)
+    drawTrace(plotE3, '#121314', 3.0); // Unidad 3 (Obsidian - Derivada positiva)
+    drawTrace(plotR, '#8FA9C4', 1.5);  // Entrada r(t) (Azul glaciar)
+
+    neuroAnimationId = requestAnimationFrame(loop);
+  }
+
+  // --- ESCUCHAR EVENTOS DE CICLO DE VIDA ---
   window.addEventListener('tab-changed', (e: any) => {
     if (e.detail.activeTab === 'neuro') {
-      if (neuroAnimationId === null) initNeuroSimulator();
+      startSimulator();
     } else {
-      if (neuroAnimationId !== null) {
-        cancelAnimationFrame(neuroAnimationId);
-        neuroAnimationId = null;
-      }
+      stopSimulator();
     }
   });
 
   document.addEventListener('astro:page-load', () => {
-    if (activeSimulation === 'neuro') initNeuroSimulator();
+    if ((window as any).activeSimulation === 'neuro') {
+      startSimulator();
+    } else {
+      stopSimulator();
+    }
   });
 </script>
+
+<style>
+  /* Animación fluida de desvanecimiento */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>

@@ -4,169 +4,342 @@ import FondoTuring from '../components/FondoTuring.astro';
 ---
 
 <LayoutBase title="Sobre mí">
-  <!-- Fondo matemático dinámico bio-inspirado -->
+  <!-- Fondo matemático interactivo bio-inspirado Verde Salvia -->
   <FondoTuring />
 
-  <div class="space-y-16 animate-[fadeIn_0.6s_ease-out]">
+  <div class="space-y-20 animate-[fadeIn_0.6s_ease-out]">
     
-    <!-- SECCIÓN HERO: Presentación Disruptiva -->
-    <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center min-h-[60vh]">
+    <!-- SECCIÓN HERO: El Manifiesto y la Ingeniería Balanceada -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center min-h-[70vh] pt-4 md:pt-8">
       
-      <!-- Bloque Izquierdo: Pitch Personal (7 Columnas) -->
+      <!-- Bloque Izquierdo: Pitch Profesional & Artístico (7 Columnas) -->
       <div class="lg:col-span-7 space-y-6">
         <div class="inline-flex items-center gap-2 px-3 py-1 bg-bio-green/10 text-bio-green rounded-full border border-bio-green/20">
-          <span class="font-code text-[10px] font-bold tracking-wider">SISTEMAS BIO-INSPIRADOS</span>
+          <span class="h-1.5 w-1.5 rounded-full bg-bio-rose animate-pulse"></span>
+          <span class="font-code text-[10px] font-bold tracking-wider uppercase">Ingeniería & Diseño Bio-Inspirado</span>
         </div>
         
-        <h1 class="text-4xl md:text-5xl lg:text-6xl tracking-tight text-bio-text font-tech">
-          Donde la precisión de la <span class="text-bio-green underline decoration-bio-rose decoration-wavy underline-offset-4">mecatrónica</span> emula a la naturaleza.
+        <h1 class="text-4xl md:text-5xl lg:text-6xl tracking-tight text-bio-text font-tech leading-none">
+          No soy un Da Vinci, <br class="hidden md:inline" />
+          no soy un Picasso, <br />
+          <span class="text-bio-green underline decoration-bio-rose decoration-wavy underline-offset-4">pero soy feliz creando.</span>
         </h1>
         
-        <p class="text-base md:text-lg text-bio-text/85 leading-relaxed font-sans max-w-xl">
-          Hola, soy un ingeniero mecatrónico apasionado por la intersección entre el hardware de control de precisión, el desarrollo frontend interactivo y los algoritmos inspirados en la biología.
+        <!-- Texto modificado para dar un balance técnico riguroso y profesional -->
+        <p class="text-base md:text-lg text-bio-text/85 leading-relaxed font-sans max-w-2xl">
+          Como <span class="font-bold text-bio-green">Ingeniero Mecatrónico especialista en Inteligencia Artificial</span>, mi núcleo profesional radica en el diseño de sistemas dinámicos de control, automatización industrial y robótica autónoma. No concibo la ingeniería como una estructura rígida y fría; para mí, el <span class="font-bold text-bio-blue">desarrollo Frontend</span> es mi pincel tecnológico. Es el espacio donde convergen la matemática y la estética para dar color, movimiento y un sentido intuitivo a las ideas complejas.
         </p>
+
+        <!-- Bloque de Cita Destacada: Tu Esencia de Aprendizaje -->
+        <div class="border-l-3 border-bio-rose pl-4 py-1.5 bg-white/30 backdrop-blur-sm rounded-r-xl max-w-xl">
+          <p class="text-xs md:text-sm italic text-bio-brown font-medium leading-relaxed">
+            "Nunca me canso de mirar el mundo con otros ojos, de redescubrir las leyes físicas del universo y de explorar nuevas perspectivas teóricas para explicárselas de manera didáctica a los demás."
+          </p>
+        </div>
 
         <div class="flex flex-wrap gap-4 pt-2">
           <a 
             href="/portfolio/proyectos/" 
             class="px-5 py-3 bg-bio-green hover:bg-bio-green/90 text-bio-bg font-code text-xs font-bold rounded-xl shadow-md hover:scale-[1.02] transition-all flex items-center gap-2"
           >
-            Explorar Proyectos
+            Ver mis Proyectos
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
           </a>
           <a 
             href="/portfolio/divulgacion/" 
             class="px-5 py-3 border border-bio-text/20 hover:bg-bio-text/5 text-bio-text font-code text-xs font-bold rounded-xl transition-all"
           >
-            Artículos de Divulgación
+            Divulgación Científica
           </a>
         </div>
       </div>
 
-      <!-- Bloque Derecho: Telemetría / Grid de Identidad (5 Columnas) -->
-      <div class="lg:col-span-5 bg-white/40 backdrop-blur-md p-6 rounded-2xl border border-bio-text/10 shadow-sm relative overflow-hidden">
-        <!-- Grid decorativo mecatrónico -->
+      <!-- Bloque Derecho: Tu Perfil Técnico / Consola de Telemetría Interactiva (5 Columnas) -->
+      <div class="lg:col-span-5 bg-white/60 backdrop-blur-md p-6 rounded-2xl border border-bio-text/10 shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[440px]">
+        <!-- Grid decorativo de ingeniería -->
         <div class="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:12px_12px]"></div>
         
-        <div class="flex justify-between items-center border-b border-bio-text/10 pb-4 mb-4">
-          <span class="font-code text-[10px] text-bio-text/50">SYSTEM_CORE: STATUS_01</span>
-          <span class="text-[9px] font-code bg-bio-rose/20 text-bio-brown px-2 py-0.5 rounded">ONLINE</span>
-        </div>
-
-        <!-- Atributos Técnicos Interactivos -->
-        <div class="space-y-4">
-          <div class="space-y-1">
-            <div class="flex justify-between text-xs font-code">
-              <span class="text-bio-text/70">⚡ Automatización y Robótica</span>
-              <span class="font-bold text-bio-green">95%</span>
-            </div>
-            <div class="w-full bg-bio-text/10 h-1.5 rounded-full overflow-hidden">
-              <div class="bg-bio-green h-full rounded-full" style="width: 95%"></div>
-            </div>
+        <div class="z-10">
+          <div class="flex justify-between items-center border-b border-bio-text/10 pb-4 mb-4">
+            <span class="font-code text-[10px] text-bio-text/50">PROFILE // TELEMETRY_CORE_01</span>
+            <span class="text-[9px] font-code bg-bio-green/20 text-bio-green px-2 py-0.5 rounded font-bold animate-pulse">RUNNING</span>
           </div>
 
-          <div class="space-y-1">
-            <div class="flex justify-between text-xs font-code">
-              <span class="text-bio-text/70">🎨 Desarrollo Frontend / Shaders</span>
-              <span class="font-bold text-bio-blue">90%</span>
+          <!-- Ficha de Ingeniería con tus Hitos de Carrera -->
+          <div class="space-y-3">
+            <div class="grid grid-cols-3 py-2 border-b border-bio-text/5">
+              <span class="font-code text-[11px] text-bio-text/50 uppercase">Formación</span>
+              <span class="font-tech text-xs font-bold text-bio-text col-span-2">Ingeniero Mecatrónico (AI Specialist)</span>
             </div>
-            <div class="w-full bg-bio-text/10 h-1.5 rounded-full overflow-hidden">
-              <div class="bg-bio-blue h-full rounded-full" style="width: 90%"></div>
+            <div class="grid grid-cols-3 py-2 border-b border-bio-text/5">
+              <span class="font-code text-[11px] text-bio-text/50 uppercase">Hito Clave</span>
+              <span class="font-tech text-xs font-bold text-bio-text col-span-2">Doble Titulación completada a los 21 años</span>
             </div>
-          </div>
-
-          <div class="space-y-1">
-            <div class="flex justify-between text-xs font-code">
-              <span class="text-bio-text/70">🧬 Algoritmos Biológicos (AI/Turing)</span>
-              <span class="font-bold text-bio-rose">85%</span>
+            <div class="grid grid-cols-3 py-2 border-b border-bio-text/5">
+              <span class="font-code text-[11px] text-bio-text/50 uppercase">Enfoque</span>
+              <span class="font-tech text-xs font-bold text-bio-text col-span-2">Control Automático & Sistemas Dinámicos</span>
             </div>
-            <div class="w-full bg-bio-text/10 h-1.5 rounded-full overflow-hidden">
-              <div class="bg-bio-rose h-full rounded-full" style="width: 85%"></div>
+            <div class="grid grid-cols-3 py-1">
+              <span class="font-code text-[11px] text-bio-text/50 uppercase">Creatividad</span>
+              <span class="font-tech text-xs font-bold text-bio-rose col-span-2">Simulaciones Gráficas & Frontend</span>
             </div>
           </div>
         </div>
 
-        <!-- ASCII mecatrónico e información resumida -->
-        <div class="mt-6 p-4 bg-bio-bg/60 border border-bio-text/5 rounded-xl text-center">
-          <pre class="font-code text-xs text-bio-brown leading-tight select-none">
-  ┌─────────────────────────────────┐
-  │  ▲   Control PID & Estabilidad   │
-  │  ⚙   Kinematics & Dinámica       │
-  │  ✦   Bio-Inspired Algorithms     │
-  └─────────────────────────────────┘
-          </pre>
-          <p class="text-[10px] font-code text-bio-text/60 mt-3 leading-relaxed">
-            Especialista en estructurar interfaces web pesadas donde la visualización de datos y simulaciones físicas convergen elegantemente.
-          </p>
+        <!-- Terminal de Comando Interactiva (Typewriter Telemetry) que reemplaza al ASCII ineficiente -->
+        <div class="mt-6 p-4 bg-bio-text/[0.03] border border-bio-text/10 rounded-xl z-10">
+          <div class="flex items-center gap-1.5 pb-2 border-b border-bio-text/10 mb-2">
+            <span class="h-2 w-2 rounded-full bg-bio-rose"></span>
+            <span class="h-2 w-2 rounded-full bg-bio-blue"></span>
+            <span class="h-2 w-2 rounded-full bg-bio-green"></span>
+            <span class="font-code text-[9px] text-bio-text/40 ml-1">terminal_output.sh</span>
+          </div>
+          
+          <!-- Elemento que albergará el script de escritura automática -->
+          <div id="telemetry-terminal" class="font-code text-[10px] text-bio-green leading-relaxed min-h-[120px] whitespace-pre-line">
+            <!-- El código interactivo escribirá aquí en tiempo real -->
+          </div>
+          
+          <div class="flex justify-between items-center mt-3 text-[8px] font-code text-bio-text/40">
+            <span>BAUD_RATE: 115200 bps</span>
+            <span>SYSTEM_CPU: OPTIMAL</span>
+          </div>
         </div>
+
       </div>
 
     </section>
 
-    <!-- SECCIÓN: Filosofía & Áreas de Enfoque -->
+    <!-- SECCIÓN INTERACTIVA: El Tablero de Exploración de Deivs117 -->
     <section class="space-y-8 border-t border-bio-text/10 pt-16">
       <div class="max-w-3xl">
-        <h2 class="text-3xl font-tech text-bio-text">Filosofía de Desarrollo</h2>
+        <h2 class="text-3xl font-tech text-bio-text tracking-tight">El Tablero del Aprendiz</h2>
         <p class="text-sm md:text-base text-bio-text/70 font-sans mt-2">
-          La ingeniería moderna no solo debe ser funcional y precisa, debe ser elegante y entender las dinámicas complejas del entorno real. Mi enfoque une tres mundos complementarios:
+          Haz clic en las diferentes pestañas para explorar cómo interactúan mis pasiones, mis estudios y mi experiencia simulando dinámicas naturales.
         </p>
       </div>
 
-      <!-- Grilla de Pilares -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Sistema de Tabs Interactivas -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        <!-- Pilar 1 -->
-        <div class="bg-white/60 p-6 rounded-2xl border border-bio-text/10 flex flex-col justify-between hover:border-bio-green transition-all group">
-          <div>
-            <div class="h-10 w-10 rounded-lg bg-bio-green/10 flex items-center justify-center text-bio-green mb-4 group-hover:scale-105 transition-transform">
-              ⚙️
+        <!-- Botones de Navegación del Tablero (Left Column) -->
+        <div class="lg:col-span-4 flex flex-col gap-3">
+          <button 
+            id="tab-btn-trayectoria" 
+            class="tab-btn text-left p-4 rounded-xl border border-bio-green text-bio-bg bg-bio-green transition-all flex items-center justify-between group"
+            data-tab="trayectoria"
+          >
+            <div>
+              <span class="block text-[10px] font-code uppercase opacity-70">01 // Hito Profesional</span>
+              <span class="font-tech text-sm font-bold">Mi Trayectoria a los 21</span>
             </div>
-            <h3 class="font-tech text-lg text-bio-text mb-2">Mecatrónica & Control</h3>
-            <p class="text-xs text-bio-text/60 leading-relaxed font-sans">
-              Diseño e implementación de sistemas de control clásico, lógica difusa y modelado matemático para sistemas físicos interactivos en tiempo real.
-            </p>
-          </div>
-          <span class="text-[10px] font-code text-bio-green mt-4 block">PID • LQR • DINÁMICA DE SISTEMAS</span>
+            <span class="text-xs">⚡</span>
+          </button>
+
+          <button 
+            id="tab-btn-neuro" 
+            class="tab-btn text-left p-4 rounded-xl border border-bio-text/10 text-bio-text bg-white/40 hover:bg-white/70 transition-all flex items-center justify-between group"
+            data-tab="neuro"
+          >
+            <div>
+              <span class="block text-[10px] font-code uppercase opacity-60">02 // Modelado Matemático</span>
+              <span class="font-tech text-sm font-bold">Circuitos y Neuro-Simulación</span>
+            </div>
+            <span class="text-xs">🧬</span>
+          </button>
+
+          <button 
+            id="tab-btn-fascinaciones" 
+            class="tab-btn text-left p-4 rounded-xl border border-bio-text/10 text-bio-text bg-white/40 hover:bg-white/70 transition-all flex items-center justify-between group"
+            data-tab="fascinaciones"
+          >
+            <div>
+              <span class="block text-[10px] font-code uppercase opacity-60">03 // Curiosidad Científica</span>
+              <span class="font-tech text-sm font-bold">Fascinaciones Teóricas</span>
+            </div>
+            <span class="text-xs">🌌</span>
+          </button>
         </div>
 
-        <!-- Pilar 2 -->
-        <div class="bg-white/60 p-6 rounded-2xl border border-bio-text/10 flex flex-col justify-between hover:border-bio-blue transition-all group">
-          <div>
-            <div class="h-10 w-10 rounded-lg bg-bio-blue/10 flex items-center justify-center text-bio-blue mb-4 group-hover:scale-105 transition-transform">
-              🎨
+        <!-- Contenedor de Información del Tablero -->
+        <div class="lg:col-span-8 bg-white/60 backdrop-blur-md p-6 md:p-8 rounded-2xl border border-bio-text/10 shadow-sm min-h-[300px] flex flex-col justify-between">
+          
+          <!-- CONTENIDO 1: Mi Trayectoria -->
+          <div id="tab-content-trayectoria" class="tab-content space-y-4">
+            <div class="flex justify-between items-start">
+              <h3 class="font-tech text-xl text-bio-text">La velocidad de un eterno estudiante</h3>
+              <span class="font-code text-xs px-2.5 py-1 bg-bio-green/10 text-bio-green rounded-full font-bold">Edad: 21 Años</span>
             </div>
-            <h3 class="font-tech text-lg text-bio-text mb-2">Frontend & Animaciones</h3>
-            <p class="text-xs text-bio-text/60 leading-relaxed font-sans">
-              Desarrollo de interfaces ricas, aprovechando la potencia de los gráficos en el cliente mediante aceleración de hardware en el navegador.
+            <p class="text-sm text-bio-text/80 leading-relaxed font-sans">
+              Completar la carrera de <strong class="text-bio-green">Ingeniería Mecatrónica</strong> y la <strong class="text-bio-green">Especialización en Inteligencia Artificial</strong> a los 21 años no es un dato de orgullo arrogante, es la prueba de una mentalidad hambrienta por aprender. Es la velocidad resultante de querer comprender la confluencia entre el mundo de las leyes físicas y las posibilidades lógicas del software.
             </p>
-          </div>
-          <span class="text-[10px] font-code text-bio-blue mt-4 block">HTML5 CANVAS • SHADERS • TAILWIND</span>
-        </div>
-
-        <!-- Pilar 3 -->
-        <div class="bg-white/60 p-6 rounded-2xl border border-bio-text/10 flex flex-col justify-between hover:border-bio-rose transition-all group">
-          <div>
-            <div class="h-10 w-10 rounded-lg bg-bio-rose/10 flex items-center justify-center text-bio-rose mb-4 group-hover:scale-105 transition-transform">
-              🧬
+            <p class="text-sm text-bio-text/80 leading-relaxed font-sans">
+              Esta combinación me faculta para diseñar e implementar robots inteligentes, sistemas industriales que van más allá del control tradicional (PID clásico) y aplicar arquitecturas lógicas de vanguardia a la resolución de problemas reales.
+            </p>
+            <div class="grid grid-cols-2 gap-4 pt-4 text-xs font-code">
+              <div class="p-3 bg-bio-bg/50 rounded-lg border border-bio-text/5">
+                <span class="block font-bold text-bio-green">✓ COGNITIVE HARDWARE</span>
+                Robótica, automatización y modelado de dinámicas físicas.
+              </div>
+              <div class="p-3 bg-bio-bg/50 rounded-lg border border-bio-text/5">
+                <span class="block font-bold text-bio-blue">✓ COGNITIVE SOFTWARE</span>
+                Deep Learning, Redes Neuronales y Frontend estético interactivo.
+              </div>
             </div>
-            <h3 class="font-tech text-lg text-bio-text mb-2">Tecnología Bio-Inspirada</h3>
-            <p class="text-xs text-bio-text/60 leading-relaxed font-sans">
-              Exploración de sistemas dinámicos químicos y biológicos (como autómatas celulares o redes neuronales artificiales) aplicados al diseño artificial.
-            </p>
           </div>
-          <span class="text-[10px] font-code text-bio-rose mt-4 block">ALAN TURING • REDES NEURONALES • CAS</span>
-        </div>
 
+          <!-- CONTENIDO 2: Neuro-Simulación -->
+          <div id="tab-content-neuro" class="tab-content hidden space-y-4">
+            <div class="flex justify-between items-start">
+              <h3 class="font-tech text-xl text-bio-text">Modelado de Circuitos Neuronales Biológicos</h3>
+              <span class="font-code text-xs px-2.5 py-1 bg-bio-rose/10 text-bio-rose rounded-full font-bold">Sistemas Dinámicos</span>
+            </div>
+            <p class="text-sm text-bio-text/80 leading-relaxed font-sans">
+              Uno de los campos donde he explotado mis habilidades es en la simulación de neuronas reales usando <strong class="text-bio-rose">ecuaciones diferenciales</strong>. He trabajado simulando los transitorios y los potenciales de activación (las espigas eléctricas de transmisión de impulsos) en circuitos biológicamente inspirados.
+            </p>
+            <p class="text-sm text-bio-text/80 leading-relaxed font-sans">
+              Esto trasciende las típicas librerías pre-construidas de Deep Learning: es entender desde las matemáticas fundamentales cómo la naturaleza procesa datos en paralelo, para luego emular esos principios óptimos en automatizaciones de hardware real.
+            </p>
+            <div class="p-3 bg-bio-rose/5 rounded-lg border border-bio-rose/20 text-xs font-code text-bio-brown">
+              ⚙️ <strong>Enfoque matemático:</strong> Modelos biofísicos de conductancia (estilo Hodgkin-Huxley) • Comportamientos transitorios • Estabilidad de sistemas dinámicos cerrados.
+            </div>
+          </div>
+
+          <!-- CONTENIDO 3: Fascinaciones Teóricas -->
+          <div id="tab-content-fascinaciones" class="tab-content hidden space-y-4">
+            <div class="flex justify-between items-start">
+              <h3 class="font-tech text-xl text-bio-text">La curiosidad del universo</h3>
+              <span class="font-code text-xs px-2.5 py-1 bg-bio-blue/10 text-bio-blue rounded-full font-bold">Límites del Conocimiento</span>
+            </div>
+            <p class="text-sm text-bio-text/80 leading-relaxed font-sans">
+              Como eterno aprendiz, mantengo mi mente abierta investigando campos que me apasionan profundamente. La <strong class="text-bio-blue">física teórica</strong> y el modelado de dinámicas caóticas son mi forma de recordarme la complejidad maravillosa del universo.
+            </p>
+            <p class="text-sm text-bio-text/80 leading-relaxed font-sans">
+              Asimismo, la <strong class="text-bio-blue">computación cuántica</strong> es un foco de fascinación constante: la idea de computar usando la superposición de estados y el entrelazamiento es la próxima gran revolución lógica para los ingenieros que buscamos romper barreras de procesamiento masivo.
+            </p>
+            <div class="p-3 bg-bio-blue/5 rounded-lg border border-bio-blue/20 text-xs font-code text-bio-text/70">
+              🌌 <strong>Líneas de exploración personal:</strong> Simulación de dinámicas caóticas • Conceptos básicos de algoritmos cuánticos • Autoorganización.
+            </div>
+          </div>
+
+          <!-- Footer del Tablero Informativo -->
+          <div class="border-t border-bio-text/10 pt-4 mt-6 flex justify-between items-center text-[10px] font-code text-bio-text/40">
+            <span>DATOS DE EXPLORACIÓN DE SECCIÓN // DEIVS117</span>
+            <span>PRESIONE OTRA PESTAÑA PARA CAMBIAR CANAL</span>
+          </div>
+
+        </div>
       </div>
     </section>
 
   </div>
 </LayoutBase>
 
+<script>
+  // Lógica interactiva para cambiar de pestaña (Tabs)
+  function initTabs() {
+    const buttons = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        const tabId = button.getAttribute('data-tab');
+
+        buttons.forEach(btn => {
+          btn.classList.remove('bg-bio-green', 'text-bio-bg', 'border-bio-green');
+          btn.classList.add('bg-white/40', 'text-bio-text', 'border-bio-text/10', 'hover:bg-white/70');
+        });
+
+        button.classList.add('bg-bio-green', 'text-bio-bg', 'border-bio-green');
+        button.classList.remove('bg-white/40', 'text-bio-text', 'border-bio-text/10', 'hover:bg-white/70');
+
+        contents.forEach(content => {
+          content.classList.add('hidden');
+        });
+
+        const targetContent = document.getElementById(`tab-content-${tabId}`);
+        if (targetContent) {
+          targetContent.classList.remove('hidden');
+          targetContent.classList.add('animate-[fadeIn_0.3s_ease-out]');
+        }
+      });
+    });
+  }
+
+  // Lógica interactiva de Typewriter para la terminal de telemetría
+  let terminalInterval: number | undefined;
+
+  function initTelemetryTerminal() {
+    const terminal = document.getElementById('telemetry-terminal');
+    if (!terminal) return;
+
+    // Limpiamos cualquier intervalo activo previo para prevenir memory leaks en ViewTransitions
+    if (terminalInterval) {
+      clearInterval(terminalInterval);
+    }
+
+    const logLines = [
+      "> cargando nucleo_deivs117.sh...",
+      "> inicializando kernel de control robotico...",
+      "> sintonizando controladores PID... [OK]",
+      "  - kp: 1.25 | ki: 0.04 | kd: 0.12",
+      "> resolviendo ecuaciones de conductancia...",
+      "  - modelo: hodgkin_huxley_v2.0",
+      "  - transitorio neuronal: estable",
+      "> conectando modelos de deep learning...",
+      "  - backend turing tensor: online",
+      "> activando motor grafico frontend (canvas 2d)...",
+      "> sistema mecatronico nominal. listo para crear."
+    ];
+
+    let lineIndex = 0;
+    let charIndex = 0;
+    let currentText = "";
+    terminal.innerHTML = "";
+
+    function typeChar() {
+      if (lineIndex < logLines.length) {
+        const currentLine = logLines[lineIndex];
+        
+        if (charIndex < currentLine.length) {
+          currentText += currentLine[charIndex];
+          terminal!.innerHTML = currentText + "█"; // Cursor de terminal parpadeante
+          charIndex++;
+        } else {
+          currentText += "\n";
+          lineIndex++;
+          charIndex = 0;
+          // Pequeña pausa antes de saltar a escribir la siguiente línea
+          setTimeout(typeChar, 180);
+          return;
+        }
+      } else {
+        // Al terminar, esperamos un momento y reiniciamos el loop
+        setTimeout(() => {
+          lineIndex = 0;
+          charIndex = 0;
+          currentText = "";
+          terminal!.innerHTML = "";
+          typeChar();
+        }, 5000);
+        return;
+      }
+    }
+
+    // Ajustamos la velocidad del typewriter a 18ms por caracter para que sea fluido
+    terminalInterval = window.setInterval(typeChar, 18);
+  }
+
+  // Ejecución sincronizada con las transiciones estáticas de Astro
+  document.addEventListener('astro:page-load', () => {
+    initTabs();
+    initTelemetryTerminal();
+  });
+</script>
+
 <style>
-  /* Animación sutil de entrada de página */
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
 </style>

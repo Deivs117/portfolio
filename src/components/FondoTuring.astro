@@ -1,14 +1,15 @@
 ---
 // Componente de Fondo Turing con simulación Reacción-Difusión Gray-Scott
-// Configurado con contraste ultra suave para servir como marca de agua orgánica interactiva
+// Configurado con la paleta Verde Salvia sobre Beige para una textura orgánica interactiva
 ---
 
-<div class="fixed inset-0 -z-20 w-full h-full bg-bio-bg overflow-hidden pointer-events-none">
-  <canvas id="turing-bg-canvas" class="w-full h-full opacity-[0.22] transition-opacity duration-1000"></canvas>
+<div class="fixed inset-0 -z-20 w-full h-full bg-[#F4F1EA] overflow-hidden pointer-events-none">
+  <!-- Aumentamos un poco la opacidad a 0.28 para que el verde salvia sea más imponente y visible -->
+  <canvas id="turing-bg-canvas" class="w-full h-full opacity-[0.28] transition-opacity duration-1000"></canvas>
 </div>
 
 <script>
-  // Función para inicializar la simulación matemática al cargar la página
+  // Inicialización de la simulación matemática de Turing
   function initTuringBackground() {
     const canvas = document.getElementById('turing-bg-canvas') as HTMLCanvasElement;
     if (!canvas) return;
@@ -16,25 +17,24 @@
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Resolución interna de cómputo baja para asegurar 60 FPS en cualquier dispositivo
-    const gridW = 90;
-    const gridH = 60;
+    // Resolución interna de cómputo optimizada para 60 FPS
+    const gridW = 1000;
+    const gridH = 650;
 
     let currentU = new Float32Array(gridW * gridH);
     let currentV = new Float32Array(gridW * gridH);
     let nextU = new Float32Array(gridW * gridH);
     let nextV = new Float32Array(gridW * gridH);
 
-    // Parámetros físicos del modelo de Gray-Scott (Patrones estables de manchas y líneas)
-    const Du = 0.14;
-    const Dv = 0.07;
+    // Parámetros del modelo Gray-Scott para patrones estables de manchas y líneas
+    const Du = 0.60;
+    const Dv = 0.20;
     const feed = 0.037;
     const kill = 0.060;
 
-    // Colores de mezcla (Pasteles ultra suaves de tu paleta)
-    // Fondo: Beige Base (#F4F1EA) -> Mezclado con Verde Salvia muy sutil (#EAECE8) y un toque de Palo de rosa
+    // Colores de la paleta predeterminada Verde Salvia (#4E5E52) y Beige (#F4F1EA)
     const colorBg = { r: 244, g: 241, b: 234 }; 
-    const colorPattern = { r: 218, g: 224, b: 219 }; // Verde Salvia pastel super lavado
+    const colorPattern = { r: 78, g: 94, b: 82 }; // Verde Salvia original imponente
 
     function resetSimulation() {
       for (let i = 0; i < gridW * gridH; i++) {
@@ -42,11 +42,11 @@
         currentV[i] = 0.0;
       }
       
-      // Sembrar gotas caóticas
-      for (let s = 0; s < 8; s++) {
+      // Sembrar gotas iniciales caóticas
+      for (let s = 0; s < 10; s++) {
         const startX = Math.floor(Math.random() * (gridW - 20)) + 10;
         const startY = Math.floor(Math.random() * (gridH - 20)) + 10;
-        const r = 5;
+        const r = 6;
         for (let dy = -r; dy <= r; dy++) {
           for (let dx = -r; dx <= r; dx++) {
             if (dx*dx + dy*dy < r*r) {
@@ -59,13 +59,13 @@
       }
     }
 
-    // Laplaciano de 9 puntos para simular difusión espacial
+    // Laplaciano de 9 puntos para resolver la difusión espacial
     function laplacian(x: number, y: number, arr: Float32Array) {
       let sum = 0;
       const centerVal = arr[x + y * gridW];
       
       const left = arr[((x - 1 + gridW) % gridW) + y * gridW];
-      const right = arr[((x + 1) % gridW) + y * gridW];
+      const right = arr[((x + 1) % gridW) + gridW * y];
       const top = arr[x + (((y - 1 + gridH) % gridH) * gridW)];
       const bottom = arr[x + (((y + 1) % gridH) * gridW)];
       
@@ -81,9 +81,9 @@
       return sum;
     }
 
+    // Un paso matemático del algoritmo Gray-Scott
     function step() {
-      // Optimizamos ejecutando 4 sub-pasos matemáticos por frame para acelerar el crecimiento del patrón
-      const subSteps = 4;
+      const subSteps = 4; // Iteraciones de física por frame para acelerar el crecimiento natural
       for (let s = 0; s < subSteps; s++) {
         for (let y = 0; y < gridH; y++) {
           for (let x = 0; x < gridW; x++) {
@@ -115,9 +115,9 @@
     function draw() {
       for (let i = 0; i < gridW * gridH; i++) {
         const v = currentV[i];
-        const factor = Math.min(Math.max(v * 4.0, 0.0), 1.0); // Contraste suave
+        const factor = Math.min(Math.max(v * 4.2, 0.0), 1.0); // Contraste óptico
 
-        // Degradado lineal entre color de fondo beige y patrón verde mudo suave
+        // Mezcla interpolada entre el fondo beige y el patrón verde salvia
         const r = Math.floor(colorBg.r + (colorPattern.r - colorBg.r) * factor);
         const g = Math.floor(colorBg.g + (colorPattern.g - colorBg.g) * factor);
         const b = Math.floor(colorBg.b + (colorPattern.b - colorBg.b) * factor);
@@ -129,7 +129,7 @@
         imgData.data[pxIdx + 3] = 255;
       }
 
-      // Escalado suave por interpolación bilineal
+      // Escalado suave bilineal por medio de un canvas temporal
       const tempCanvas = document.createElement('canvas');
       tempCanvas.width = gridW;
       tempCanvas.height = gridH;
@@ -144,12 +144,12 @@
       canvas.height = window.innerHeight;
     }
 
-    // Interacción: inyectar perturbaciones al mover el mouse en el documento
+    // Inyectar reactivo químico al interactuar (Mouse / Touch)
     function handleInteraction(clientX: number, clientY: number) {
       const gridX = Math.floor((clientX / window.innerWidth) * gridW);
       const gridY = Math.floor((clientY / window.innerHeight) * gridH);
 
-      const r = 4;
+      const r = 10; // Radio de perturbación
       for (let dy = -r; dy <= r; dy++) {
         for (let dx = -r; dx <= r; dx++) {
           const nx = gridX + dx;
@@ -158,22 +158,22 @@
             if (dx*dx + dy*dy < r*r) {
               const idx = nx + ny * gridW;
               currentU[idx] = 0.1;
-              currentV[idx] = 0.8 + Math.random() * 0.2;
+              currentV[idx] = 0.8 + Math.random() * 0.2; // Alta perturbación de reactivo
             }
           }
         }
       }
     }
 
+    // El mouse altera el patrón directamente en la página principal
     window.addEventListener('mousemove', (e) => {
-      // Inyectar reactivo con baja probabilidad para evitar sobrecargar la simulación
-      if (Math.random() < 0.15) {
+      if (Math.random() < 0.2) { // Controlamos la frecuencia para optimizar CPU
         handleInteraction(e.clientX, e.clientY);
       }
     });
 
     window.addEventListener('touchmove', (e) => {
-      if (e.touches[0] && Math.random() < 0.15) {
+      if (e.touches[0] && Math.random() < 0.2) {
         handleInteraction(e.touches[0].clientX, e.touches[0].clientY);
       }
     });
@@ -192,6 +192,6 @@
     loop();
   }
 
-  // Ejecutar en la carga inicial y tras las transiciones de página de Astro
+  // Ejecución en la carga y transiciones de Astro (ViewTransitions)
   document.addEventListener('astro:page-load', initTuringBackground);
 </script>

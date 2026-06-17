@@ -1,6 +1,30 @@
 ---
+// Footer pulido con estilo "Grid-Orgánico" usando fuentes de código
+const currentYear = new Date().getFullYear();
 ---
 
-<footer class="flex items-center justify-center px-6 py-4 bg-gray-900 border-t border-gray-800 text-gray-500 text-sm">
-  <p>&copy; {new Date().getFullYear()} Deivs117 &mdash; Mechatronics Engineering Portfolio</p>
+<footer class="w-full border-t border-bio-text/10 bg-bio-bg mt-auto py-8">
+  <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+    
+    <!-- Status Telemetry Footer -->
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-1.5">
+        <span class="h-2 w-2 rounded-full bg-bio-green animate-pulse"></span>
+        <span class="font-code text-[10px] tracking-wider text-bio-text/60 uppercase">System: Nominal</span>
+      </div>
+      <span class="text-bio-text/20 font-code text-xs">|</span>
+      <span class="font-code text-[10px] text-bio-text/50">Latitud: 3.4516° N (Cali, CO)</span>
+    </div>
+
+    <!-- Copyright & Credits -->
+    <div class="flex flex-col items-center md:items-end gap-1">
+      <span class="font-code text-[10px] text-bio-text/80">
+        © {currentYear} Deiv — Portfolio Bio-Mecatrónico
+      </span>
+      <span class="font-code text-[9px] text-bio-text/40">
+        Hecho a mano... o de la mano de los LLMs
+      </span>
+    </div>
+
+  </div>
 </footer>

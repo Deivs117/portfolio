@@ -3,13 +3,170 @@ import LayoutBase from '../layouts/LayoutBase.astro';
 import FondoTuring from '../components/FondoTuring.astro';
 ---
 
-<LayoutBase title="Sobre mí | Portfolio">
+<LayoutBase title="Sobre mí">
+  <!-- Fondo matemático dinámico bio-inspirado -->
   <FondoTuring />
-  <section class="flex flex-col items-center justify-center min-h-[80vh] px-6 text-center">
-    <h1 class="text-4xl font-bold text-cyan-400 mb-4">Sobre mí</h1>
-    <p class="text-gray-400 max-w-xl">
-      Bienvenido a mi portfolio de Ingeniería Mecatrónica. Aquí encontrarás mis proyectos,
-      publicaciones y espacio personal.
-    </p>
-  </section>
+
+  <div class="space-y-16 animate-[fadeIn_0.6s_ease-out]">
+    
+    <!-- SECCIÓN HERO: Presentación Disruptiva -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center min-h-[60vh]">
+      
+      <!-- Bloque Izquierdo: Pitch Personal (7 Columnas) -->
+      <div class="lg:col-span-7 space-y-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-bio-green/10 text-bio-green rounded-full border border-bio-green/20">
+          <span class="font-code text-[10px] font-bold tracking-wider">SISTEMAS BIO-INSPIRADOS</span>
+        </div>
+        
+        <h1 class="text-4xl md:text-5xl lg:text-6xl tracking-tight text-bio-text font-tech">
+          Donde la precisión de la <span class="text-bio-green underline decoration-bio-rose decoration-wavy underline-offset-4">mecatrónica</span> emula a la naturaleza.
+        </h1>
+        
+        <p class="text-base md:text-lg text-bio-text/85 leading-relaxed font-sans max-w-xl">
+          Hola, soy un ingeniero mecatrónico apasionado por la intersección entre el hardware de control de precisión, el desarrollo frontend interactivo y los algoritmos inspirados en la biología.
+        </p>
+
+        <div class="flex flex-wrap gap-4 pt-2">
+          <a 
+            href="/portfolio/proyectos/" 
+            class="px-5 py-3 bg-bio-green hover:bg-bio-green/90 text-bio-bg font-code text-xs font-bold rounded-xl shadow-md hover:scale-[1.02] transition-all flex items-center gap-2"
+          >
+            Explorar Proyectos
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </a>
+          <a 
+            href="/portfolio/divulgacion/" 
+            class="px-5 py-3 border border-bio-text/20 hover:bg-bio-text/5 text-bio-text font-code text-xs font-bold rounded-xl transition-all"
+          >
+            Artículos de Divulgación
+          </a>
+        </div>
+      </div>
+
+      <!-- Bloque Derecho: Telemetría / Grid de Identidad (5 Columnas) -->
+      <div class="lg:col-span-5 bg-white/40 backdrop-blur-md p-6 rounded-2xl border border-bio-text/10 shadow-sm relative overflow-hidden">
+        <!-- Grid decorativo mecatrónico -->
+        <div class="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:12px_12px]"></div>
+        
+        <div class="flex justify-between items-center border-b border-bio-text/10 pb-4 mb-4">
+          <span class="font-code text-[10px] text-bio-text/50">SYSTEM_CORE: STATUS_01</span>
+          <span class="text-[9px] font-code bg-bio-rose/20 text-bio-brown px-2 py-0.5 rounded">ONLINE</span>
+        </div>
+
+        <!-- Atributos Técnicos Interactivos -->
+        <div class="space-y-4">
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs font-code">
+              <span class="text-bio-text/70">⚡ Automatización y Robótica</span>
+              <span class="font-bold text-bio-green">95%</span>
+            </div>
+            <div class="w-full bg-bio-text/10 h-1.5 rounded-full overflow-hidden">
+              <div class="bg-bio-green h-full rounded-full" style="width: 95%"></div>
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs font-code">
+              <span class="text-bio-text/70">🎨 Desarrollo Frontend / Shaders</span>
+              <span class="font-bold text-bio-blue">90%</span>
+            </div>
+            <div class="w-full bg-bio-text/10 h-1.5 rounded-full overflow-hidden">
+              <div class="bg-bio-blue h-full rounded-full" style="width: 90%"></div>
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs font-code">
+              <span class="text-bio-text/70">🧬 Algoritmos Biológicos (AI/Turing)</span>
+              <span class="font-bold text-bio-rose">85%</span>
+            </div>
+            <div class="w-full bg-bio-text/10 h-1.5 rounded-full overflow-hidden">
+              <div class="bg-bio-rose h-full rounded-full" style="width: 85%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ASCII mecatrónico e información resumida -->
+        <div class="mt-6 p-4 bg-bio-bg/60 border border-bio-text/5 rounded-xl text-center">
+          <pre class="font-code text-xs text-bio-brown leading-tight select-none">
+  ┌─────────────────────────────────┐
+  │  ▲   Control PID & Estabilidad   │
+  │  ⚙   Kinematics & Dinámica       │
+  │  ✦   Bio-Inspired Algorithms     │
+  └─────────────────────────────────┘
+          </pre>
+          <p class="text-[10px] font-code text-bio-text/60 mt-3 leading-relaxed">
+            Especialista en estructurar interfaces web pesadas donde la visualización de datos y simulaciones físicas convergen elegantemente.
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- SECCIÓN: Filosofía & Áreas de Enfoque -->
+    <section class="space-y-8 border-t border-bio-text/10 pt-16">
+      <div class="max-w-3xl">
+        <h2 class="text-3xl font-tech text-bio-text">Filosofía de Desarrollo</h2>
+        <p class="text-sm md:text-base text-bio-text/70 font-sans mt-2">
+          La ingeniería moderna no solo debe ser funcional y precisa, debe ser elegante y entender las dinámicas complejas del entorno real. Mi enfoque une tres mundos complementarios:
+        </p>
+      </div>
+
+      <!-- Grilla de Pilares -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Pilar 1 -->
+        <div class="bg-white/60 p-6 rounded-2xl border border-bio-text/10 flex flex-col justify-between hover:border-bio-green transition-all group">
+          <div>
+            <div class="h-10 w-10 rounded-lg bg-bio-green/10 flex items-center justify-center text-bio-green mb-4 group-hover:scale-105 transition-transform">
+              ⚙️
+            </div>
+            <h3 class="font-tech text-lg text-bio-text mb-2">Mecatrónica & Control</h3>
+            <p class="text-xs text-bio-text/60 leading-relaxed font-sans">
+              Diseño e implementación de sistemas de control clásico, lógica difusa y modelado matemático para sistemas físicos interactivos en tiempo real.
+            </p>
+          </div>
+          <span class="text-[10px] font-code text-bio-green mt-4 block">PID • LQR • DINÁMICA DE SISTEMAS</span>
+        </div>
+
+        <!-- Pilar 2 -->
+        <div class="bg-white/60 p-6 rounded-2xl border border-bio-text/10 flex flex-col justify-between hover:border-bio-blue transition-all group">
+          <div>
+            <div class="h-10 w-10 rounded-lg bg-bio-blue/10 flex items-center justify-center text-bio-blue mb-4 group-hover:scale-105 transition-transform">
+              🎨
+            </div>
+            <h3 class="font-tech text-lg text-bio-text mb-2">Frontend & Animaciones</h3>
+            <p class="text-xs text-bio-text/60 leading-relaxed font-sans">
+              Desarrollo de interfaces ricas, aprovechando la potencia de los gráficos en el cliente mediante aceleración de hardware en el navegador.
+            </p>
+          </div>
+          <span class="text-[10px] font-code text-bio-blue mt-4 block">HTML5 CANVAS • SHADERS • TAILWIND</span>
+        </div>
+
+        <!-- Pilar 3 -->
+        <div class="bg-white/60 p-6 rounded-2xl border border-bio-text/10 flex flex-col justify-between hover:border-bio-rose transition-all group">
+          <div>
+            <div class="h-10 w-10 rounded-lg bg-bio-rose/10 flex items-center justify-center text-bio-rose mb-4 group-hover:scale-105 transition-transform">
+              🧬
+            </div>
+            <h3 class="font-tech text-lg text-bio-text mb-2">Tecnología Bio-Inspirada</h3>
+            <p class="text-xs text-bio-text/60 leading-relaxed font-sans">
+              Exploración de sistemas dinámicos químicos y biológicos (como autómatas celulares o redes neuronales artificiales) aplicados al diseño artificial.
+            </p>
+          </div>
+          <span class="text-[10px] font-code text-bio-rose mt-4 block">ALAN TURING • REDES NEURONALES • CAS</span>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
 </LayoutBase>
+
+<style>
+  /* Animación sutil de entrada de página */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>

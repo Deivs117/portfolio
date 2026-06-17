@@ -1,0 +1,101 @@
+=========================================================================
+
+ARCHIVO DE EXCLUSIÓN DE GIT (.gitignore) - PORTFOLIO BIO-MECATRÓNICO
+
+Diseñado para Deivs117 - Astro v4 + Tailwind CSS
+
+=========================================================================
+
+-------------------------------------------------------------------------
+
+1. DEPENDENCIAS (Nunca se suben, se restauran localmente con 'npm install')
+
+-------------------------------------------------------------------------
+
+node_modules/
+/node_modules/
+
+-------------------------------------------------------------------------
+
+2. DIRECTORIOS DE COMPILACIÓN Y CACHÉ
+
+-------------------------------------------------------------------------
+
+Carpeta donde Astro guarda el código estático compilado listo para producción
+
+dist/
+/dist
+
+Carpeta de caché interna de compilación de Astro (TypeScript / Optimización)
+
+.astro/
+
+-------------------------------------------------------------------------
+
+3. ARCHIVOS DE SISTEMA OPERATIVO Y LOGS
+
+-------------------------------------------------------------------------
+
+macOS
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+Windows
+
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+Logs de error y telemetría de npm / node
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+-------------------------------------------------------------------------
+
+4. CONFIGURACIONES DE EDITORES E IDEs
+
+-------------------------------------------------------------------------
+
+Configuración local de VS Code (opcional, se ignora para evitar sobreescribir temas)
+
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+.ntvs
+*.njsproj
+*.sln
+*.swp
+
+-------------------------------------------------------------------------
+
+5. VARIABLES DE ENTORNO Y LLAVES DE SEGURIDAD (Crítico si usamos backend/APIs)
+
+-------------------------------------------------------------------------
+
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.development.local
+.env.test.local
+.env.production.local
+*.env.local
+
+-------------------------------------------------------------------------
+
+6. ARCHIVOS TEMPORALES Y DIAGNÓSTICOS
+
+-------------------------------------------------------------------------
+
+.DS_Store?
+.cache/
+.parcel-cache/
+.eslintcache

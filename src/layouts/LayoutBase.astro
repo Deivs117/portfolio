@@ -1,32 +1,42 @@
 ---
-import ViewTransitions from 'astro/components/ViewTransitions.astro';
+import { ViewTransitions } from 'astro:transitions';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
 
 interface Props {
   title: string;
-  description?: string;
 }
 
-const { title, description = 'Mechatronics Engineering Portfolio' } = Astro.props;
+const { title } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <meta name="description" content="Portfolio de Ingeniería Mecatrónica, IA y Sistemas Bio-inspirados por David Caicedo Samboni" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/portfolio/favicon.svg" />
-    <title>{title}</title>
+    <meta name="generator" content={Astro.generator} />
+    <title>{title} | Deivs117</title>
+    
+    <!-- Animaciones ultra fluidas nativas entre ventanas -->
     <ViewTransitions />
   </head>
-  <body class="min-h-screen flex flex-col bg-gray-950 text-gray-100">
+  <body class="bg-bio-bg text-bio-text min-h-screen flex flex-col selection:bg-bio-blue/30 selection:text-bio-green">
+    <!-- Grid decorativo mecatrónico muy sutil de fondo -->
+    <div class="fixed inset-0 opacity-[0.03] pointer-events-none z-50 bg-[radial-gradient(#121314_1px,transparent_1px)] [background-size:16px_16px]"></div>
+    
+    <!-- Barra de Navegación común -->
     <Navbar />
-    <main class="flex-1">
+
+    <!-- Área de contenido dinámico -->
+    <main class="flex-grow w-full max-w-7xl mx-auto px-6 py-8 md:py-12 relative z-10">
       <slot />
     </main>
+
+    <!-- Pie de página común -->
     <Footer />
   </body>
 </html>

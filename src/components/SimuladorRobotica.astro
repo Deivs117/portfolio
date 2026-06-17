@@ -1,0 +1,277 @@
+---
+// Componente modular para la simulación interactiva de Robótica 2DOF
+---
+
+<div class="w-full h-full flex flex-col">
+  <div class="pb-3 flex justify-between items-center shrink-0 border-b border-bio-text/5">
+    <span class="font-code text-[10px] text-bio-green font-bold">[LAB_01] CONTROLADOR ROBÓTICO 2DOF</span>
+    <div class="flex gap-2">
+      <button id="btn-robot-auto" class="px-2.5 py-1 text-[9px] font-code bg-bio-green text-white rounded-md font-bold transition-all">AUTO</button>
+      <button id="btn-robot-manual" class="px-2.5 py-1 text-[9px] font-code bg-bio-text/10 text-bio-text rounded-md transition-all">MANUAL</button>
+    </div>
+  </div>
+  <div class="flex-grow bg-bio-bg/40 border border-bio-text/10 rounded-xl overflow-hidden relative min-h-[380px] mt-4">
+    <canvas id="canvas-robotica" class="w-full h-full cursor-pointer block outline-none" tabindex="0"></canvas>
+    <div id="robot-control-hint" class="absolute bottom-3 right-3 bg-white/95 px-3 py-1.5 rounded-lg border border-bio-text/10 shadow-sm text-[9px] font-code text-bio-text pointer-events-none hidden max-w-[210px] leading-relaxed">
+      Haz clic para enfocar.<br>Mueve el gripper con <strong class="text-bio-green">W,A,S,D</strong> o <strong class="text-bio-green">Flechas</strong>.
+    </div>
+    <div class="absolute bottom-3 left-3 text-[9px] font-code text-bio-text/45 pointer-events-none" id="robot-status-text">
+      STATUS: AUTOMATIC MODE
+    </div>
+  </div>
+</div>
+
+<script>
+  let robotAnimationId: number | null = null;
+
+  function initRobotSimulator() {
+    const canvas = document.getElementById('canvas-robotica') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d')!;
+    let isAuto = true;
+    let W = canvas.width = canvas.parentElement!.clientWidth;
+    let H = canvas.height = canvas.parentElement!.clientHeight;
+
+    // Eslabones del brazo acortados y balanceados para evitar singularidades
+    const L1 = H * 0.2; 
+    const L2 = H * 0.2; 
+    const basex = W * 0.40; // Base ligeramente desplazada a la izquierda para alcanzar estantes
+    const basey = H - 40;
+
+    // Variables cinemáticas articulares
+    let t1 = -Math.PI / 4, t2 = Math.PI / 2;
+    let targetX = basex + 70, targetY = basey - 90;
+
+    // Pelota y estantería sintonizadas en distancias operacionales óptimas
+    const grabPoint = basex - 90; // Punto estático de recogida en banda
+    let ball = { x: 0, y: H - 52, active: true, radius: 8 };
+    let grabbed = false;
+    let shelfBalls: {x: number, y: number}[] = []; 
+    const maxShelf = 5;
+    const shelfX = basex + 100; // Estantería más cercana
+
+    // Captura de entrada de teclado
+    const keysPressed: Record<string, boolean> = {};
+    canvas.addEventListener('keydown', (e) => {
+      keysPressed[e.key.toLowerCase()] = true;
+      if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+      }
+    });
+    canvas.addEventListener('keyup', (e) => {
+      keysPressed[e.key.toLowerCase()] = false;
+    });
+
+    // Control de modo AUTO/MANUAL
+    document.getElementById('btn-robot-auto')?.addEventListener('click', (e) => {
+      isAuto = true;
+      document.getElementById('robot-control-hint')?.classList.add('hidden');
+      (e.target as HTMLElement).classList.replace('bg-bio-text/10', 'bg-bio-green');
+      (e.target as HTMLElement).classList.add('text-white');
+      document.getElementById('btn-robot-manual')?.classList.replace('bg-bio-green', 'bg-bio-text/10');
+      document.getElementById('btn-robot-manual')?.classList.remove('text-white');
+      document.getElementById('robot-status-text')!.innerText = "STATUS: AUTOMATIC MODE";
+      grabbed = false; ball.x = 0; ball.active = true;
+    });
+
+    document.getElementById('btn-robot-manual')?.addEventListener('click', (e) => {
+      isAuto = false;
+      document.getElementById('robot-control-hint')?.classList.remove('hidden');
+      (e.target as HTMLElement).classList.replace('bg-bio-text/10', 'bg-bio-green');
+      (e.target as HTMLElement).classList.add('text-white');
+      document.getElementById('btn-robot-auto')?.classList.replace('bg-bio-green', 'bg-bio-text/10');
+      document.getElementById('btn-robot-auto')?.classList.remove('text-white');
+      document.getElementById('robot-status-text')!.innerText = "STATUS: KEYBOARD MANUAL MODE [WASD / ARROWS]";
+      grabbed = false; ball.x = grabPoint; ball.active = true;
+    });
+
+    // Cinemática Inversa Planar 2DOF (Codo abajo)
+    function solveIK(x: number, y: number) {
+      const px = x - basex;
+      const py = basey - y;
+      
+      let D = (px*px + py*py - L1*L1 - L2*L2) / (2 * L1 * L2);
+      D = Math.max(-0.99, Math.min(0.99, D)); // Clampar para prevenir errores matemáticos
+      
+      const t2Target = Math.acos(D);
+      const t1Target = Math.atan2(py, px) - Math.atan2(L2 * Math.sin(t2Target), L1 + L2 * Math.cos(t2Target));
+      
+      // Control sutil para sintonización transitoria suave (amortiguación física)
+      t1 += (-t1Target - t1) * 0.16;
+      t2 += (t2Target - t2) * 0.16;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      // --- 1. DIBUJAR ESTANTERÍA ELEVADA ---
+      ctx.strokeStyle = '#8C7870'; ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(shelfX, H - 40); ctx.lineTo(shelfX, H - 170); // Soporte vertical
+      ctx.stroke();
+
+      for (let i = 0; i < maxShelf; i++) {
+        const sy = H - 54 - (i * 22);
+        ctx.beginPath();
+        ctx.moveTo(shelfX - 8, sy); ctx.lineTo(shelfX + 40, sy); // Bandejas
+        ctx.stroke();
+      }
+
+      // Pelotas en el estante
+      shelfBalls.forEach((b, idx) => {
+        ctx.fillStyle = '#D8A499';
+        ctx.beginPath();
+        ctx.arc(shelfX + 16, H - 62 - (idx * 22), ball.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Banda transportadora inferior
+      ctx.fillStyle = '#E5E7EB'; ctx.fillRect(0, H - 40, W, 25);
+      ctx.strokeStyle = 'rgba(18, 19, 20, 0.1)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, H - 40); ctx.lineTo(W, H - 40); ctx.stroke();
+
+      // --- 2. GESTIÓN DE LA PELOTA EN LA BANDA ---
+      if (ball.active) {
+        if (isAuto) {
+          if (!grabbed) {
+            if (ball.x < grabPoint) ball.x += 1.8;
+            else ball.x = grabPoint; // Pausa en punto estático de recogida
+            targetX = ball.x; targetY = ball.y;
+          }
+        } else {
+          ball.x = grabPoint;
+        }
+        ctx.fillStyle = '#D8A499';
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // --- 3. LOGICAS OPERACIONALES ---
+      if (isAuto) {
+        if (ball.active && Math.abs(ball.x - grabPoint) < 2 && !grabbed) {
+          if (Math.abs(targetX - ball.x) < 4) {
+            grabbed = true;
+          }
+        }
+        if (grabbed) {
+          // Destino en la estantería actual libre
+          const targetShelfY = H - 62 - (shelfBalls.length * 22);
+          targetX = shelfX + 16;
+          targetY = targetShelfY;
+          ball.x = basex + L1 * Math.cos(t1) + L2 * Math.cos(t1 + t2);
+          ball.y = basey + L1 * Math.sin(t1) + L2 * Math.sin(t1 + t2);
+
+          // Soltar pelota al alcanzar la coordenada
+          if (Math.abs(ball.x - targetX) < 8 && Math.abs(ball.y - targetY) < 8) {
+            shelfBalls.push({ x: targetX, y: targetY });
+            grabbed = false;
+            ball.active = false;
+
+            // Vaciar estantería si está completa
+            if (shelfBalls.length >= maxShelf) {
+              setTimeout(() => { shelfBalls = []; }, 800);
+            }
+
+            // Reposicionar nueva bola tras retardo
+            setTimeout(() => {
+              ball.x = 0; ball.y = H - 52; ball.active = true;
+            }, 1000);
+          }
+        }
+      } else {
+        // Control manual sintonizado con teclas
+        const speed = 4;
+        if (keysPressed['w'] || keysPressed['arrowup']) targetY -= speed;
+        if (keysPressed['s'] || keysPressed['arrowdown']) targetY += speed;
+        if (keysPressed['a'] || keysPressed['arrowleft']) targetX -= speed;
+        if (keysPressed['d'] || keysPressed['arrowright']) targetX += speed;
+
+        // Limitar mecánicamente el alcance operacional para prevenir tirones
+        const dist = Math.sqrt(Math.pow(targetX - basex, 2) + Math.pow(targetY - basey, 2));
+        if (dist > (L1 + L2) - 4) {
+          const angle = Math.atan2(targetY - basey, targetX - basex);
+          targetX = basex + ((L1 + L2) - 4) * Math.cos(angle);
+          targetY = basey + ((L1 + L2) - 4) * Math.sin(angle);
+        }
+
+        // Detección de colisión manual para recoger la bola
+        const dToBall = Math.sqrt(Math.pow(targetX - ball.x, 2) + Math.pow(targetY - ball.y, 2));
+        if (dToBall < 12 && ball.active && !grabbed) {
+          grabbed = true;
+        }
+
+        if (grabbed) {
+          ball.x = targetX; ball.y = targetY;
+          // Soltar automáticamente al arrastrarla cerca del estante
+          if (ball.x > shelfX && ball.y < H - 50) {
+            shelfBalls.push({ x: shelfX + 16, y: ball.y });
+            grabbed = false;
+            ball.active = false;
+            if (shelfBalls.length >= maxShelf) {
+              setTimeout(() => { shelfBalls = []; }, 800);
+            }
+            setTimeout(() => { ball.x = grabPoint; ball.y = H - 52; ball.active = true; }, 1200);
+          }
+        }
+
+        // Retícula de puntero manual
+        ctx.strokeStyle = 'rgba(216, 164, 153, 0.4)'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(targetX, targetY, 8, 0, Math.PI * 2); ctx.stroke();
+      }
+
+      solveIK(targetX, targetY);
+
+      // --- 4. RENDERIZADO DEL BRAZO ROBÓTICO ---
+      const j1x = basex + L1 * Math.cos(t1);
+      const j1y = basey + L1 * Math.sin(t1);
+      const j2x = j1x + L2 * Math.cos(t1 + t2);
+      const j2y = j1y + L2 * Math.sin(t1 + t2);
+
+      // Eslabones
+      ctx.lineWidth = 11; ctx.lineCap = 'round';
+      ctx.strokeStyle = '#4E5E52'; ctx.beginPath(); ctx.moveTo(basex, basey); ctx.lineTo(j1x, j1y); ctx.stroke();
+      ctx.strokeStyle = '#8FA9C4'; ctx.beginPath(); ctx.moveTo(j1x, j1y); ctx.lineTo(j2x, j2y); ctx.stroke();
+
+      // Juntas
+      ctx.fillStyle = '#F4F1EA';
+      ctx.beginPath(); ctx.arc(j1x, j1y, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(j2x, j2y, 4, 0, Math.PI * 2); ctx.fill();
+
+      // Base rotacional
+      ctx.fillStyle = '#4E5E52'; ctx.beginPath(); ctx.arc(basex, basey, 12, Math.PI, 0); ctx.fill();
+
+      // Pinza terminal
+      ctx.strokeStyle = '#121314'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(j2x, j2y); ctx.lineTo(j2x, j2y + 12); ctx.stroke();
+
+      robotAnimationId = requestAnimationFrame(draw);
+    }
+
+    // Gestionar resize del contenedor de forma dinámica
+    function handleResize() {
+      W = canvas.width = canvas.parentElement!.clientWidth;
+      H = canvas.height = canvas.parentElement!.clientHeight;
+    }
+    window.addEventListener('resize', handleResize);
+
+    draw();
+  }
+
+  // Escuchar evento del controlador de pestañas para iniciar o detener bucle de renderizado
+  window.addEventListener('tab-changed', (e: any) => {
+    if (e.detail.activeTab === 'robotica') {
+      if (robotAnimationId === null) initRobotSimulator();
+    } else {
+      if (robotAnimationId !== null) {
+        cancelAnimationFrame(robotAnimationId);
+        robotAnimationId = null;
+      }
+    }
+  });
+
+  document.addEventListener('astro:page-load', () => {
+    if (activeSimulation === 'robotica') initRobotSimulator();
+  });
+</script>

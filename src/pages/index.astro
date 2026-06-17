@@ -25,12 +25,10 @@ import FondoTuring from '../components/FondoTuring.astro';
           <span class="text-bio-green underline decoration-bio-rose decoration-wavy underline-offset-4">pero soy feliz creando.</span>
         </h1>
         
-        <!-- Texto modificado para dar un balance técnico riguroso y profesional -->
         <p class="text-base md:text-lg text-bio-text/85 leading-relaxed font-sans max-w-2xl">
           Como <span class="font-bold text-bio-green">Ingeniero Mecatrónico especialista en Inteligencia Artificial</span>, mi núcleo profesional radica en el diseño de sistemas dinámicos de control, automatización industrial y robótica autónoma. No concibo la ingeniería como una estructura rígida y fría; para mí, el <span class="font-bold text-bio-blue">desarrollo Frontend</span> es mi pincel tecnológico. Es el espacio donde convergen la matemática y la estética para dar color, movimiento y un sentido intuitivo a las ideas complejas.
         </p>
 
-        <!-- Bloque de Cita Destacada: Tu Esencia de Aprendizaje -->
         <div class="border-l-3 border-bio-rose pl-4 py-1.5 bg-white/30 backdrop-blur-sm rounded-r-xl max-w-xl">
           <p class="text-xs md:text-sm italic text-bio-brown font-medium leading-relaxed">
             "Nunca me canso de mirar el mundo con otros ojos, de redescubrir las leyes físicas del universo y de explorar nuevas perspectivas teóricas para explicárselas de manera didáctica a los demás."
@@ -38,194 +36,155 @@ import FondoTuring from '../components/FondoTuring.astro';
         </div>
 
         <div class="flex flex-wrap gap-4 pt-2">
-          <a 
-            href="/portfolio/proyectos/" 
-            class="px-5 py-3 bg-bio-green hover:bg-bio-green/90 text-bio-bg font-code text-xs font-bold rounded-xl shadow-md hover:scale-[1.02] transition-all flex items-center gap-2"
-          >
+          <a href="/portfolio/proyectos/" class="px-5 py-3 bg-bio-green hover:bg-bio-green/90 text-bio-bg font-code text-xs font-bold rounded-xl shadow-md hover:scale-[1.02] transition-all flex items-center gap-2">
             Ver mis Proyectos
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
           </a>
-          <a 
-            href="/portfolio/divulgacion/" 
-            class="px-5 py-3 border border-bio-text/20 hover:bg-bio-text/5 text-bio-text font-code text-xs font-bold rounded-xl transition-all"
-          >
+          <a href="/portfolio/divulgacion/" class="px-5 py-3 border border-bio-text/20 hover:bg-bio-text/5 text-bio-text font-code text-xs font-bold rounded-xl transition-all">
             Divulgación Científica
           </a>
         </div>
       </div>
 
-      <!-- Bloque Derecho: Tu Perfil Técnico / Consola de Telemetría Interactiva (5 Columnas) -->
+      <!-- Bloque Derecho: Consola de Telemetría Interactiva (5 Columnas) -->
       <div class="lg:col-span-5 bg-white/60 backdrop-blur-md p-6 rounded-2xl border border-bio-text/10 shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[440px]">
-        <!-- Grid decorativo de ingeniería -->
         <div class="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:12px_12px]"></div>
         
         <div class="z-10">
           <div class="flex justify-between items-center border-b border-bio-text/10 pb-4 mb-4">
             <span class="font-code text-[10px] text-bio-text/50">PROFILE // TELEMETRY_CORE_01</span>
-            <span class="text-[9px] font-code bg-bio-green/20 text-bio-green px-2 py-0.5 rounded font-bold animate-pulse">RUNNING</span>
+            <span class="text-[9px] font-code bg-bio-green/20 text-bio-green px-2 py-0.5 rounded font-bold animate-pulse">ONLINE</span>
           </div>
 
-          <!-- Ficha de Ingeniería con tus Hitos de Carrera -->
-          <div class="space-y-3">
-            <div class="grid grid-cols-3 py-2 border-b border-bio-text/5">
-              <span class="font-code text-[11px] text-bio-text/50 uppercase">Formación</span>
-              <span class="font-tech text-xs font-bold text-bio-text col-span-2">Ingeniero Mecatrónico (AI Specialist)</span>
-            </div>
-            <div class="grid grid-cols-3 py-2 border-b border-bio-text/5">
-              <span class="font-code text-[11px] text-bio-text/50 uppercase">Hito Clave</span>
-              <span class="font-tech text-xs font-bold text-bio-text col-span-2">Doble Titulación completada a los 21 años</span>
-            </div>
-            <div class="grid grid-cols-3 py-2 border-b border-bio-text/5">
-              <span class="font-code text-[11px] text-bio-text/50 uppercase">Enfoque</span>
-              <span class="font-tech text-xs font-bold text-bio-text col-span-2">Control Automático & Sistemas Dinámicos</span>
-            </div>
-            <div class="grid grid-cols-3 py-1">
-              <span class="font-code text-[11px] text-bio-text/50 uppercase">Creatividad</span>
-              <span class="font-tech text-xs font-bold text-bio-rose col-span-2">Simulaciones Gráficas & Frontend</span>
-            </div>
+          <div class="space-y-3 opacity-30 blur-[1px]" id="profile-bg-data">
+             <!-- Placeholder visual mientras la terminal carga -->
+             <div class="h-4 bg-bio-text/10 rounded w-3/4"></div>
+             <div class="h-4 bg-bio-text/10 rounded w-full"></div>
+             <div class="h-4 bg-bio-text/10 rounded w-5/6"></div>
           </div>
         </div>
 
-        <!-- Terminal de Comando Interactiva (Typewriter Telemetry) que reemplaza al ASCII ineficiente -->
-        <div class="mt-6 p-4 bg-bio-text/[0.03] border border-bio-text/10 rounded-xl z-10">
-          <div class="flex items-center gap-1.5 pb-2 border-b border-bio-text/10 mb-2">
+        <!-- Terminal de Comando (Typewriter Secuencial) -->
+        <div class="mt-6 p-4 bg-bio-text/[0.04] border border-bio-text/10 rounded-xl z-10 h-full flex flex-col">
+          <div class="flex items-center gap-1.5 pb-2 border-b border-bio-text/10 mb-2 shrink-0">
             <span class="h-2 w-2 rounded-full bg-bio-rose"></span>
             <span class="h-2 w-2 rounded-full bg-bio-blue"></span>
             <span class="h-2 w-2 rounded-full bg-bio-green"></span>
-            <span class="font-code text-[9px] text-bio-text/40 ml-1">terminal_output.sh</span>
+            <span class="font-code text-[9px] text-bio-text/50 ml-1">init_system.sh</span>
           </div>
           
-          <!-- Elemento que albergará el script de escritura automática -->
-          <div id="telemetry-terminal" class="font-code text-[10px] text-bio-green leading-relaxed min-h-[120px] whitespace-pre-line">
-            <!-- El código interactivo escribirá aquí en tiempo real -->
+          <div id="telemetry-terminal" class="font-code text-[11px] text-bio-green leading-relaxed whitespace-pre-line flex-grow overflow-hidden">
+            <!-- Texto inyectado por JS -->
           </div>
           
-          <div class="flex justify-between items-center mt-3 text-[8px] font-code text-bio-text/40">
-            <span>BAUD_RATE: 115200 bps</span>
-            <span>SYSTEM_CPU: OPTIMAL</span>
+          <div class="flex justify-between items-center mt-3 text-[8px] font-code text-bio-text/40 shrink-0">
+            <span>MEM: ALLOCATED</span>
+            <span>SYSTEM_CPU: IDLE</span>
           </div>
         </div>
-
       </div>
 
     </section>
 
-    <!-- SECCIÓN INTERACTIVA: El Tablero de Exploración de Deivs117 -->
-    <section class="space-y-8 border-t border-bio-text/10 pt-16">
+    <!-- SECCIÓN INTERACTIVA: El Tablero del Aprendiz -->
+    <section class="space-y-8 border-t border-bio-text/10 pt-16 pb-12">
       <div class="max-w-3xl">
         <h2 class="text-3xl font-tech text-bio-text tracking-tight">El Tablero del Aprendiz</h2>
         <p class="text-sm md:text-base text-bio-text/70 font-sans mt-2">
-          Haz clic en las diferentes pestañas para explorar cómo interactúan mis pasiones, mis estudios y mi experiencia simulando dinámicas naturales.
+          La ingeniería se comprende construyéndola. Explora estas tres simulaciones dinámicas interactivas (renderizadas en tiempo real en Canvas) que reflejan mi enfoque mecatrónico y científico.
         </p>
       </div>
 
-      <!-- Sistema de Tabs Interactivas -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        <!-- Botones de Navegación del Tablero (Left Column) -->
+        <!-- Botones de Pestañas (4 Columnas) -->
         <div class="lg:col-span-4 flex flex-col gap-3">
-          <button 
-            id="tab-btn-trayectoria" 
-            class="tab-btn text-left p-4 rounded-xl border border-bio-green text-bio-bg bg-bio-green transition-all flex items-center justify-between group"
-            data-tab="trayectoria"
-          >
+          <button class="tab-btn text-left p-4 rounded-xl border border-bio-green text-bio-bg bg-bio-green transition-all flex items-center justify-between group" data-tab="robotica">
             <div>
-              <span class="block text-[10px] font-code uppercase opacity-70">01 // Hito Profesional</span>
-              <span class="font-tech text-sm font-bold">Mi Trayectoria a los 21</span>
+              <span class="block text-[10px] font-code uppercase opacity-70">01 // Hardware & Control</span>
+              <span class="font-tech text-sm font-bold">Robótica 2DOF</span>
             </div>
-            <span class="text-xs">⚡</span>
+            <span class="text-xs">⚙️</span>
           </button>
 
-          <button 
-            id="tab-btn-neuro" 
-            class="tab-btn text-left p-4 rounded-xl border border-bio-text/10 text-bio-text bg-white/40 hover:bg-white/70 transition-all flex items-center justify-between group"
-            data-tab="neuro"
-          >
+          <button class="tab-btn text-left p-4 rounded-xl border border-bio-text/10 text-bio-text bg-white/40 hover:bg-white/70 transition-all flex items-center justify-between group" data-tab="neuro">
             <div>
-              <span class="block text-[10px] font-code uppercase opacity-60">02 // Modelado Matemático</span>
-              <span class="font-tech text-sm font-bold">Circuitos y Neuro-Simulación</span>
+              <span class="block text-[10px] font-code uppercase opacity-60">02 // Sistemas Dinámicos</span>
+              <span class="font-tech text-sm font-bold">Derivada Neuronal</span>
             </div>
             <span class="text-xs">🧬</span>
           </button>
 
-          <button 
-            id="tab-btn-fascinaciones" 
-            class="tab-btn text-left p-4 rounded-xl border border-bio-text/10 text-bio-text bg-white/40 hover:bg-white/70 transition-all flex items-center justify-between group"
-            data-tab="fascinaciones"
-          >
+          <button class="tab-btn text-left p-4 rounded-xl border border-bio-text/10 text-bio-text bg-white/40 hover:bg-white/70 transition-all flex items-center justify-between group" data-tab="cuantica">
             <div>
-              <span class="block text-[10px] font-code uppercase opacity-60">03 // Curiosidad Científica</span>
-              <span class="font-tech text-sm font-bold">Fascinaciones Teóricas</span>
+              <span class="block text-[10px] font-code uppercase opacity-60">03 // Física Teórica</span>
+              <span class="font-tech text-sm font-bold">Colapso Cuántico</span>
             </div>
             <span class="text-xs">🌌</span>
           </button>
         </div>
 
-        <!-- Contenedor de Información del Tablero -->
-        <div class="lg:col-span-8 bg-white/60 backdrop-blur-md p-6 md:p-8 rounded-2xl border border-bio-text/10 shadow-sm min-h-[300px] flex flex-col justify-between">
+        <!-- Contenedores de Simulación (8 Columnas) -->
+        <div class="lg:col-span-8 bg-white/70 backdrop-blur-md p-2 md:p-4 rounded-2xl border border-bio-text/10 shadow-sm flex flex-col min-h-[450px]">
           
-          <!-- CONTENIDO 1: Mi Trayectoria -->
-          <div id="tab-content-trayectoria" class="tab-content space-y-4">
-            <div class="flex justify-between items-start">
-              <h3 class="font-tech text-xl text-bio-text">La velocidad de un eterno estudiante</h3>
-              <span class="font-code text-xs px-2.5 py-1 bg-bio-green/10 text-bio-green rounded-full font-bold">Edad: 21 Años</span>
-            </div>
-            <p class="text-sm text-bio-text/80 leading-relaxed font-sans">
-              Completar la carrera de <strong class="text-bio-green">Ingeniería Mecatrónica</strong> y la <strong class="text-bio-green">Especialización en Inteligencia Artificial</strong> a los 21 años no es un dato de orgullo arrogante, es la prueba de una mentalidad hambrienta por aprender. Es la velocidad resultante de querer comprender la confluencia entre el mundo de las leyes físicas y las posibilidades lógicas del software.
-            </p>
-            <p class="text-sm text-bio-text/80 leading-relaxed font-sans">
-              Esta combinación me faculta para diseñar e implementar robots inteligentes, sistemas industriales que van más allá del control tradicional (PID clásico) y aplicar arquitecturas lógicas de vanguardia a la resolución de problemas reales.
-            </p>
-            <div class="grid grid-cols-2 gap-4 pt-4 text-xs font-code">
-              <div class="p-3 bg-bio-bg/50 rounded-lg border border-bio-text/5">
-                <span class="block font-bold text-bio-green">✓ COGNITIVE HARDWARE</span>
-                Robótica, automatización y modelado de dinámicas físicas.
+          <!-- TAB 1: ROBÓTICA -->
+          <div id="tab-content-robotica" class="tab-content w-full h-full flex flex-col">
+            <div class="px-4 pt-2 pb-4 flex justify-between items-start shrink-0">
+              <div>
+                <h3 class="font-tech text-lg text-bio-text">Manipulador 2DOF & Cinemática</h3>
+                <p class="text-xs text-bio-text/60 font-sans mt-1">Automatización de tareas mediante cinemática inversa y seguimiento de trayectorias.</p>
               </div>
-              <div class="p-3 bg-bio-bg/50 rounded-lg border border-bio-text/5">
-                <span class="block font-bold text-bio-blue">✓ COGNITIVE SOFTWARE</span>
-                Deep Learning, Redes Neuronales y Frontend estético interactivo.
+              <div class="flex gap-2">
+                <button id="btn-robot-auto" class="px-3 py-1.5 text-[10px] font-code bg-bio-green text-white rounded">AUTO</button>
+                <button id="btn-robot-manual" class="px-3 py-1.5 text-[10px] font-code bg-bio-text/10 text-bio-text rounded">MANUAL</button>
+              </div>
+            </div>
+            <!-- Interactive Canvas -->
+            <div class="flex-grow bg-bio-bg/50 border border-bio-text/10 rounded-xl overflow-hidden relative">
+              <canvas id="canvas-robotica" class="w-full h-full cursor-crosshair block"></canvas>
+              <div class="absolute bottom-2 left-2 text-[9px] font-code text-bio-text/40 pointer-events-none" id="robot-status-text">
+                STATUS: AUTOMATIC MODE
               </div>
             </div>
           </div>
 
-          <!-- CONTENIDO 2: Neuro-Simulación -->
-          <div id="tab-content-neuro" class="tab-content hidden space-y-4">
-            <div class="flex justify-between items-start">
-              <h3 class="font-tech text-xl text-bio-text">Modelado de Circuitos Neuronales Biológicos</h3>
-              <span class="font-code text-xs px-2.5 py-1 bg-bio-rose/10 text-bio-rose rounded-full font-bold">Sistemas Dinámicos</span>
+          <!-- TAB 2: NEURO-SIMULACIÓN -->
+          <div id="tab-content-neuro" class="tab-content hidden w-full h-full flex flex-col">
+            <div class="px-4 pt-2 pb-4 flex justify-between items-start shrink-0">
+              <div>
+                <h3 class="font-tech text-lg text-bio-text">Transitorio Neuronal (Derivada)</h3>
+                <p class="text-xs text-bio-text/60 font-sans mt-1">Integración de EDOs. Haz clic en la gráfica y mantén presionada la <strong class="text-bio-text">BARRA ESPACIADORA</strong> para inyectar pulso $r(t)$.</p>
+              </div>
             </div>
-            <p class="text-sm text-bio-text/80 leading-relaxed font-sans">
-              Uno de los campos donde he explotado mis habilidades es en la simulación de neuronas reales usando <strong class="text-bio-rose">ecuaciones diferenciales</strong>. He trabajado simulando los transitorios y los potenciales de activación (las espigas eléctricas de transmisión de impulsos) en circuitos biológicamente inspirados.
-            </p>
-            <p class="text-sm text-bio-text/80 leading-relaxed font-sans">
-              Esto trasciende las típicas librerías pre-construidas de Deep Learning: es entender desde las matemáticas fundamentales cómo la naturaleza procesa datos en paralelo, para luego emular esos principios óptimos en automatizaciones de hardware real.
-            </p>
-            <div class="p-3 bg-bio-rose/5 rounded-lg border border-bio-rose/20 text-xs font-code text-bio-brown">
-              ⚙️ <strong>Enfoque matemático:</strong> Modelos biofísicos de conductancia (estilo Hodgkin-Huxley) • Comportamientos transitorios • Estabilidad de sistemas dinámicos cerrados.
-            </div>
-          </div>
-
-          <!-- CONTENIDO 3: Fascinaciones Teóricas -->
-          <div id="tab-content-fascinaciones" class="tab-content hidden space-y-4">
-            <div class="flex justify-between items-start">
-              <h3 class="font-tech text-xl text-bio-text">La curiosidad del universo</h3>
-              <span class="font-code text-xs px-2.5 py-1 bg-bio-blue/10 text-bio-blue rounded-full font-bold">Límites del Conocimiento</span>
-            </div>
-            <p class="text-sm text-bio-text/80 leading-relaxed font-sans">
-              Como eterno aprendiz, mantengo mi mente abierta investigando campos que me apasionan profundamente. La <strong class="text-bio-blue">física teórica</strong> y el modelado de dinámicas caóticas son mi forma de recordarme la complejidad maravillosa del universo.
-            </p>
-            <p class="text-sm text-bio-text/80 leading-relaxed font-sans">
-              Asimismo, la <strong class="text-bio-blue">computación cuántica</strong> es un foco de fascinación constante: la idea de computar usando la superposición de estados y el entrelazamiento es la próxima gran revolución lógica para los ingenieros que buscamos romper barreras de procesamiento masivo.
-            </p>
-            <div class="p-3 bg-bio-blue/5 rounded-lg border border-bio-blue/20 text-xs font-code text-bio-text/70">
-              🌌 <strong>Líneas de exploración personal:</strong> Simulación de dinámicas caóticas • Conceptos básicos de algoritmos cuánticos • Autoorganización.
+            <!-- Interactive Canvas -->
+            <div class="flex-grow bg-bio-bg/50 border border-bio-text/10 rounded-xl overflow-hidden relative">
+              <canvas id="canvas-neuro" class="w-full h-full cursor-pointer block" tabindex="0"></canvas>
+              <div class="absolute top-2 right-2 text-[9px] font-code text-bio-text bg-white/80 px-2 py-1 rounded shadow-sm">
+                <span class="text-bio-blue font-bold">■ r(t)</span> | 
+                <span class="text-[#121314] font-bold">■ E3 (Pos)</span> | 
+                <span class="text-bio-rose font-bold">■ E5 (Neg)</span>
+              </div>
             </div>
           </div>
 
-          <!-- Footer del Tablero Informativo -->
-          <div class="border-t border-bio-text/10 pt-4 mt-6 flex justify-between items-center text-[10px] font-code text-bio-text/40">
-            <span>DATOS DE EXPLORACIÓN DE SECCIÓN // DEIVS117</span>
-            <span>PRESIONE OTRA PESTAÑA PARA CAMBIAR CANAL</span>
+          <!-- TAB 3: CUÁNTICA -->
+          <div id="tab-content-cuantica" class="tab-content hidden w-full h-full flex flex-col">
+            <div class="px-4 pt-2 pb-4 flex justify-between items-start shrink-0">
+              <div>
+                <h3 class="font-tech text-lg text-bio-text">Doble Rendija & Observador</h3>
+                <p class="text-xs text-bio-text/60 font-sans mt-1">Comportamiento ondulatorio vs colapso de función de onda de Copenhague.</p>
+              </div>
+              <button id="btn-observer-toggle" class="px-3 py-1.5 text-[10px] font-code bg-bio-blue text-white rounded flex items-center gap-1 transition-colors">
+                👁️ AÑADIR OBSERVADOR
+              </button>
+            </div>
+            <!-- Interactive Canvas -->
+            <div class="flex-grow bg-[#121314] border border-bio-text/10 rounded-xl overflow-hidden relative">
+              <canvas id="canvas-cuantica" class="w-full h-full block"></canvas>
+              <div class="absolute bottom-2 left-2 text-[9px] font-code text-bio-bg/50 pointer-events-none" id="quantum-status-text">
+                STATE: FUNCIÓN DE ONDA (INTERFERENCIA)
+              </div>
+            </div>
           </div>
 
         </div>
@@ -236,8 +195,12 @@ import FondoTuring from '../components/FondoTuring.astro';
 </LayoutBase>
 
 <script>
-  // Lógica interactiva para cambiar de pestaña (Tabs)
-  function initTabs() {
+  /* ====================================================================================
+     LÓGICA GENERAL: TABS Y TELEMETRÍA (TYPEWRITER)
+     ==================================================================================== */
+  
+  function initTabsAndTerminal() {
+    // --- 1. TABS LOGIC ---
     const buttons = document.querySelectorAll('.tab-btn');
     const contents = document.querySelectorAll('.tab-content');
 
@@ -253,87 +216,454 @@ import FondoTuring from '../components/FondoTuring.astro';
         button.classList.add('bg-bio-green', 'text-bio-bg', 'border-bio-green');
         button.classList.remove('bg-white/40', 'text-bio-text', 'border-bio-text/10', 'hover:bg-white/70');
 
-        contents.forEach(content => {
-          content.classList.add('hidden');
-        });
+        contents.forEach(content => content.classList.add('hidden'));
 
         const targetContent = document.getElementById(`tab-content-${tabId}`);
         if (targetContent) {
           targetContent.classList.remove('hidden');
           targetContent.classList.add('animate-[fadeIn_0.3s_ease-out]');
+          // Despachar evento para forzar redibujado de canvas al mostrarse
+          window.dispatchEvent(new Event('resize')); 
         }
       });
     });
-  }
 
-  // Lógica interactiva de Typewriter para la terminal de telemetría
-  let terminalInterval: number | undefined;
-
-  function initTelemetryTerminal() {
+    // --- 2. TELEMETRY TYPEWRITER SECUENCIAL ---
     const terminal = document.getElementById('telemetry-terminal');
-    if (!terminal) return;
+    const bgData = document.getElementById('profile-bg-data');
+    if (!terminal || terminal.dataset.booted === "true") return;
+    terminal.dataset.booted = "true"; // Evitar doble ejecución en ViewTransitions
 
-    // Limpiamos cualquier intervalo activo previo para prevenir memory leaks en ViewTransitions
-    if (terminalInterval) {
-      clearInterval(terminalInterval);
-    }
-
-    const logLines = [
-      "> cargando nucleo_deivs117.sh...",
-      "> inicializando kernel de control robotico...",
-      "> sintonizando controladores PID... [OK]",
-      "  - kp: 1.25 | ki: 0.04 | kd: 0.12",
-      "> resolviendo ecuaciones de conductancia...",
-      "  - modelo: hodgkin_huxley_v2.0",
-      "  - transitorio neuronal: estable",
-      "> conectando modelos de deep learning...",
-      "  - backend turing tensor: online",
-      "> activando motor grafico frontend (canvas 2d)...",
-      "> sistema mecatronico nominal. listo para crear."
+    const bootLogs = [
+      "> init_system_core...",
+      "> cargando modulos de control PID...",
+      "> sintonizando variables de estado... [OK]",
+      "> estableciendo comunicacion neuronal...",
+      "> resolviendo ecuaciones diferenciales...",
+      "> inicializando motores graficos (webgl/canvas2d)...",
+      "> sistema estabilizado."
     ];
 
-    let lineIndex = 0;
-    let charIndex = 0;
-    let currentText = "";
-    terminal.innerHTML = "";
+    const profileData = `> Nombre: Deivs117
+> Profesión: Ingeniero Mecatrónico
+> Especialidad: Inteligencia Artificial (21 años)
+> Habilidades Físicas: Automatización, Robótica, Control
+> Habilidades Lógicas: Deep Learning, Simulaciones EDO
+> Canal Creativo: Frontend & UI/UX Design
+> Estado: ONLINE y preparado para compilar ideas.`;
 
-    function typeChar() {
-      if (lineIndex < logLines.length) {
-        const currentLine = logLines[lineIndex];
-        
-        if (charIndex < currentLine.length) {
-          currentText += currentLine[charIndex];
-          terminal!.innerHTML = currentText + "█"; // Cursor de terminal parpadeante
-          charIndex++;
-        } else {
-          currentText += "\n";
-          lineIndex++;
-          charIndex = 0;
-          // Pequeña pausa antes de saltar a escribir la siguiente línea
-          setTimeout(typeChar, 180);
-          return;
-        }
-      } else {
-        // Al terminar, esperamos un momento y reiniciamos el loop
-        setTimeout(() => {
-          lineIndex = 0;
-          charIndex = 0;
-          currentText = "";
-          terminal!.innerHTML = "";
-          typeChar();
-        }, 5000);
-        return;
-      }
+    async function sleep(ms: number) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    // Ajustamos la velocidad del typewriter a 18ms por caracter para que sea fluido
-    terminalInterval = window.setInterval(typeChar, 18);
+    async function runTypewriter() {
+      // Fase 1: Arranque (Boot)
+      for (const line of bootLogs) {
+        terminal!.innerHTML += line + "<br>";
+        await sleep(150);
+      }
+      await sleep(800);
+
+      // Fase 2: Limpieza (Clear)
+      terminal!.innerHTML = "> clear<br>";
+      await sleep(300);
+      terminal!.innerHTML = "";
+      
+      // Mostrar fondo con opacidad simulando que los datos se establecen
+      if(bgData) bgData.classList.remove('opacity-30', 'blur-[1px]');
+      
+      // Fase 3: Escritura de perfil (Typewriter real)
+      let currentHTML = "";
+      const lines = profileData.split('\n');
+      
+      for (const line of lines) {
+        for (const char of line) {
+          currentHTML += char;
+          terminal!.innerHTML = currentHTML + '<span class="animate-pulse">█</span>';
+          await sleep(20); // Velocidad de tecleo rápida
+        }
+        currentHTML += "<br>";
+        terminal!.innerHTML = currentHTML + '<span class="animate-pulse">█</span>';
+        await sleep(250); // Pausa al final de línea
+      }
+      
+      // Fase 4: Estático / Idle (Se queda parpadeando permanentemente)
+      terminal!.innerHTML = currentHTML + '<span class="animate-pulse">█</span>';
+    }
+
+    runTypewriter();
   }
 
-  // Ejecución sincronizada con las transiciones estáticas de Astro
+  /* ====================================================================================
+     SIMULADORES INTERACTIVOS (CANVAS 2D)
+     ==================================================================================== */
+  
+  function initSimulations() {
+    
+    // --- CANVAS 1: ROBÓTICA 2DOF ---
+    const canRob = document.getElementById('canvas-robotica') as HTMLCanvasElement;
+    if (canRob) {
+      const ctx = canRob.getContext('2d')!;
+      let isAuto = true;
+      let W = canRob.width = canRob.parentElement!.clientWidth;
+      let H = canRob.height = canRob.parentElement!.clientHeight;
+      
+      const L1 = W * 0.15; // Longitud brazo 1
+      const L2 = W * 0.15; // Longitud brazo 2
+      const basex = W / 2;
+      const basey = H - 30;
+
+      // Estado del robot
+      let theta1 = -Math.PI / 4;
+      let theta2 = Math.PI / 2;
+      let targetX = basex + 50;
+      let targetY = basey - 50;
+      
+      // Estado de la pelota (Banda transportadora)
+      let ballX = 0;
+      let ballY = basey - 15;
+      let hasBall = false;
+
+      // Eventos UI
+      document.getElementById('btn-robot-auto')?.addEventListener('click', (e) => {
+        isAuto = true;
+        (e.target as HTMLElement).classList.replace('bg-bio-text/10', 'bg-bio-green');
+        (e.target as HTMLElement).classList.replace('text-bio-text', 'text-white');
+        document.getElementById('btn-robot-manual')?.classList.replace('bg-bio-green', 'bg-bio-text/10');
+        document.getElementById('btn-robot-manual')?.classList.replace('text-white', 'text-bio-text');
+        document.getElementById('robot-status-text')!.innerText = "STATUS: AUTOMATIC MODE";
+        hasBall = false; ballX = 0; // Reset
+      });
+      document.getElementById('btn-robot-manual')?.addEventListener('click', (e) => {
+        isAuto = false;
+        (e.target as HTMLElement).classList.replace('bg-bio-text/10', 'bg-bio-green');
+        (e.target as HTMLElement).classList.replace('text-bio-text', 'text-white');
+        document.getElementById('btn-robot-auto')?.classList.replace('bg-bio-green', 'bg-bio-text/10');
+        document.getElementById('btn-robot-auto')?.classList.replace('text-white', 'text-bio-text');
+        document.getElementById('robot-status-text')!.innerText = "STATUS: MANUAL TELEOPERATION (CLICK & DRAG)";
+        hasBall = false;
+      });
+
+      canRob.addEventListener('mousemove', (e) => {
+        if (!isAuto) {
+          const rect = canRob.getBoundingClientRect();
+          targetX = e.clientX - rect.left;
+          targetY = e.clientY - rect.top;
+        }
+      });
+
+      function inverseKinematics(x: number, y: number) {
+        // Mapear respecto a la base
+        const px = x - basex;
+        const py = basey - y; // Y invertido para matemáticas
+        
+        let D = (px*px + py*py - L1*L1 - L2*L2) / (2 * L1 * L2);
+        // Evitar singularidades / alcance máximo
+        D = Math.max(-1, Math.min(1, D));
+        
+        // Configuración de codo abajo
+        const t2 = Math.acos(D);
+        const t1 = Math.atan2(py, px) - Math.atan2(L2 * Math.sin(t2), L1 + L2 * Math.cos(t2));
+        
+        // Suavizar movimiento (Control P simple)
+        theta1 += (-t1 - theta1) * 0.1; 
+        theta2 += (t2 - theta2) * 0.1;
+      }
+
+      function drawRobot() {
+        ctx.clearRect(0, 0, W, H);
+        
+        // Banda transportadora
+        ctx.fillStyle = '#E5E7EB';
+        ctx.fillRect(0, basey, W, 30);
+        ctx.strokeStyle = '#8FA9C4';
+        ctx.beginPath(); ctx.moveTo(0, basey); ctx.lineTo(W, basey); ctx.stroke();
+
+        if (isAuto) {
+          // Lógica automática: Seguir pelota en banda
+          if (!hasBall) {
+            ballX += 1.5; // Velocidad banda
+            targetX = ballX;
+            targetY = ballY;
+            if (ballX > basex) { // Robot agarra
+              hasBall = true;
+            }
+          } else {
+            // Mover a caja destino
+            targetX = basex + 100;
+            targetY = basey - 80;
+            ballX = basex + L1*Math.cos(theta1) + L2*Math.cos(theta1+theta2);
+            ballY = basey + L1*Math.sin(theta1) + L2*Math.sin(theta1+theta2);
+            if (Math.abs(theta1 - (-Math.atan2(basey-targetY, targetX-basex))) < 0.1) {
+              hasBall = false;
+              ballX = -50; // Reiniciar
+            }
+          }
+        }
+
+        inverseKinematics(targetX, targetY);
+
+        // Cinemática Directa (Render)
+        const j1x = basex + L1 * Math.cos(theta1);
+        const j1y = basey + L1 * Math.sin(theta1);
+        const j2x = j1x + L2 * Math.cos(theta1 + theta2);
+        const j2y = j1y + L2 * Math.sin(theta1 + theta2);
+
+        // Dibujar pelota
+        if (!hasBall && isAuto) {
+          ctx.beginPath(); ctx.arc(ballX, ballY, 12, 0, Math.PI*2);
+          ctx.fillStyle = '#D8A499'; ctx.fill();
+        } else if (hasBall) {
+          ctx.beginPath(); ctx.arc(j2x, j2y, 12, 0, Math.PI*2);
+          ctx.fillStyle = '#D8A499'; ctx.fill();
+        }
+
+        // Dibujar Base
+        ctx.beginPath(); ctx.arc(basex, basey, 20, Math.PI, 0);
+        ctx.fillStyle = '#4E5E52'; ctx.fill();
+
+        // Eslabones
+        ctx.lineWidth = 14;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#4E5E52';
+        ctx.beginPath(); ctx.moveTo(basex, basey); ctx.lineTo(j1x, j1y); ctx.stroke();
+        
+        ctx.strokeStyle = '#8FA9C4'; // Segundo eslabón color técnico
+        ctx.beginPath(); ctx.moveTo(j1x, j1y); ctx.lineTo(j2x, j2y); ctx.stroke();
+
+        // Articulaciones
+        ctx.fillStyle = '#F4F1EA';
+        ctx.beginPath(); ctx.arc(j1x, j1y, 6, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(j2x, j2y, 6, 0, Math.PI*2); ctx.fill();
+        
+        // Pinza
+        ctx.strokeStyle = '#121314'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(j2x, j2y); ctx.lineTo(j2x, j2y + 15); ctx.stroke();
+
+        requestAnimationFrame(drawRobot);
+      }
+      drawRobot();
+      window.addEventListener('resize', () => { W = canRob.width = canRob.parentElement!.clientWidth; H = canRob.height = canRob.parentElement!.clientHeight; });
+    }
+
+    // --- CANVAS 2: NEURO-SIMULACIÓN (EDO EULER) ---
+    const canNeuro = document.getElementById('canvas-neuro') as HTMLCanvasElement;
+    if (canNeuro) {
+      const ctx = canNeuro.getContext('2d')!;
+      let W = canNeuro.width = canNeuro.parentElement!.clientWidth;
+      let H = canNeuro.height = canNeuro.parentElement!.clientHeight;
+      
+      // Variables de Estado
+      let E1=0, E2=0, E3=0, E4=0, E5=0;
+      let r_input = 0;
+      let isSpacePressed = false;
+      
+      // Parámetros del paper/imagen
+      const tau = 0.01; // 10ms
+      const a=1, b=1, c=1, M=1000, sigma=30;
+      const dt = 0.002; // Euler timestep
+
+      // Historial para graficar (tamaño W)
+      let historyR: number[] = Array(W).fill(0);
+      let historyE3: number[] = Array(W).fill(0);
+      let historyE5: number[] = Array(W).fill(0);
+
+      canNeuro.addEventListener('keydown', (e) => { if(e.code === 'Space') { isSpacePressed = true; e.preventDefault(); } });
+      canNeuro.addEventListener('keyup', (e) => { if(e.code === 'Space') { isSpacePressed = false; e.preventDefault(); } });
+      canNeuro.addEventListener('mousedown', () => { isSpacePressed = true; });
+      canNeuro.addEventListener('mouseup', () => { isSpacePressed = false; });
+      canNeuro.addEventListener('mouseleave', () => { isSpacePressed = false; });
+
+      function solveEDO() {
+        // Sub-steps numéricos para estabilidad
+        for(let i=0; i<8; i++) {
+          // Generar señal de entrada rectangular con ruido gaussiano
+          let noise = (Math.random() + Math.random() + Math.random() - 1.5) * 2.0; // aprox normal
+          let target_r = isSpacePressed ? 20 + noise : Math.abs(noise)*0.2;
+          
+          // Suavizado del estímulo
+          r_input += (target_r - r_input) * 0.1; 
+
+          // Método de Euler Explícito para el sistema de ecuaciones
+          E1 += dt * (-E1 + r_input) / tau;
+          E2 += dt * (-E2 + a*E1) / tau;
+          
+          let term3 = Math.max(0, b*E1 - c*E2);
+          E3 += dt * (-E3 + (M * term3*term3) / (sigma*sigma + term3*term3)) / tau;
+          
+          E4 += dt * (-E4 + a*E1) / tau;
+          
+          let term5 = Math.max(0, b*E4 - c*E1);
+          E5 += dt * (-E5 + (M * term5*term5) / (sigma*sigma + term5*term5)) / tau;
+        }
+
+        // Almacenar en buffers circulares
+        historyR.push(r_input); historyR.shift();
+        historyE3.push(E3); historyE3.shift();
+        historyE5.push(E5); historyE5.shift();
+      }
+
+      function drawNeuro() {
+        solveEDO();
+        ctx.clearRect(0, 0, W, H);
+        
+        // Grilla estilo osciloscopio
+        ctx.strokeStyle = 'rgba(18, 19, 20, 0.05)';
+        ctx.lineWidth = 1;
+        for(let i=0; i<W; i+=40) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,H); ctx.stroke(); }
+        for(let i=0; i<H; i+=40) { ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(W,i); ctx.stroke(); }
+
+        const drawLine = (data: number[], color: string, scale: number, offset: number, lw: number) => {
+          ctx.beginPath();
+          ctx.strokeStyle = color;
+          ctx.lineWidth = lw;
+          ctx.lineJoin = 'round';
+          for(let i=0; i<W; i++) {
+            let x = i;
+            let y = H - offset - (data[i] * scale);
+            if(i===0) ctx.moveTo(x,y);
+            else ctx.lineTo(x,y);
+          }
+          ctx.stroke();
+        }
+
+        // Mapeo visual
+        const scaleY = H / 45; // Max amplitud ~30
+        
+        // E5: Derivada Negativa (Palo de rosa)
+        drawLine(historyE5, '#D8A499', scaleY, 20, 3);
+        // E3: Derivada Positiva (Negro / Obsidian)
+        drawLine(historyE3, '#121314', scaleY, 20, 3);
+        // r(t): Entrada Azul glaciar
+        drawLine(historyR, '#8FA9C4', scaleY, 20, 1.5);
+
+        requestAnimationFrame(drawNeuro);
+      }
+      drawNeuro();
+      window.addEventListener('resize', () => { 
+        W = canNeuro.width = canNeuro.parentElement!.clientWidth; 
+        H = canNeuro.height = canNeuro.parentElement!.clientHeight; 
+        historyR = Array(W).fill(0); historyE3 = Array(W).fill(0); historyE5 = Array(W).fill(0);
+      });
+    }
+
+    // --- CANVAS 3: FÍSICA CUÁNTICA (DOBLE RENDIJA) ---
+    const canQ = document.getElementById('canvas-cuantica') as HTMLCanvasElement;
+    if (canQ) {
+      const ctx = canQ.getContext('2d')!;
+      let W = canQ.width = canQ.parentElement!.clientWidth;
+      let H = canQ.height = canQ.parentElement!.clientHeight;
+      
+      let hasObserver = false;
+      let time = 0;
+      let particles: {x:number, y:number, vy:number}[] = [];
+
+      document.getElementById('btn-observer-toggle')?.addEventListener('click', (e) => {
+        hasObserver = !hasObserver;
+        const btn = e.target as HTMLElement;
+        const status = document.getElementById('quantum-status-text');
+        if (hasObserver) {
+          btn.classList.replace('bg-bio-blue', 'bg-bio-rose');
+          btn.innerHTML = '👁️ QUITAR OBSERVADOR';
+          status!.innerText = "STATE: COLAPSO DE FUNCIÓN DE ONDA (PARTÍCULA)";
+          particles = []; // Clear old state
+        } else {
+          btn.classList.replace('bg-bio-rose', 'bg-bio-blue');
+          btn.innerHTML = '👁️ AÑADIR OBSERVADOR';
+          status!.innerText = "STATE: FUNCIÓN DE ONDA (INTERFERENCIA)";
+        }
+      });
+
+      function drawQuantum() {
+        ctx.clearRect(0, 0, W, H);
+        time += 0.05;
+
+        const slitX = W / 2;
+        const gap = 60;
+        const slit1Y = H/2 - gap/2;
+        const slit2Y = H/2 + gap/2;
+
+        if (!hasObserver) {
+          // --- MODO ONDA (Interferencia) ---
+          ctx.strokeStyle = 'rgba(143, 169, 196, 0.4)'; // bio-blue transparente
+          ctx.lineWidth = 2;
+
+          // Ondas primarias
+          for (let r = (time*20)%40; r < slitX; r+=40) {
+            ctx.beginPath();
+            ctx.arc(0, H/2, r, -Math.PI/4, Math.PI/4);
+            ctx.stroke();
+          }
+
+          // Ondas secundarias (Principio Huygens)
+          ctx.globalCompositeOperation = 'screen';
+          for (let r = (time*20)%40; r < W-slitX; r+=40) {
+            ctx.beginPath(); ctx.arc(slitX, slit1Y, r, -Math.PI/2, Math.PI/2); ctx.stroke();
+            ctx.beginPath(); ctx.arc(slitX, slit2Y, r, -Math.PI/2, Math.PI/2); ctx.stroke();
+          }
+          ctx.globalCompositeOperation = 'source-over';
+
+          // Dibujar patrón de interferencia en la pared derecha
+          ctx.fillStyle = 'rgba(143, 169, 196, 0.8)';
+          for (let y = 0; y < H; y+=2) {
+            // Distancias a cada rendija
+            let d1 = Math.sqrt(Math.pow(W-slitX, 2) + Math.pow(y-slit1Y, 2));
+            let d2 = Math.sqrt(Math.pow(W-slitX, 2) + Math.pow(y-slit2Y, 2));
+            // Superposición de ondas (Intensidad)
+            let intensity = Math.pow(Math.cos((d1 - d2)*0.08), 2) * 60;
+            ctx.fillRect(W - intensity, y, intensity, 2);
+          }
+
+        } else {
+          // --- MODO PARTÍCULA (Colapso) ---
+          
+          // Emitir partículas
+          if (Math.random() < 0.3) {
+            let targetY = (Math.random() < 0.5) ? slit1Y : slit2Y;
+            // Ruido en la trayectoria
+            targetY += (Math.random()-0.5)*15;
+            particles.push({x: 0, y: targetY, vy: (targetY - H/2) / slitX * 5});
+          }
+
+          ctx.fillStyle = '#D8A499'; // bio-rose para partículas colapsadas
+          let newParticles = [];
+          
+          for (let p of particles) {
+            p.x += 8;
+            ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, Math.PI*2); ctx.fill();
+            if (p.x < W) newParticles.push(p);
+          }
+          particles = newParticles;
+
+          // Dibujar dos bandas clásicas (Distribución Gaussiana)
+          for (let y = 0; y < H; y+=2) {
+            let int1 = Math.exp(-Math.pow(y-slit1Y, 2)/300) * 80;
+            let int2 = Math.exp(-Math.pow(y-slit2Y, 2)/300) * 80;
+            let intensity = int1 + int2;
+            ctx.fillRect(W - intensity, y, intensity, 2);
+          }
+        }
+
+        // Dibujar barrera y rendijas (Igual para ambos)
+        ctx.fillStyle = '#4E5E52';
+        ctx.fillRect(slitX-4, 0, 8, slit1Y - 15);
+        ctx.fillRect(slitX-4, slit1Y + 15, 8, slit2Y - slit1Y - 30);
+        ctx.fillRect(slitX-4, slit2Y + 15, 8, H - slit2Y);
+        
+        // Dibujar pared trasera
+        ctx.fillRect(W-4, 0, 4, H);
+
+        requestAnimationFrame(drawQuantum);
+      }
+      drawQuantum();
+      window.addEventListener('resize', () => { W = canQ.width = canQ.parentElement!.clientWidth; H = canQ.height = canQ.parentElement!.clientHeight; });
+    }
+  }
+
+  // Bind execution to Astro transitions
   document.addEventListener('astro:page-load', () => {
-    initTabs();
-    initTelemetryTerminal();
+    initTabsAndTerminal();
+    initSimulations();
   });
 </script>
 

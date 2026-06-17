@@ -149,7 +149,7 @@
       const gridX = Math.floor((clientX / window.innerWidth) * gridW);
       const gridY = Math.floor((clientY / window.innerHeight) * gridH);
 
-      const r = 10; // Radio de perturbación
+      const r = 20; // Radio de perturbación
       for (let dy = -r; dy <= r; dy++) {
         for (let dx = -r; dx <= r; dx++) {
           const nx = gridX + dx;

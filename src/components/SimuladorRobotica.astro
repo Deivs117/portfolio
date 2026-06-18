@@ -32,7 +32,7 @@
   let isAutoModeActive = true; 
   const keysPressed: Record<string, boolean> = {};
 
-  // Canvas y contexto compartido
+  // Canvas y contexto de renderizado compartido
   let canvas: HTMLCanvasElement | null = null;
   let ctx: CanvasRenderingContext2D | null = null;
 
@@ -56,10 +56,18 @@
   // --- SIMULADOR DE ROBÓTICA ---
   function initRobotSimulator() {
     canvas = document.getElementById('canvas-robotica') as HTMLCanvasElement;
-    if (!canvas) return;
+    if (!canvas) {
+      console.warn("[ROBOT_DIAGNOSTIC] Error: Canvas 'canvas-robotica' no encontrado en el DOM.");
+      return;
+    }
 
     ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.warn("[ROBOT_DIAGNOSTIC] Error: No se pudo obtener el contexto 2D del canvas.");
+      return;
+    }
+
+    console.log("[ROBOT_DIAGNOSTIC] Inicializando parámetros de simulación y variables de estado...");
     
     // Dimensiones de pantalla y píxeles físicos lógicos
     let W = 0, H = 0;
@@ -148,6 +156,8 @@
       W = width;
       H = height;
 
+      console.log(`[ROBOT_DIAGNOSTIC] Dimensiones calculadas de forma segura: W=${W}px, H=${H}px (DPR=${dpr})`);
+
       // Proporciones robustas del robot
       L1 = H * 0.38; 
       L2 = H * 0.30; 
@@ -191,6 +201,7 @@
       targetX = xHome; targetY = yHome;
       currentX = xHome; currentY = yHome;
       vx = 0; vy = 0;
+      console.log("[ROBOT_DIAGNOSTIC] Conmutado a Modo Automático");
     });
 
     document.getElementById('btn-robot-manual')?.addEventListener('click', (e) => {
@@ -209,6 +220,7 @@
       targetX = xHome; targetY = yHome;
       currentX = xHome; currentY = yHome;
       vx = 0; vy = 0;
+      console.log("[ROBOT_DIAGNOSTIC] Conmutado a Modo Manual (Teclado habilitado)");
     });
 
     // --- MATEMÁTICAS DE CINEMÁTICA ---
@@ -236,7 +248,11 @@
     function draw() {
       // Usar constante local 'c' para garantizarle a TS que context nunca será null
       const c = ctx;
-      if (!c || !isRunning) return;
+      if (!c || !isRunning) {
+        if (!c) console.warn("[ROBOT_DIAGNOSTIC] Dibujo abortado: Contexto nulo.");
+        if (!isRunning) console.log("[ROBOT_DIAGNOSTIC] Dibujo pausado: isRunning está en false.");
+        return;
+      }
 
       c.clearRect(0, 0, W, H);
 
@@ -509,6 +525,8 @@
     
     // Coordenadas lógicas iniciales
     currentX = xHome; currentY = yHome;
+    
+    console.log("[ROBOT_DIAGNOSTIC] Parámetros listos. Iniciando bucle draw().");
     draw();
   }
 
@@ -516,8 +534,17 @@
   function startSimulator() {
     stopSimulator(); // Limpiar residuos antes de iniciar
     
-    // Un retardo de 50ms permite que el layout CSS de Tailwind se asiente antes de medir
+    // Encender la bandera global de animación obligatoriamente aquí
+    isRunning = true;
+    console.log(`[ROBOT_DIAGNOSTIC] startSimulator() invocado. Bandera isRunning establecida en: ${isRunning}`);
+
+    // Un retardo de 80ms permite que el layout CSS de Tailwind se asiente antes de medir
     setTimeout(() => {
+      if (!isRunning) {
+        console.log("[ROBOT_DIAGNOSTIC] startSimulator abortado durante la espera del temporizador.");
+        return;
+      }
+      
       initRobotSimulator();
       
       // Suscribir escuchas globales de teclado directamente al objeto window para máxima fiabilidad
@@ -525,11 +552,12 @@
       window.addEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
       window.addEventListener('keyup', handleKeyUp);
-    }, 50);
+    }, 80);
   }
 
   function stopSimulator() {
     isRunning = false;
+    console.log(`[ROBOT_DIAGNOSTIC] stopSimulator() invocado. Bandera isRunning establecida en: ${isRunning}`);
     if (robotAnimationId !== null) {
       cancelAnimationFrame(robotAnimationId);
       robotAnimationId = null;
@@ -541,6 +569,7 @@
 
   // Suspender renderizado cuando la pestaña no es la activa
   window.addEventListener('tab-changed', (e: any) => {
+    console.log(`[ROBOT_DIAGNOSTIC] Evento tab-changed recibido. Nueva pestaña activa: ${e.detail.activeTab}`);
     if (e.detail.activeTab === 'robotica') {
       startSimulator();
     } else {
@@ -549,6 +578,7 @@
   });
 
   document.addEventListener('astro:page-load', () => {
+    console.log("[ROBOT_DIAGNOSTIC] Evento astro:page-load recibido.");
     if ((window as any).activeSimulation === 'robotica') {
       startSimulator();
     } else {

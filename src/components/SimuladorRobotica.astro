@@ -1,5 +1,5 @@
 ---
-// Componente modular de Robótica 2DOF sintonizado paso a paso - Fase 1: Estantería Generalizada
+// Componente modular premium de Robótica 2DOF - Fase 2: Estantería de 25 Slots (5x5) y Control de Teclado Seguro
 ---
 
 <div class="w-full h-full flex flex-col">
@@ -16,10 +16,10 @@
   <div class="flex-grow bg-bio-bg/40 border border-bio-text/10 rounded-b-2xl overflow-hidden relative min-h-[410px] w-full">
     <canvas id="canvas-robotica" class="w-full h-full cursor-pointer block outline-none" tabindex="0"></canvas>
     <!-- Leyenda interactiva -->
-    <div id="robot-control-hint" class="absolute bottom-3 right-3 bg-white/95 px-3 py-2 rounded-lg border border-bio-text/10 shadow-md text-[9px] font-code text-bio-text pointer-events-none hidden max-w-[210px] leading-relaxed">
-      Haz clic en el lienzo.<br>Controla el efector final con <strong class="text-bio-green">W,A,S,D</strong> o <strong class="text-bio-green">Flechas</strong>.
+    <div id="robot-control-hint" class="absolute bottom-3 right-3 bg-white/95 px-3 py-2 rounded-lg border border-bio-text/10 shadow-md text-[9px] font-code text-bio-text pointer-events-none hidden max-w-[210px] leading-relaxed z-10">
+      Controla la consigna (Setpoint) con:<br><strong class="text-bio-green">W, A, S, D</strong> o las <strong class="text-bio-green">Flechas de Dirección</strong>.
     </div>
-    <div class="absolute bottom-3 left-3 text-[9px] font-code text-bio-text/45 pointer-events-none" id="robot-status-text">
+    <div class="absolute bottom-3 left-3 text-[9px] font-code text-bio-text/45 pointer-events-none z-10" id="robot-status-text">
       STATUS: AUTOMATIC MODE
     </div>
   </div>
@@ -37,48 +37,52 @@
     let isAuto = true;
     isRunning = true;
     
-    // Variables de dimensiones lógicas y físicas de pantalla
+    // Dimensiones de pantalla y píxeles físicos
     let W = 0, H = 0;
     let dpr = 1;
 
-    // --- PARÁMETROS GEOMÉTRICOS DEL ROBOT (AUMENTADOS) ---
-    let L1 = 0; // Longitud primer eslabón
-    let L2 = 0; // Longitud segundo eslabón
+    // --- PARÁMETROS GEOMÉTRICOS DEL ROBOT ---
+    let L1 = 0; 
+    let L2 = 0; 
     let basex = 0;
     let basey = 0;
 
-    // --- VARIABLES DE ESTADO ARTICULAR (ÁNGULOS DE CONTROL REALES) ---
+    // --- VARIABLES DE ESTADO ARTICULAR (ÁNGULOS REALES) ---
     let theta1 = Math.PI / 3;
-    let theta2 = -Math.PI / 2; // Configurado negativo para forzar siempre la pose codo-arriba
+    let theta2 = -Math.PI / 2; // Forzar codo arriba constante
 
-    // --- COORDENADAS OPERACIONALES CLAVE CENTRALIZADAS ---
+    // --- COORDENADAS OPERACIONALES CLAVE ---
     let xHome = 0, yHome = 0;
     let xGrab = 0, yGrab = 0;
     
-    // Parámetros de la Estantería generalizada en el flanco superior derecho
-    const maxShelf = 5;
-    let shelfX = 0;
-    let shelfYBase = 0;
-    const shelfSlotSpacingY = 22; // Espaciado vertical entre slots de entrega
+    // --- NUEVA ESTANTERÍA GENERALIZADA DE 25 SLOTS (5 Filas x 5 Columnas) ---
+    const shelfRows = 5;
+    const shelfCols = 5;
+    const maxShelf = shelfRows * shelfCols; // 25
+    
+    let shelfX = 0;         // Coordenada horizontal de inicio de la estantería
+    let shelfYBase = 0;     // Coordenada vertical base (Ranura inferior)
+    const colSpacing = 16;  // Separación horizontal entre columnas
+    const rowSpacing = 22;  // Separación vertical entre niveles
 
-    // Función de coordenadas generalizada (Elimina el hardcodeo de offsets por todo el script)
+    // Algoritmo matemático para indexar coordenadas sin valores acoplados estáticamente
     function getShelfSlotCoordinates(index: number) {
+      const row = Math.floor(index / shelfCols); // De 0 a 4 (de abajo hacia arriba)
+      const col = index % shelfCols;             // De 0 a 4 (de izquierda a derecha)
       return {
-        x: shelfX,
-        y: shelfYBase - index * shelfSlotSpacingY
+        x: shelfX + col * colSpacing,
+        y: shelfYBase - row * rowSpacing
       };
     }
 
     // --- SETPOINT VS VARIABLE DE PROCESO (FÍSICA DE SEGUNDO ORDEN) ---
-    let targetX = 0, targetY = 0; // Setpoint cartesiano deseado
-    let currentX = 0, currentY = 0; // Variable de proceso real del efector final (Filtro mecánico)
+    let targetX = 0, targetY = 0; 
+    let currentX = 0, currentY = 0; 
     
-    // Velocidades para simular inercia (Modelo masa-resorte-amortiguador bajo sintonización)
     let vx = 0, vy = 0;
-    const k_spring = 0.045; // Rigidez del controlador proporcional
-    const c_damping = 0.14; // Coeficiente de amortiguamiento (Sutilmente subamortiguado para mostrar sobreimpulso)
+    const k_spring = 0.045; 
+    const c_damping = 0.14; 
 
-    // Historial para el osciloscopio técnico
     const historyLength = 100;
     const setpointHistory: number[] = Array(historyLength).fill(0);
     const responseHistory: number[] = Array(historyLength).fill(0);
@@ -87,7 +91,7 @@
     let ball = {
       x: 0,
       y: 0,
-      radius: 8.5,
+      radius: 7.5, // Ligeramente más compacta para caber estéticamente en los 25 slots
       active: true,
       isStaticAtGrab: false
     };
@@ -102,13 +106,18 @@
     const STATE_GO_HOME = 3;    
     let currentState = STATE_HOME;
 
-    // --- CAPTURA DE TECLADO ---
+    // --- REGISTRO DE TECLADO ---
     const keysPressed: Record<string, boolean> = {};
     
     function handleKeyDown(e: KeyboardEvent) {
-      keysPressed[e.key.toLowerCase()] = true;
-      if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(e.key.toLowerCase())) {
-        e.preventDefault(); 
+      const key = e.key.toLowerCase();
+      keysPressed[key] = true;
+      
+      // Bloquear el scroll por defecto del navegador solo si el robot está en modo manual
+      if (!isAuto) {
+        if (["arrowup", "arrowdown", "arrowleft", "arrowright", "w", "a", "s", "d", " "].includes(key)) {
+          e.preventDefault(); 
+        }
       }
     }
 
@@ -116,7 +125,7 @@
       keysPressed[e.key.toLowerCase()] = false;
     }
 
-    // --- ADAPTACIÓN DE TAMAÑO Y CRISPNESS (ELIMINA EL PIXELADO) ---
+    // --- ADAPTACIÓN DE TAMAÑO Y CRISPNESS ---
     function resize() {
       if (!canvas || !ctx) return;
       const rect = canvas.getBoundingClientRect();
@@ -125,32 +134,30 @@
       const width = rect.width || canvas.parentElement?.clientWidth || 600;
       const height = rect.height || canvas.parentElement?.clientHeight || 410;
 
-      // Dimensiones de buffer adaptadas al pixel ratio del dispositivo
       canvas.width = width * dpr;
       canvas.height = height * dpr;
       
-      // Escalar contexto para usar píxeles lógicos en el código de dibujo
       ctx.resetTransform();
       ctx.scale(dpr, dpr);
       
       W = width;
       H = height;
 
-      // Escalar proporciones para hacer el robot imponente
-      L1 = H * 0.40; 
-      L2 = H * 0.32; 
-      basex = W * 0.48;
+      // Proporciones del robot robustas
+      L1 = H * 0.38; 
+      L2 = H * 0.30; 
+      basex = W * 0.46; // Desplazado ligeramente a la izquierda para acomodar las 5 columnas a la derecha
       basey = H - 55;
 
       xHome = basex;
       yHome = basey - H * 0.35;
 
-      xGrab = basex + W * 0.18; // Pelota se detiene a la derecha del robot
+      xGrab = basex + W * 0.16; 
       yGrab = basey - 12;
 
-      // Definir la base física de la estantería generalizada en el flanco superior derecho
-      shelfX = basex + W * 0.22;
-      shelfYBase = basey - H * 0.25;
+      // Ubicación base de la estantería de 25 slots elevada en la parte superior derecha
+      shelfX = basex + W * 0.18;
+      shelfYBase = basey - H * 0.20;
 
       if (currentState === STATE_HOME && isAuto) {
         targetX = xHome; targetY = yHome;
@@ -200,27 +207,22 @@
     });
 
     // --- MATEMÁTICAS DE CINEMÁTICA ---
-    
-    // Cinemática Directa local del robot
     function getDirectKinematics(t1Val: number, t2Val: number) {
       const xLocal = L1 * Math.cos(t1Val) + L2 * Math.cos(t1Val + t2Val);
       const yLocal = L1 * Math.sin(t1Val) + L2 * Math.sin(t1Val + t2Val);
       return { x: basex + xLocal, y: basey - yLocal };
     }
 
-    // Cinemática Inversa Sintonizada (Pose de Codo Arriba Constante)
     function solveInverseKinematics(xd: number, yd: number) {
       const px = xd - basex;
-      const py = basey - yd; // py positivo hacia arriba
+      const py = basey - yd; 
 
       let cosTheta2 = (px * px + py * py - L1 * L1 - L2 * L2) / (2 * L1 * L2);
       cosTheta2 = Math.max(-0.9999, Math.min(0.9999, cosTheta2));
       
-      // Sintonía: theta2 negativo fuerza la pose de "codo arriba" evitando dipping antinatural
       const t2Target = -Math.acos(cosTheta2);
       const t1Target = Math.atan2(py, px) - Math.atan2(L2 * Math.sin(t2Target), L1 + L2 * Math.cos(t2Target));
 
-      // Filtro proporcional de articulaciones
       theta1 += (t1Target - theta1) * 0.15;
       theta2 += (t2Target - theta2) * 0.15;
     }
@@ -231,8 +233,7 @@
 
       ctx.clearRect(0, 0, W, H);
 
-      // --- 1. FONDO ESTÉTICO E INDUSTRIAL (PLANOS TÉCNICOS) ---
-      // Grilla sutil de ingeniería
+      // --- 1. FONDO ESTÉTICO E INDUSTRIAL ---
       ctx.strokeStyle = 'rgba(18, 19, 20, 0.03)'; ctx.lineWidth = 1;
       const stepGrid = 25;
       for (let x = 0; x < W; x += stepGrid) {
@@ -242,24 +243,18 @@
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
       }
 
-      // Envolvente radial de rango máximo operacional
+      // Envolvente radial del espacio de trabajo
       ctx.strokeStyle = 'rgba(143, 169, 196, 0.08)'; ctx.lineWidth = 1.5;
       ctx.setLineDash([4, 4]);
-      ctx.beginPath();
-      ctx.arc(basex, basey, L1 + L2, Math.PI, 0);
-      ctx.stroke();
+      ctx.beginPath(); ctx.arc(basex, basey, L1 + L2, Math.PI, 0); ctx.stroke();
       ctx.setLineDash([]);
 
-      // --- 2. MODELADO DE RESPUESTA EN FRECUENCIA (FÍSICA DE SEGUNDO ORDEN) ---
+      // --- 2. MODELADO FÍSICO DE CONTROL ---
       const ax = k_spring * (targetX - currentX) - c_damping * vx;
       const ay = k_spring * (targetY - currentY) - c_damping * vy;
-      
-      vx += ax;
-      vy += ay;
-      currentX += vx;
-      currentY += vy;
+      vx += ax; vy += ay;
+      currentX += vx; currentY += vy;
 
-      // Almacenar datos para el osciloscopio en tiempo real
       setpointHistory.push(targetX); setpointHistory.shift();
       responseHistory.push(currentX); responseHistory.shift();
 
@@ -269,14 +264,12 @@
       if (isAuto) {
         switch (currentState) {
           case STATE_HOME:
-            targetX = xHome;
-            targetY = yHome;
+            targetX = xHome; targetY = yHome;
             ball.isStaticAtGrab = false;
 
-            // La pelota llega rodando desde el extremo derecho
             if (ball.active) {
               if (ball.x > xGrab) {
-                ball.x -= 1.8; 
+                ball.x -= 2.0; 
               } else {
                 ball.x = xGrab;
                 ball.isStaticAtGrab = true; 
@@ -286,9 +279,7 @@
             break;
 
           case STATE_APPROACH:
-            targetX = xGrab;
-            targetY = yGrab;
-
+            targetX = xGrab; targetY = yGrab;
             const dToBall = Math.sqrt(Math.pow(currentGripper.x - ball.x, 2) + Math.pow(currentGripper.y - ball.y, 2));
             if (dToBall < 6) {
               grabbed = true;
@@ -297,7 +288,7 @@
             break;
 
           case STATE_DELIVER:
-            // Obtener el slot libre actual mediante la función generalizada de coordenadas
+            // Obtener coordenadas de entrega calculadas algorítmicamente para la matriz 5x5
             const activeSlot = getShelfSlotCoordinates(shelfBalls.length);
             targetX = activeSlot.x;
             targetY = activeSlot.y;
@@ -311,17 +302,16 @@
               grabbed = false;
               ball.active = false;
 
+              // Reiniciar al completar los 25 slots de la estantería
               if (shelfBalls.length >= maxShelf) {
-                setTimeout(() => { shelfBalls = []; }, 800);
+                setTimeout(() => { shelfBalls = []; }, 1000);
               }
               currentState = STATE_GO_HOME;
             }
             break;
 
           case STATE_GO_HOME:
-            targetX = xHome;
-            targetY = yHome;
-
+            targetX = xHome; targetY = yHome;
             const dToHome = Math.sqrt(Math.pow(currentGripper.x - xHome, 2) + Math.pow(currentGripper.y - yHome, 2));
             if (dToHome < 6) {
               setTimeout(() => {
@@ -367,7 +357,7 @@
           ball.x = currentGripper.x;
           ball.y = currentGripper.y;
 
-          // Autodepósito en el slot libre de la estantería dinámica
+          // Autodepósito por aproximación al slot activo en manual
           const targetSlotManual = getShelfSlotCoordinates(shelfBalls.length);
           const distToShelfSlot = Math.sqrt(Math.pow(ball.x - targetSlotManual.x, 2) + Math.pow(ball.y - targetSlotManual.y, 2));
           if (distToShelfSlot < 25) {
@@ -376,7 +366,7 @@
             ball.active = false;
 
             if (shelfBalls.length >= maxShelf) {
-              setTimeout(() => { shelfBalls = []; }, 800);
+              setTimeout(() => { shelfBalls = []; }, 1000);
             }
             setTimeout(() => {
               ball.x = xGrab; ball.y = yGrab; ball.active = true;
@@ -384,32 +374,37 @@
           }
         }
 
+        // Puntero de consigna visual
         ctx.strokeStyle = 'rgba(216, 164, 153, 0.45)'; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.arc(targetX, targetY, 7, 0, Math.PI * 2); ctx.stroke();
       }
 
       solveInverseKinematics(currentX, currentY);
 
-      // --- 4. RENDERIZADO VECTORIAL DE LA ESTANTERÍA GENERALIZADA ---
-      ctx.strokeStyle = '#8C7870'; ctx.lineWidth = 3.5;
+      // --- 4. RENDERIZADO VECTORIAL DE LA ESTANTERÍA DE 25 SLOTS (5x5) ---
+      ctx.strokeStyle = '#8C7870'; ctx.lineWidth = 3;
       ctx.beginPath();
-      // Dibujar soporte vertical central de la estantería elevado
-      const bottomSupportY = shelfYBase + 12;
-      const topSupportY = shelfYBase - (maxShelf - 1) * shelfSlotSpacingY - 10;
-      ctx.moveTo(shelfX, bottomSupportY); ctx.lineTo(shelfX, topSupportY); 
+      
+      // Poste vertical izquierdo
+      ctx.moveTo(shelfX - 8, shelfYBase + 12);
+      ctx.lineTo(shelfX - 8, shelfYBase - (shelfRows - 1) * rowSpacing - 10);
+      
+      // Poste vertical derecho
+      ctx.moveTo(shelfX + (shelfCols - 1) * colSpacing + 8, shelfYBase + 12);
+      ctx.lineTo(shelfX + (shelfCols - 1) * colSpacing + 8, shelfYBase - (shelfRows - 1) * rowSpacing - 10);
       ctx.stroke();
 
-      // Dibujar cada ranura (slot) de forma dinámica usando la función de coordenadas
-      ctx.lineWidth = 2.5;
-      for (let i = 0; i < maxShelf; i++) {
-        const slot = getShelfSlotCoordinates(i);
+      // Bandejas horizontales (5 niveles)
+      ctx.lineWidth = 2;
+      for (let r = 0; r < shelfRows; r++) {
+        const sy = shelfYBase - r * rowSpacing + 8;
         ctx.beginPath();
-        ctx.moveTo(slot.x - 20, slot.y + 8); 
-        ctx.lineTo(slot.x + 20, slot.y + 8); 
+        ctx.moveTo(shelfX - 12, sy);
+        ctx.lineTo(shelfX + (shelfCols - 1) * colSpacing + 12, sy);
         ctx.stroke();
       }
 
-      // Dibujar las pelotas entregadas en sus respectivos slots
+      // Dibujar las pelotas entregadas en sus coordenadas exactas de la malla
       shelfBalls.forEach((b, idx) => {
         const slot = getShelfSlotCoordinates(idx);
         ctx.fillStyle = '#D8A499';
@@ -418,7 +413,7 @@
         ctx.fill();
       });
 
-      // Dibujar la pelota en la banda o sujetada
+      // Dibujar la pelota en la banda o sujeta
       if (ball.active && (!grabbed || !isAuto)) {
         ctx.fillStyle = '#D8A499';
         ctx.beginPath();
@@ -426,7 +421,7 @@
         ctx.fill();
       }
 
-      // --- 5. RENDERIZADO DEL BRAZO EN CONFIGURACIÓN CODO ARRIBA ---
+      // --- 5. RENDERIZADO DEL BRAZO ROBÓTICO CODO ARRIBA ---
       const j1x = basex + L1 * Math.cos(theta1);
       const j1y = basey - L1 * Math.sin(theta1); 
       
@@ -510,13 +505,37 @@
     draw();
   }
 
+  // --- REGISTRO DE TECLADO GLOBAL (RESUELVE EL ERROR TS2304) ---
+  const keysPressed: Record<string, boolean> = {};
+  let isAutoModeActive = true; // Flag auxiliar compartido para interceptar teclas de dirección
+
+  function handleKeyDown(e: KeyboardEvent) {
+    const key = e.key.toLowerCase();
+    keysPressed[key] = true;
+    
+    // Bloquear el scroll por defecto del navegador solo si el robot está en modo manual
+    if (!isAutoModeActive) {
+      if (["arrowup", "arrowdown", "arrowleft", "arrowright", "w", "a", "s", "d", " "].includes(key)) {
+        e.preventDefault(); 
+      }
+    }
+  }
+
+  function handleKeyUp(e: KeyboardEvent) {
+    keysPressed[e.key.toLowerCase()] = false;
+  }
+
   // --- CONTROL EXPLICITO DE INICIALIZACION SEGURO ---
   function startSimulator() {
-    stopSimulator(); // Limpiar residuos antes de iniciar
+    stopSimulator(); 
     
-    // Un retardo de 50ms permite que el layout CSS de Tailwind se asiente antes de medir
     setTimeout(() => {
       initRobotSimulator();
+      
+      window.removeEventListener('keydown', handleKeyDown);
+      window.addEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      window.addEventListener('keyup', handleKeyUp);
     }, 50);
   }
 
@@ -526,6 +545,8 @@
       cancelAnimationFrame(robotAnimationId);
       robotAnimationId = null;
     }
+    window.removeEventListener('keydown', handleKeyDown);
+    window.removeEventListener('keyup', handleKeyUp);
   }
 
   // Suspender renderizado cuando la pestaña no es la activa

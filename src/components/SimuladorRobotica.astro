@@ -1,5 +1,5 @@
 ---
-// Componente modular premium de Robótica 2DOF con estantería generalizada de 25 slots y control de teclado blindado (TypeScript Safe)
+// Componente modular de Robótica 2DOF con doble osciloscopio apilado a la izquierda (TypeScript Safe)
 ---
 
 <div class="w-full h-full flex flex-col">
@@ -13,13 +13,13 @@
       <button id="btn-robot-manual" class="px-2.5 py-1 text-[9px] font-code bg-bio-text/10 text-bio-text rounded-md transition-all">MANUAL</button>
     </div>
   </div>
-  <div class="flex-grow bg-bio-bg/40 border border-bio-text/10 rounded-b-2xl overflow-hidden relative min-h-[410px] w-full">
+  <div class="flex-grow bg-bio-bg/40 border border-bio-text/10 rounded-b-2xl overflow-hidden relative min-h-[370px] w-full">
     <canvas id="canvas-robotica" class="w-full h-full cursor-pointer block outline-none" tabindex="0"></canvas>
     <!-- Leyenda interactiva -->
     <div id="robot-control-hint" class="absolute bottom-3 right-3 bg-white/95 px-3 py-2 rounded-lg border border-bio-text/10 shadow-md text-[9px] font-code text-bio-text pointer-events-none hidden max-w-[210px] leading-relaxed z-10">
       Controla el efector final con:<br><strong class="text-bio-green">W, A, S, D</strong> o las <strong class="text-bio-green">Flechas de Dirección</strong>.
     </div>
-    <div class="absolute bottom-3 left-3 text-[9px] font-code text-bio-text/45 pointer-events-none z-10" id="robot-status-text">
+    <div class="absolute bottom-3 left-[210px] text-[9px] font-code text-bio-text/45 pointer-events-none z-10" id="robot-status-text">
       STATUS: AUTOMATIC MODE
     </div>
   </div>
@@ -115,9 +115,12 @@
     const k_spring = 0.045; 
     const c_damping = 0.14; 
 
+    // Historiales de telemetría para los dos ejes
     const historyLength = 100;
-    const setpointHistory: number[] = Array(historyLength).fill(0);
-    const responseHistory: number[] = Array(historyLength).fill(0);
+    const setpointXHistory: number[] = Array(historyLength).fill(0);
+    const responseXHistory: number[] = Array(historyLength).fill(0);
+    const setpointYHistory: number[] = Array(historyLength).fill(0);
+    const responseYHistory: number[] = Array(historyLength).fill(0);
 
     // --- ESTADO DE LA PELOTA ---
     let ball = {
@@ -145,7 +148,7 @@
       dpr = window.devicePixelRatio || 1;
       
       const width = rect.width || canvas.parentElement?.clientWidth || 600;
-      const height = rect.height || canvas.parentElement?.clientHeight || 410;
+      const height = rect.height || canvas.parentElement?.clientHeight || 370;
 
       canvas.width = width * dpr;
       canvas.height = height * dpr;
@@ -158,21 +161,21 @@
 
       console.log(`[ROBOT_DIAGNOSTIC] Dimensiones calculadas de forma segura: W=${W}px, H=${H}px (DPR=${dpr})`);
 
-      // Proporciones robustas del robot
-      L1 = H * 0.38; 
-      L2 = H * 0.30; 
-      basex = W * 0.46; // Desplazado ligeramente para acomodar las 5 columnas a la derecha
+      // Proporciones del robot optimizadas para evitar choques con los gráficos de la izquierda
+      L1 = H * 0.225; 
+      L2 = H * 0.3; 
+      basex = W * 0.58; // Desplazado firmemente a la derecha para dejar libre el flanco izquierdo
       basey = H - 55;
 
       xHome = basex;
-      yHome = basey - H * 0.35;
+      yHome = basey - H * 0.32;
 
-      xGrab = basex + W * 0.16; 
+      xGrab = basex + W * 0.14; 
       yGrab = basey - 12;
 
       // Ubicación base de la estantería de 25 slots elevada en la parte derecha
-      shelfX = basex + W * 0.18;
-      shelfYBase = basey - H * 0.20;
+      shelfX = basex + W * 0.15;
+      shelfYBase = basey - H * 0.18;
 
       if (currentState === STATE_HOME && isAutoModeActive) {
         targetX = xHome; targetY = yHome;
@@ -246,7 +249,7 @@
 
     // --- BUCLE DE SIMULACIÓN ---
     function draw() {
-      // Usar constante local 'c' para garantizarle a TS que context nunca será null
+      // Usar constante local 'c' para garantizarle a TS que el contexto nunca será null
       const c = ctx;
       if (!c || !isRunning) {
         if (!c) console.warn("[ROBOT_DIAGNOSTIC] Dibujo abortado: Contexto nulo.");
@@ -266,7 +269,7 @@
         c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke();
       }
 
-      // Envolvente radial del espacio de trabajo
+      // Envolvente radial del espacio de trabajo del brazo
       c.strokeStyle = 'rgba(143, 169, 196, 0.08)'; c.lineWidth = 1.5;
       c.setLineDash([4, 4]);
       c.beginPath(); c.arc(basex, basey, L1 + L2, Math.PI, 0); c.stroke();
@@ -278,8 +281,11 @@
       vx += ax; vy += ay;
       currentX += vx; currentY += vy;
 
-      setpointHistory.push(targetX); setpointHistory.shift();
-      responseHistory.push(currentX); responseHistory.shift();
+      // Almacenamos telemetría cartesiana. Para el eje Y calculamos altura física (basey - Y)
+      setpointXHistory.push(targetX); setpointXHistory.shift();
+      responseXHistory.push(currentX); responseXHistory.shift();
+      setpointYHistory.push(basey - targetY); setpointYHistory.shift();
+      responseYHistory.push(basey - currentY); responseYHistory.shift();
 
       // --- 3. PROCESAR LÓGICA AUTOMÁTICA VS MANUAL ---
       const currentGripper = getDirectKinematics(theta1, theta2);
@@ -397,7 +403,7 @@
           }
         }
 
-        // Puntero de consigna visual
+        // Puntero de consigna visual (Clampeado)
         c.strokeStyle = 'rgba(216, 164, 153, 0.45)'; c.lineWidth = 1;
         c.beginPath(); c.arc(targetX, targetY, 7, 0, Math.PI * 2); c.stroke();
       }
@@ -475,45 +481,85 @@
       c.lineWidth = 4;
       c.beginPath(); c.moveTo(j2x, j2y); c.lineTo(j2x, j2y + 12); c.stroke();
 
-      // --- 6. OSCILOSCOPIO DINÁMICO TÉCNICO (SINTONIZACIÓN PID) ---
-      const plotX = W - 170;
-      const plotY = 25;
-      const plotW = 150;
-      const plotH = 65;
+      // --- 6. RENDERIZADO GENERALIZADO DE OSCILOSCOPIOS EN EL FLANCO IZQUIERDO ---
+      const drawOscilloscope = (
+        x: number, y: number, w: number, h: number, 
+        title: string, 
+        minVal: number, maxVal: number, 
+        setpointData: number[], responseData: number[]
+      ) => {
+        // Recuadro exterior y fondo sutil
+        c.fillStyle = 'rgba(18, 19, 20, 0.02)'; c.fillRect(x, y, w, h);
+        c.strokeStyle = 'rgba(18, 19, 20, 0.1)'; c.lineWidth = 1;
+        c.strokeRect(x, y, w, h);
 
-      c.fillStyle = 'rgba(18, 19, 20, 0.02)'; c.fillRect(plotX, plotY, plotW, plotH);
-      c.strokeStyle = 'rgba(18, 19, 20, 0.1)'; c.lineWidth = 1;
-      c.strokeRect(plotX, plotY, plotW, plotH);
-
-      c.strokeStyle = 'rgba(18, 19, 20, 0.03)';
-      c.beginPath();
-      c.moveTo(plotX + plotW/2, plotY); c.lineTo(plotX + plotW/2, plotY + plotH);
-      c.moveTo(plotX, plotY + plotH/2); c.lineTo(plotX + plotW, plotY + plotH/2);
-      c.stroke();
-
-      const drawScopeCurve = (history: number[], color: string, thickness: number) => {
-        c.beginPath(); c.strokeStyle = color; c.lineWidth = thickness;
-        c.lineJoin = 'round';
-        
-        const minVal = basex - 120;
-        const maxVal = basex + 120;
-        const range = maxVal - minVal;
-
-        for (let i = 0; i < history.length; i++) {
-          const cx = plotX + (i / (history.length - 1)) * plotW;
-          const norm = (history[i] - minVal) / range;
-          const cy = plotY + plotH - (norm * plotH);
-          if (i === 0) c.moveTo(cx, cy);
-          else c.lineTo(cx, cy);
-        }
+        // Rejilla técnica interna de referencia
+        c.strokeStyle = 'rgba(18, 19, 20, 0.03)';
+        c.beginPath();
+        c.moveTo(x + w / 2, y); c.lineTo(x + w / 2, y + h);
+        c.moveTo(x, y + h / 2); c.lineTo(x + w, y + h / 2);
         c.stroke();
-      }
 
-      drawScopeCurve(setpointHistory, 'rgba(143, 169, 196, 0.5)', 1.5); 
-      drawScopeCurve(responseHistory, '#4E5E52', 1.8); 
+        // Trazar curvas con recorte y clamping estricto
+        const drawCurve = (history: number[], color: string, thickness: number) => {
+          c.beginPath(); c.strokeStyle = color; c.lineWidth = thickness;
+          c.lineJoin = 'round';
+          
+          const range = maxVal - minVal;
 
-      c.fillStyle = '#121314'; c.font = "8px Azeret Mono"; c.textAlign = "left";
-      c.fillText("X-AXIS STEP RESPONSE", plotX, plotY - 6);
+          for (let i = 0; i < history.length; i++) {
+            const cx = x + (i / (history.length - 1)) * w;
+            
+            // Clamping estricto de valores
+            const clampedVal = Math.max(minVal, Math.min(maxVal, history[i]));
+            const norm = (clampedVal - minVal) / range;
+            const cy = y + h - (norm * h);
+
+            if (i === 0) c.moveTo(cx, cy);
+            else c.lineTo(cx, cy);
+          }
+          c.stroke();
+        };
+
+        drawCurve(setpointData, 'rgba(143, 169, 196, 0.55)', 1.5); 
+        drawCurve(responseData, '#4E5E52', 1.8); 
+
+        // Etiquetas minimalistas Azeret Mono
+        c.fillStyle = '#121314'; c.font = "8px Azeret Mono"; c.textAlign = "left";
+        c.fillText(title, x, y - 6);
+      };
+
+      // --- PARÁMETROS GEOMÉTRICOS DEL DOBLE OSCILOSCOPIO (APILADOS VERTICALMENTE) ---
+      const plotX = 25;       // Ubicados en el extremo izquierdo libre
+      const plotW = 165;      // Más anchos y amplios
+      const plotH = 115;      // Mayor altura para evitar saturaciones visuales
+      
+      const plotY_X = 25;      // Primer recuadro (Eje X)
+      const plotY_Y = 165;     // Segundo recuadro (Eje Y)
+
+      // Límites sintonizados físicamente en base al rango de comando del robot (X y Y)
+      const minXLimit = basex - 80;  
+      const maxXLimit = basex + 250; 
+
+      // Para el Eje Y usamos la altura física máxima esperada: L1 + L2
+      const minYLimit = -15;  
+      const maxYLimit = (L1 + L2) + 20; 
+
+      // Render de Eje X
+      drawOscilloscope(
+        plotX, plotY_X, plotW, plotH, 
+        "X-AXIS STEP RESPONSE (px)", 
+        minXLimit, maxXLimit, 
+        setpointXHistory, responseXHistory
+      );
+
+      // Render de Eje Y (Física: Suelo a techo)
+      drawOscilloscope(
+        plotX, plotY_Y, plotW, plotH, 
+        "Y-AXIS HEIGHT RESPONSE (px)", 
+        minYLimit, maxYLimit, 
+        setpointYHistory, responseYHistory
+      );
 
       robotAnimationId = requestAnimationFrame(draw);
     }
@@ -523,7 +569,12 @@
     window.addEventListener('resize', resize);
     resize();
     
-    // Coordenadas lógicas iniciales
+    // Rellenar historiales con los valores estáticos iniciales
+    setpointXHistory.fill(xHome);
+    responseXHistory.fill(xHome);
+    setpointYHistory.fill(basey - yHome);
+    responseYHistory.fill(basey - yHome);
+    
     currentX = xHome; currentY = yHome;
     
     console.log("[ROBOT_DIAGNOSTIC] Parámetros listos. Iniciando bucle draw().");
@@ -534,7 +585,6 @@
   function startSimulator() {
     stopSimulator(); // Limpiar residuos antes de iniciar
     
-    // Encender la bandera global de animación obligatoriamente aquí
     isRunning = true;
     console.log(`[ROBOT_DIAGNOSTIC] startSimulator() invocado. Bandera isRunning establecida en: ${isRunning}`);
 

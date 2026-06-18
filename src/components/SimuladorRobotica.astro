@@ -1,5 +1,5 @@
 ---
-// Componente modular premium de Robótica 2DOF con física de control y osciloscopio dinámico
+// Componente modular de Robótica 2DOF sintonizado paso a paso - Fase 1: Estantería Generalizada
 ---
 
 <div class="w-full h-full flex flex-col">
@@ -27,6 +27,7 @@
 
 <script>
   let robotAnimationId: number | null = null;
+  let isRunning = false;
 
   function initRobotSimulator() {
     const canvas = document.getElementById('canvas-robotica') as HTMLCanvasElement;
@@ -34,6 +35,7 @@
 
     const ctx = canvas.getContext('2d')!;
     let isAuto = true;
+    isRunning = true;
     
     // Variables de dimensiones lógicas y físicas de pantalla
     let W = 0, H = 0;
@@ -49,20 +51,32 @@
     let theta1 = Math.PI / 3;
     let theta2 = -Math.PI / 2; // Configurado negativo para forzar siempre la pose codo-arriba
 
-    // --- COORDENADAS OPERACIONALES CLAVE ---
+    // --- COORDENADAS OPERACIONALES CLAVE CENTRALIZADAS ---
     let xHome = 0, yHome = 0;
     let xGrab = 0, yGrab = 0;
-    let shelfX = 0;
+    
+    // Parámetros de la Estantería generalizada en el flanco superior derecho
     const maxShelf = 5;
+    let shelfX = 0;
+    let shelfYBase = 0;
+    const shelfSlotSpacingY = 22; // Espaciado vertical entre slots de entrega
+
+    // Función de coordenadas generalizada (Elimina el hardcodeo de offsets por todo el script)
+    function getShelfSlotCoordinates(index: number) {
+      return {
+        x: shelfX,
+        y: shelfYBase - index * shelfSlotSpacingY
+      };
+    }
 
     // --- SETPOINT VS VARIABLE DE PROCESO (FÍSICA DE SEGUNDO ORDEN) ---
-    let targetX = 0, targetY = 0; // Setpoint cartesiano deseado (Rojo)
+    let targetX = 0, targetY = 0; // Setpoint cartesiano deseado
     let currentX = 0, currentY = 0; // Variable de proceso real del efector final (Filtro mecánico)
     
     // Velocidades para simular inercia (Modelo masa-resorte-amortiguador bajo sintonización)
     let vx = 0, vy = 0;
     const k_spring = 0.045; // Rigidez del controlador proporcional
-    const c_damping = 0.25; // Coeficiente de amortiguamiento (Sutilmente subamortiguado para mostrar sobreimpulso)
+    const c_damping = 0.14; // Coeficiente de amortiguamiento (Sutilmente subamortiguado para mostrar sobreimpulso)
 
     // Historial para el osciloscopio técnico
     const historyLength = 100;
@@ -73,7 +87,7 @@
     let ball = {
       x: 0,
       y: 0,
-      radius: 9,
+      radius: 8.5,
       active: true,
       isStaticAtGrab: false
     };
@@ -90,35 +104,41 @@
 
     // --- CAPTURA DE TECLADO ---
     const keysPressed: Record<string, boolean> = {};
-    canvas.addEventListener('keydown', (e) => {
+    
+    function handleKeyDown(e: KeyboardEvent) {
       keysPressed[e.key.toLowerCase()] = true;
       if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(e.key.toLowerCase())) {
         e.preventDefault(); 
       }
-    });
-    canvas.addEventListener('keyup', (e) => {
+    }
+
+    function handleKeyUp(e: KeyboardEvent) {
       keysPressed[e.key.toLowerCase()] = false;
-    });
+    }
 
     // --- ADAPTACIÓN DE TAMAÑO Y CRISPNESS (ELIMINA EL PIXELADO) ---
     function resize() {
+      if (!canvas || !ctx) return;
       const rect = canvas.getBoundingClientRect();
       dpr = window.devicePixelRatio || 1;
       
+      const width = rect.width || canvas.parentElement?.clientWidth || 600;
+      const height = rect.height || canvas.parentElement?.clientHeight || 410;
+
       // Dimensiones de buffer adaptadas al pixel ratio del dispositivo
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
       
       // Escalar contexto para usar píxeles lógicos en el código de dibujo
       ctx.resetTransform();
       ctx.scale(dpr, dpr);
       
-      W = rect.width;
-      H = rect.height;
+      W = width;
+      H = height;
 
-      // Escalar proporciones para hacer el robot mucho más imponente
-      L1 = H * 0.40; // 40% del alto de la pantalla (Más grande)
-      L2 = H * 0.32; // 32% del alto de la pantalla
+      // Escalar proporciones para hacer el robot imponente
+      L1 = H * 0.40; 
+      L2 = H * 0.32; 
       basex = W * 0.48;
       basey = H - 55;
 
@@ -128,7 +148,9 @@
       xGrab = basex + W * 0.18; // Pelota se detiene a la derecha del robot
       yGrab = basey - 12;
 
-      shelfX = basex - W * 0.20; // Estantería se ubica a la izquierda del robot
+      // Definir la base física de la estantería generalizada en el flanco superior derecho
+      shelfX = basex + W * 0.22;
+      shelfYBase = basey - H * 0.25;
 
       if (currentState === STATE_HOME && isAuto) {
         targetX = xHome; targetY = yHome;
@@ -205,6 +227,8 @@
 
     // --- BUCLE DE SIMULACIÓN ---
     function draw() {
+      if (!isRunning) return;
+
       ctx.clearRect(0, 0, W, H);
 
       // --- 1. FONDO ESTÉTICO E INDUSTRIAL (PLANOS TÉCNICOS) ---
@@ -226,13 +250,7 @@
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Dibujar sombras decorativas de maquinaria industrial de fondo
-      ctx.fillStyle = 'rgba(78, 94, 82, 0.025)';
-      ctx.fillRect(W * 0.05, H - 180, 50, 140); // Silueta de panel eléctrico
-      ctx.fillRect(W * 0.05 + 15, H - 210, 20, 30); // Baliza de status
-
       // --- 2. MODELADO DE RESPUESTA EN FRECUENCIA (FÍSICA DE SEGUNDO ORDEN) ---
-      // Dinámica de masas: ax = k*(setpoint - actual) - c*velocidad
       const ax = k_spring * (targetX - currentX) - c_damping * vx;
       const ay = k_spring * (targetY - currentY) - c_damping * vy;
       
@@ -258,21 +276,19 @@
             // La pelota llega rodando desde el extremo derecho
             if (ball.active) {
               if (ball.x > xGrab) {
-                ball.x -= 1.8; // Velocidad suave de banda
+                ball.x -= 1.8; 
               } else {
                 ball.x = xGrab;
-                ball.isStaticAtGrab = true; // Se detiene exótica en posición de recolección
+                ball.isStaticAtGrab = true; 
                 currentState = STATE_APPROACH;
               }
             }
             break;
 
           case STATE_APPROACH:
-            // Pelota quieta. El robot inicia la trayectoria elegante
             targetX = xGrab;
             targetY = yGrab;
 
-            // Detección de acople mecánico sutil
             const dToBall = Math.sqrt(Math.pow(currentGripper.x - ball.x, 2) + Math.pow(currentGripper.y - ball.y, 2));
             if (dToBall < 6) {
               grabbed = true;
@@ -281,10 +297,10 @@
             break;
 
           case STATE_DELIVER:
-            // Llevar al estante libre de la izquierda
-            const targetShelfY = H - 62 - (shelfBalls.length * 22);
-            targetX = shelfX + 15;
-            targetY = targetShelfY;
+            // Obtener el slot libre actual mediante la función generalizada de coordenadas
+            const activeSlot = getShelfSlotCoordinates(shelfBalls.length);
+            targetX = activeSlot.x;
+            targetY = activeSlot.y;
 
             ball.x = currentGripper.x;
             ball.y = currentGripper.y;
@@ -320,13 +336,12 @@
         }
       } else {
         // --- CONTROL MANUAL DE COORDENADAS ---
-        const step = 5;
+        const step = 4;
         if (keysPressed['w'] || keysPressed['arrowup']) targetY -= step;
         if (keysPressed['s'] || keysPressed['arrowdown']) targetY += step;
         if (keysPressed['a'] || keysPressed['arrowleft']) targetX -= step;
         if (keysPressed['d'] || keysPressed['arrowright']) targetX += step;
 
-        // Clampar límites operacionales para prevenir quiebres mecánicos
         const distFromBase = Math.sqrt(Math.pow(targetX - basex, 2) + Math.pow(targetY - basey, 2));
         const maxRange = (L1 + L2) - 6;
         const minRange = Math.abs(L1 - L2) + 16;
@@ -343,7 +358,6 @@
 
         if (targetY > yGrab) targetY = yGrab;
 
-        // Agarre manual al tocar
         const dToBallManual = Math.sqrt(Math.pow(currentGripper.x - ball.x, 2) + Math.pow(currentGripper.y - ball.y, 2));
         if (dToBallManual < 12 && ball.active && !grabbed) {
           grabbed = true;
@@ -353,9 +367,11 @@
           ball.x = currentGripper.x;
           ball.y = currentGripper.y;
 
-          // Autodepósito en estante izquierdo
-          if (ball.x < shelfX + 20 && ball.y < H - 48) {
-            shelfBalls.push({ x: shelfX + 15, y: ball.y });
+          // Autodepósito en el slot libre de la estantería dinámica
+          const targetSlotManual = getShelfSlotCoordinates(shelfBalls.length);
+          const distToShelfSlot = Math.sqrt(Math.pow(ball.x - targetSlotManual.x, 2) + Math.pow(ball.y - targetSlotManual.y, 2));
+          if (distToShelfSlot < 25) {
+            shelfBalls.push({ x: targetSlotManual.x, y: targetSlotManual.y });
             grabbed = false;
             ball.active = false;
 
@@ -368,34 +384,41 @@
           }
         }
 
-        // Puntero de consigna
         ctx.strokeStyle = 'rgba(216, 164, 153, 0.45)'; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.arc(targetX, targetY, 7, 0, Math.PI * 2); ctx.stroke();
       }
 
       solveInverseKinematics(currentX, currentY);
 
-      // --- 4. RENDERIZADO DE LA ESTANTERÍA Y BANDAS (IZQUIERDA) ---
+      // --- 4. RENDERIZADO VECTORIAL DE LA ESTANTERÍA GENERALIZADA ---
       ctx.strokeStyle = '#8C7870'; ctx.lineWidth = 3.5;
       ctx.beginPath();
-      ctx.moveTo(shelfX, H - 40); ctx.lineTo(shelfX, H - 165); 
+      // Dibujar soporte vertical central de la estantería elevado
+      const bottomSupportY = shelfYBase + 12;
+      const topSupportY = shelfYBase - (maxShelf - 1) * shelfSlotSpacingY - 10;
+      ctx.moveTo(shelfX, bottomSupportY); ctx.lineTo(shelfX, topSupportY); 
       ctx.stroke();
 
+      // Dibujar cada ranura (slot) de forma dinámica usando la función de coordenadas
+      ctx.lineWidth = 2.5;
       for (let i = 0; i < maxShelf; i++) {
-        const sy = H - 54 - (i * 22);
+        const slot = getShelfSlotCoordinates(i);
         ctx.beginPath();
-        ctx.moveTo(shelfX - 35, sy); ctx.lineTo(shelfX + 6, sy); 
+        ctx.moveTo(slot.x - 20, slot.y + 8); 
+        ctx.lineTo(slot.x + 20, slot.y + 8); 
         ctx.stroke();
       }
 
+      // Dibujar las pelotas entregadas en sus respectivos slots
       shelfBalls.forEach((b, idx) => {
+        const slot = getShelfSlotCoordinates(idx);
         ctx.fillStyle = '#D8A499';
         ctx.beginPath();
-        ctx.arc(shelfX - 15, H - 62 - (idx * 22), ball.radius, 0, Math.PI * 2);
+        ctx.arc(slot.x, slot.y, ball.radius, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      // Dibujar la pelota
+      // Dibujar la pelota en la banda o sujetada
       if (ball.active && (!grabbed || !isAuto)) {
         ctx.fillStyle = '#D8A499';
         ctx.beginPath();
@@ -403,9 +426,9 @@
         ctx.fill();
       }
 
-      // --- 5. RENDERIZADO DEL BRAZO CON CONFIGURACIÓN CODO ARRIBA ---
+      // --- 5. RENDERIZADO DEL BRAZO EN CONFIGURACIÓN CODO ARRIBA ---
       const j1x = basex + L1 * Math.cos(theta1);
-      const j1y = basey - L1 * Math.sin(theta1); // py invertido para canvas
+      const j1y = basey - L1 * Math.sin(theta1); 
       
       const j2x = j1x + L2 * Math.cos(theta1 + theta2);
       const j2y = j1y - L2 * Math.sin(theta1 + theta2);
@@ -429,35 +452,32 @@
       ctx.fillStyle = '#4E5E52';
       ctx.beginPath(); ctx.arc(basex, basey, 14, Math.PI, 0); ctx.fill();
 
-      // Efector final / Gripper (Sombra activa al agarrar)
+      // Efector final / Gripper
       ctx.strokeStyle = grabbed ? '#D8A499' : '#121314'; 
       ctx.lineWidth = 4;
       ctx.beginPath(); ctx.moveTo(j2x, j2y); ctx.lineTo(j2x, j2y + 12); ctx.stroke();
 
       // --- 6. OSCILOSCOPIO DINÁMICO TÉCNICO (SINTONIZACIÓN PID) ---
-      const plotX = W - 300;
-      const plotY = 75;
-      const plotW = 250;
-      const plotH = 100;
+      const plotX = W - 170;
+      const plotY = 25;
+      const plotW = 150;
+      const plotH = 65;
 
       ctx.fillStyle = 'rgba(18, 19, 20, 0.02)'; ctx.fillRect(plotX, plotY, plotW, plotH);
       ctx.strokeStyle = 'rgba(18, 19, 20, 0.1)'; ctx.lineWidth = 1;
       ctx.strokeRect(plotX, plotY, plotW, plotH);
 
-      // Trazar rejilla de scope
       ctx.strokeStyle = 'rgba(18, 19, 20, 0.03)';
       ctx.beginPath();
       ctx.moveTo(plotX + plotW/2, plotY); ctx.lineTo(plotX + plotW/2, plotY + plotH);
       ctx.moveTo(plotX, plotY + plotH/2); ctx.lineTo(plotX + plotW, plotY + plotH/2);
       ctx.stroke();
 
-      // Dibujar curvas de telemetría de control
       const drawScopeCurve = (history: number[], color: string, thickness: number) => {
         ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = thickness;
         ctx.lineJoin = 'round';
         
-        // Mapeo automático de escala
-        const minVal = basex - 250;
+        const minVal = basex - 120;
         const maxVal = basex + 120;
         const range = maxVal - minVal;
 
@@ -471,8 +491,8 @@
         ctx.stroke();
       }
 
-      drawScopeCurve(setpointHistory, 'rgba(143, 169, 196, 0.5)', 1.5); // Setpoint en Azul sutil
-      drawScopeCurve(responseHistory, '#4E5E52', 1.8); // Respuesta de proceso en Verde Salvia
+      drawScopeCurve(setpointHistory, 'rgba(143, 169, 196, 0.5)', 1.5); 
+      drawScopeCurve(responseHistory, '#4E5E52', 1.8); 
 
       ctx.fillStyle = '#121314'; ctx.font = "8px Azeret Mono"; ctx.textAlign = "left";
       ctx.fillText("X-AXIS STEP RESPONSE", plotX, plotY - 6);
@@ -481,6 +501,7 @@
     }
 
     // Adaptar y re-escalar de forma síncrona ante eventos de redimensión de pantalla
+    window.removeEventListener('resize', resize);
     window.addEventListener('resize', resize);
     resize();
     
@@ -489,21 +510,38 @@
     draw();
   }
 
+  // --- CONTROL EXPLICITO DE INICIALIZACION SEGURO ---
+  function startSimulator() {
+    stopSimulator(); // Limpiar residuos antes de iniciar
+    
+    // Un retardo de 50ms permite que el layout CSS de Tailwind se asiente antes de medir
+    setTimeout(() => {
+      initRobotSimulator();
+    }, 50);
+  }
+
+  function stopSimulator() {
+    isRunning = false;
+    if (robotAnimationId !== null) {
+      cancelAnimationFrame(robotAnimationId);
+      robotAnimationId = null;
+    }
+  }
+
   // Suspender renderizado cuando la pestaña no es la activa
   window.addEventListener('tab-changed', (e: any) => {
     if (e.detail.activeTab === 'robotica') {
-      if (robotAnimationId === null) initRobotSimulator();
+      startSimulator();
     } else {
-      if (robotAnimationId !== null) {
-        cancelAnimationFrame(robotAnimationId);
-        robotAnimationId = null;
-      }
+      stopSimulator();
     }
   });
 
   document.addEventListener('astro:page-load', () => {
     if ((window as any).activeSimulation === 'robotica') {
-      initRobotSimulator();
+      startSimulator();
+    } else {
+      stopSimulator();
     }
   });
 </script>

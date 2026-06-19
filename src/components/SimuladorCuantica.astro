@@ -1,5 +1,5 @@
 ---
-// Componente modular premium para el experimento cuántico de la Doble Rendija con histogramas duales persistentes
+// Componente modular premium para el experimento cuántico de la Doble Rendija con sistema auto-limpiable (TypeScript Safe)
 ---
 
 <div class="w-full h-full flex flex-col">
@@ -8,7 +8,6 @@
       <span class="font-code text-[10px] px-2 py-0.5 bg-bio-blue text-white rounded font-bold">QUANTUM_WAVE</span>
       <span class="font-code text-[10px] text-bio-blue font-bold">[LAB_03] INTERFERÓMETRO DE DOBLE RENDIJA</span>
     </div>
-    <!-- Botón de Conmutación Estilizado -->
     <button id="btn-observer-toggle" class="px-2.5 py-1 text-[9px] font-code bg-bio-blue text-white rounded-md font-bold transition-all hover:scale-[1.02] shadow-sm">
       👁️ AÑADIR OBSERVADOR
     </button>
@@ -16,13 +15,11 @@
   <div class="flex-grow bg-[#121314] border border-bio-text/10 rounded-b-2xl overflow-hidden relative min-h-[380px] mt-4">
     <canvas id="canvas-cuantica" class="w-full h-full block outline-none"></canvas>
     
-    <!-- Leyenda interactiva -->
     <div class="absolute bottom-3 left-3 text-[9px] font-code text-bio-bg/50 pointer-events-none" id="quantum-status-text">
       ESTADO: ONDA RECTORA (MÚLTIPLE INTERFERENCIA)
     </div>
 
-    <!-- Leyenda de colores del histograma persistente -->
-    <div class="absolute top-3 right-3 text-[8px] font-code text-white bg-black/60 px-2.5 py-1.5 rounded-md border border-white/5 shadow-md flex gap-3 pointer-events-none">
+    <div class="absolute top-3 right-3 text-[8px] font-code text-white bg-black/60 px-2.5 py-1.5 rounded-md border border-white/5 shadow-md flex gap-3 pointer-events-none z-10">
       <span class="flex items-center gap-1"><span class="h-1.5 w-1.5 bg-bio-blue rounded-full"></span> Ondas (Sin Obs.)</span>
       <span class="flex items-center gap-1"><span class="h-1.5 w-1.5 bg-bio-rose rounded-full"></span> Partículas (Con Obs.)</span>
     </div>
@@ -31,18 +28,20 @@
 
 <script>
   let quantumAnimationId: number | null = null;
+  let isRunning = false;
+  let canvas: HTMLCanvasElement | null = null;
+  let ctx: CanvasRenderingContext2D | null = null;
 
   function initQuantumSimulator() {
-    const canvas = document.getElementById('canvas-cuantica') as HTMLCanvasElement;
+    canvas = document.getElementById('canvas-cuantica') as HTMLCanvasElement;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d')!;
+    ctx = canvas.getContext('2d');
+    if (!ctx) return;
     
-    // Obtener dimensiones lógicas del Layout de forma segura
     let W = canvas.parentElement!.clientWidth || 600;
     let H = canvas.parentElement!.clientHeight || 410;
 
-    // --- RENDERIZADO EN ALTA DEFINICIÓN (CRISP RENDER VECTORIAL) ---
     const dpr = window.devicePixelRatio || 1;
     canvas.width = W * dpr;
     canvas.height = H * dpr;
@@ -51,7 +50,6 @@
     let hasObserver = false;
     let qTime = 0;
 
-    // Partículas cuánticas en tránsito
     interface Particle {
       x: number;
       y: number;
@@ -63,7 +61,6 @@
     }
     let qParticles: Particle[] = [];
     
-    // --- NUEVO SISTEMA DE PARTÍCULAS DE IMPACTO (SPARKS) ---
     interface ImpactSpark {
       x: number;
       y: number;
@@ -75,20 +72,16 @@
     }
     let impactSparks: ImpactSpark[] = [];
 
-    // --- HISTOGRAMAS PERSISTENTES DUALES ---
     const histBins = 55;
-    let histHitsWave = Array(histBins).fill(0);      // Histograma de Ondas (Sin observador)
-    let histHitsParticle = Array(histBins).fill(0);  // Histograma de Partículas (Con observador)
+    let histHitsWave = Array(histBins).fill(0);      
+    let histHitsParticle = Array(histBins).fill(0);  
 
-    // Configuración del click del observador sin reinicios de datos
     const btn = document.getElementById('btn-observer-toggle');
     if (btn) {
       (btn as any).onclick = (e: Event) => {
         hasObserver = !hasObserver;
         const status = document.getElementById('quantum-status-text');
         
-        // ¡La telemetría y las partículas en tránsito se conservan intactas al conmutar!
-
         if (hasObserver) {
           btn.classList.replace('bg-bio-blue', 'bg-bio-rose');
           btn.innerHTML = '👁️ QUITAR OBSERVADOR';
@@ -101,15 +94,14 @@
       };
     }
 
-    // Función auxiliar para emitir chispas fosforescentes de impacto
     function spawnSparks(x: number, y: number, color: string) {
-      const count = Math.floor(Math.random() * 4) + 4; // Entre 4 y 7 chispas por impacto
+      const count = Math.floor(Math.random() * 4) + 4; 
       for (let i = 0; i < count; i++) {
         impactSparks.push({
           x: x,
           y: y,
-          vx: -(Math.random() * 2.2 + 0.6), // Salen despedidas hacia la izquierda (rebotan de la pantalla)
-          vy: (Math.random() - 0.5) * 2.5,  // Angulo de dispersión vertical
+          vx: -(Math.random() * 2.2 + 0.6), 
+          vy: (Math.random() - 0.5) * 2.5,  
           color: color,
           alpha: 1.0,
           size: Math.random() * 2.5 + 1.0
@@ -118,7 +110,17 @@
     }
 
     function draw() {
-      ctx.clearRect(0, 0, W, H);
+      // --- DETECTOR ATÓMICO DE FUGAS DE ANIMACIÓN ---
+      if (!canvas || !canvas.isConnected || !isRunning) {
+        console.log("[QUANTUM_DIAGNOSTIC] Deteniendo bucle por cambio de pestaña.");
+        stopSimulator();
+        return;
+      }
+
+      const c = ctx;
+      if (!c) return;
+
+      c.clearRect(0, 0, W, H);
       qTime += 0.08;
 
       const emitX = 40;
@@ -128,17 +130,14 @@
       const slit1Y = H / 2 - dSlits / 2;
       const slit2Y = H / 2 + dSlits / 2;
 
-      // --- 1. EMISOR DE CUANTOS ---
       if (Math.random() < 0.28) {
         if (!hasObserver) {
-          // Modo Onda Coherente (Azul)
           qParticles.push({
             x: emitX, y: H / 2, r: 3,
             vx: 4.8, vy: (Math.random() - 0.5) * 1.5,
             mode: 'wave'
           });
         } else {
-          // Modo Partícula Clásica (Palo de rosa)
           const targetY = Math.random() < 0.5 ? slit1Y : slit2Y;
           const angle = Math.atan2(targetY - H / 2, slitX - emitX);
           qParticles.push({
@@ -151,30 +150,26 @@
         }
       }
 
-      // --- 2. RENDERIZADO DE LOS FRENTES DE ONDA SIN OBSERVADOR ---
       const hasWaves = qParticles.some(p => p.mode === 'wave');
       if (hasWaves) {
-        ctx.strokeStyle = 'rgba(143, 169, 196, 0.08)'; ctx.lineWidth = 3;
+        c.strokeStyle = 'rgba(143, 169, 196, 0.08)'; c.lineWidth = 3;
         for (let r = (qTime * 25) % 50; r < slitX - emitX; r += 50) {
-          ctx.beginPath(); ctx.arc(emitX, H / 2, r, -Math.PI / 3, Math.PI / 3); ctx.stroke();
+          c.beginPath(); c.arc(emitX, H / 2, r, -Math.PI / 3, Math.PI / 3); c.stroke();
         }
         for (let r = (qTime * 25) % 50; r < screenX - slitX; r += 50) {
-          ctx.beginPath(); ctx.arc(slitX, slit1Y, r, -Math.PI / 3, Math.PI / 3); ctx.stroke();
-          ctx.beginPath(); ctx.arc(slitX, slit2Y, r, -Math.PI / 3, Math.PI / 3); ctx.stroke();
+          c.beginPath(); c.arc(slitX, slit1Y, r, -Math.PI / 3, Math.PI / 3); c.stroke();
+          c.beginPath(); c.arc(slitX, slit2Y, r, -Math.PI / 3, Math.PI / 3); c.stroke();
         }
       }
 
-      // --- 3. PROCESAR PARTICULAS EN TRÁNSITO ---
       qParticles.forEach(p => {
         p.x += p.vx;
         p.y += p.vy;
 
         if (p.mode === 'wave') {
-          // Representación ondulatoria (Azul glaciar)
-          ctx.fillStyle = `rgba(143, 169, 196, ${0.45 + Math.sin(qTime) * 0.3})`;
-          ctx.beginPath(); ctx.arc(p.x, p.y, p.r + Math.sin(qTime * 2) * 2.2, 0, Math.PI * 2); ctx.fill();
+          c.fillStyle = `rgba(143, 169, 196, ${0.45 + Math.sin(qTime) * 0.3})`;
+          c.beginPath(); c.arc(p.x, p.y, p.r + Math.sin(qTime * 2) * 2.2, 0, Math.PI * 2); c.fill();
           
-          // Difracción al atravesar la doble ranura
           if (Math.abs(p.x - slitX) < 5) {
             p.y = Math.random() < 0.5 ? slit1Y : slit2Y;
             const theta = (Math.random() - 0.5) * 1.25;
@@ -182,22 +177,19 @@
             p.vy = Math.sin(theta) * 4.8;
           }
         } else {
-          // Partícula clásica balística (Palo de rosa)
-          ctx.fillStyle = '#D8A499';
-          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+          c.fillStyle = '#D8A499';
+          c.beginPath(); c.arc(p.x, p.y, p.r, 0, Math.PI * 2); c.fill();
 
-          // Brillo luminoso al pasar por la rendija observada
           if (Math.abs(p.x - slitX) < 6) {
-            ctx.strokeStyle = 'rgba(216,164,153,0.35)'; ctx.lineWidth = 1;
-            ctx.beginPath(); ctx.arc(slitX, p.y, 12, 0, Math.PI * 2); ctx.stroke();
+            c.strokeStyle = 'rgba(216,164,153,0.35)'; c.lineWidth = 1;
+            c.beginPath(); c.arc(slitX, p.y, 12, 0, Math.PI * 2); c.stroke();
 
-            // Dispersión estadística gaussiana real (Box-Muller)
             if (!p.hasDiffracted) {
               p.hasDiffracted = true;
               const u1 = Math.random() || 0.0001;
               const u2 = Math.random() || 0.0001;
               const normalRandom = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
-              const theta = normalRandom * 0.16; // 0.16 radianes de dispersión
+              const theta = normalRandom * 0.16; 
               const speed = 5.8;
               p.vx = Math.cos(theta) * speed;
               p.vy = Math.sin(theta) * speed;
@@ -205,125 +197,127 @@
           }
         }
 
-        // --- 4. COLISIÓN E HISTOGRAMA DE IMPACTOS ---
         if (p.x >= screenX) {
-          p.x = -999; // Desactivar partícula
+          p.x = -999; 
           const bin = Math.floor((p.y / H) * histBins);
           if (bin >= 0 && bin < histBins) {
             if (p.mode === 'wave') {
-              // Curva matemática de difracción cuántica (Interferencia constructiva/destructiva)
               const normY = (p.y - H / 2) / (H / 2);
               const intensity = Math.pow(Math.cos(normY * 11.5), 2) * Math.exp(-normY * normY * 1.6);
               if (Math.random() < intensity + 0.05) {
                 histHitsWave[bin]++;
-                spawnSparks(screenX, p.y, '#8FA9C4'); // Emitir chispas azul glaciar
+                spawnSparks(screenX, p.y, '#8FA9C4'); 
               }
             } else {
-              // Distribución clásica de dos picos discretos colapsados (Gausiana)
               histHitsParticle[bin]++;
-              spawnSparks(screenX, p.y, '#D8A499'); // Emitir chispas de impacto palo de rosa
+              spawnSparks(screenX, p.y, '#D8A499'); 
             }
           }
         }
       });
 
-      // Limpiar partículas colisionadas de la memoria
       qParticles = qParticles.filter(p => p.x > 0);
 
-      // --- 5. DIBUJAR HISTOGRAMAS PERSISTENTES DUALES CON OPACIDAD DINÁMICA ---
-      // Calculamos un factor de escala unificado para conservar proporciones relativas de densidad
       const maxHitsWave = Math.max(...histHitsWave, 1);
       const maxHitsParticle = Math.max(...histHitsParticle, 1);
       const unifiedMax = Math.max(maxHitsWave, maxHitsParticle);
 
       const binH = H / histBins;
 
-      // 5.1. RENDERIZAR HISTOGRAMA DE ONDAS (Sin observador - Azul)
-      // Cambia de opacidad fuerte (0.75) a opacidad sutil de fondo (0.15) según el observador
-      ctx.fillStyle = hasObserver ? 'rgba(143, 169, 196, 0.15)' : 'rgba(143, 169, 196, 0.75)';
+      c.fillStyle = hasObserver ? 'rgba(143, 169, 196, 0.15)' : 'rgba(143, 169, 196, 0.75)';
       histHitsWave.forEach((hits, idx) => {
         if (hits > 0) {
           const barWidth = (hits / unifiedMax) * 80;
-          ctx.fillRect(screenX + 3, idx * binH, barWidth, binH - 1.2);
+          c.fillRect(screenX + 3, idx * binH, barWidth, binH - 1.2);
         }
       });
 
-      // 5.2. RENDERIZAR HISTOGRAMA DE PARTÍCULAS (Con observador - Palo de rosa)
-      // Cambia de opacidad fuerte (0.75) a opacidad sutil de fondo (0.15) según el observador
-      ctx.fillStyle = hasObserver ? 'rgba(216, 164, 153, 0.75)' : 'rgba(216, 164, 153, 0.15)';
+      c.fillStyle = hasObserver ? 'rgba(216, 164, 153, 0.75)' : 'rgba(216, 164, 153, 0.15)';
       histHitsParticle.forEach((hits, idx) => {
         if (hits > 0) {
           const barWidth = (hits / unifiedMax) * 80;
-          ctx.fillRect(screenX + 3, idx * binH, barWidth, binH - 1.2);
+          c.fillRect(screenX + 3, idx * binH, barWidth, binH - 1.2);
         }
       });
 
-      // --- 6. RENDERIZAR CHISPAS DE IMPACTO (PHOSPHOR GLOW) ---
-      ctx.save();
-      // Emplear mezcla de pantalla aditiva para simular brillo eléctrico analógico
-      ctx.globalCompositeOperation = 'screen';
+      c.save();
+      c.globalCompositeOperation = 'screen';
       impactSparks.forEach(spark => {
-        ctx.fillStyle = spark.color;
-        ctx.globalAlpha = spark.alpha;
-        ctx.beginPath();
-        ctx.arc(spark.x, spark.y, spark.size, 0, Math.PI * 2);
-        ctx.fill();
+        c.fillStyle = spark.color;
+        c.globalAlpha = spark.alpha;
+        c.beginPath();
+        c.arc(spark.x, spark.y, spark.size, 0, Math.PI * 2);
+        c.fill();
         
-        // Simulación física básica de decaimiento
         spark.x += spark.vx;
         spark.y += spark.vy;
-        spark.alpha -= 0.045; // Desvanecimiento progresivo
+        spark.alpha -= 0.045; 
       });
-      ctx.restore();
+      c.restore();
       
-      // Filtrar chispas apagadas
       impactSparks = impactSparks.filter(s => s.alpha > 0);
 
-      // --- 7. RENDERIZAR ESTRUCTURA FÍSICA ---
-      ctx.fillStyle = '#4E5E52';
-      ctx.fillRect(slitX - 5, 0, 10, slit1Y - 14);
-      ctx.fillRect(slitX - 5, slit1Y + 14, 10, slit2Y - slit1Y - 28);
-      ctx.fillRect(slitX - 5, slit2Y + 14, 10, H - slit2Y);
+      c.fillStyle = '#4E5E52';
+      c.fillRect(slitX - 5, 0, 10, slit1Y - 14);
+      c.fillRect(slitX - 5, slit1Y + 14, 10, slit2Y - slit1Y - 28);
+      c.fillRect(slitX - 5, slit2Y + 14, 10, H - slit2Y);
 
       if (hasObserver) {
-        ctx.fillStyle = '#D8A499'; ctx.strokeStyle = '#F4F1EA'; ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.arc(slitX, H / 2, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.fillStyle = '#121314'; ctx.beginPath(); ctx.arc(slitX, H / 2, 2.5, 0, Math.PI * 2); ctx.fill();
+        c.fillStyle = '#D8A499'; c.strokeStyle = '#F4F1EA'; c.lineWidth = 1.5;
+        c.beginPath(); c.arc(slitX, H / 2, 6, 0, Math.PI * 2); c.fill(); c.stroke();
+        c.fillStyle = '#121314'; c.beginPath(); c.arc(slitX, H / 2, 2.5, 0, Math.PI * 2); c.fill();
       }
 
-      // Pantalla sensible trasera
-      ctx.fillStyle = '#E5E7EB'; ctx.fillRect(screenX, 0, 4, H);
+      c.fillStyle = '#E5E7EB'; c.fillRect(screenX, 0, 4, H);
 
       quantumAnimationId = requestAnimationFrame(draw);
     }
 
-    // Escuchar redimensiones de pantalla
-    window.addEventListener('resize', () => {
+    const onResize = () => {
+      if (!canvas || !canvas.isConnected) {
+        window.removeEventListener('resize', onResize);
+        return;
+      }
       W = canvas.parentElement!.clientWidth || 600;
       H = canvas.parentElement!.clientHeight || 410;
       canvas.width = W * dpr;
       canvas.height = H * dpr;
-      ctx.scale(dpr, dpr);
-    });
+      ctx!.scale(dpr, dpr);
+    };
+    window.addEventListener('resize', onResize);
 
     draw();
   }
 
-  // --- CONTROL DEL CICLO DE VIDA DE LA SIMULACIÓN ---
+  function startSimulator() {
+    stopSimulator();
+    isRunning = true;
+    setTimeout(() => {
+      if (isRunning) initQuantumSimulator();
+    }, 60);
+  }
+
+  function stopSimulator() {
+    isRunning = false;
+    if (quantumAnimationId !== null) {
+      cancelAnimationFrame(quantumAnimationId);
+      quantumAnimationId = null;
+    }
+  }
+
   window.addEventListener('tab-changed', (e: any) => {
     if (e.detail.activeTab === 'cuantica') {
-      if (quantumAnimationId === null) initQuantumSimulator();
+      startSimulator();
     } else {
-      if (quantumAnimationId !== null) {
-        cancelAnimationFrame(quantumAnimationId);
-        quantumAnimationId = null;
-      }
+      stopSimulator();
     }
   });
 
   document.addEventListener('astro:page-load', () => {
     if ((window as any).activeSimulation === 'cuantica') {
-      initQuantumSimulator();
+      startSimulator();
+    } else {
+      stopSimulator();
     }
   });
 </script>

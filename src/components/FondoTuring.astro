@@ -1,15 +1,14 @@
 ---
-// Componente de Fondo Turing con simulación Reacción-Difusión Gray-Scott
-// Configurado con la paleta Verde Salvia sobre Beige para una textura orgánica interactiva
+// Componente de Fondo Turing con simulación Reacción-Difusión Gray-Scott auto-limpiable
 ---
 
 <div class="fixed inset-0 -z-20 w-full h-full bg-[#F4F1EA] overflow-hidden pointer-events-none">
-  <!-- Aumentamos un poco la opacidad a 0.28 para que el verde salvia sea más imponente y visible -->
-  <canvas id="turing-bg-canvas" class="w-full h-full opacity-[0.28] transition-opacity duration-1000"></canvas>
+  <canvas id="turing-bg-canvas" class="w-full h-full opacity-[0.55] transition-opacity duration-1000"></canvas>
 </div>
 
 <script>
-  // Inicialización de la simulación matemática de Turing
+  let turingAnimationId: number | null = null;
+
   function initTuringBackground() {
     const canvas = document.getElementById('turing-bg-canvas') as HTMLCanvasElement;
     if (!canvas) return;
@@ -17,7 +16,7 @@
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Resolución interna de cómputo optimizada para 60 FPS
+    // Resolución interna optimizada para evitar congelamientos de CPU
     const gridW = 1000;
     const gridH = 650;
 
@@ -26,172 +25,171 @@
     let nextU = new Float32Array(gridW * gridH);
     let nextV = new Float32Array(gridW * gridH);
 
-    // Parámetros del modelo Gray-Scott para patrones estables de manchas y líneas
-    const Du = 0.60;
-    const Dv = 0.20;
-    const feed = 0.037;
-    const kill = 0.060;
+    // Parámetros estables de Gray-Scott
+    const Feed = 0.037;
+    const Kill = 0.060;
+    const Da = 0.6;
+    const Db = 0.2;
 
-    // Colores de la paleta predeterminada Verde Salvia (#4E5E52) y Beige (#F4F1EA)
-    const colorBg = { r: 244, g: 241, b: 234 }; 
-    const colorPattern = { r: 78, g: 94, b: 82 }; // Verde Salvia original imponente
+    // Inicializar matrices
+    for (let i = 0; i < gridW * gridH; i++) {
+      currentU[i] = 1.0;
+      currentV[i] = 0.0;
+    }
 
-    function resetSimulation() {
-      for (let i = 0; i < gridW * gridH; i++) {
-        currentU[i] = 1.0;
-        currentV[i] = 0.0;
-      }
-      
-      // Sembrar gotas iniciales caóticas
-      for (let s = 0; s < 10; s++) {
-        const startX = Math.floor(Math.random() * (gridW - 20)) + 10;
-        const startY = Math.floor(Math.random() * (gridH - 20)) + 10;
-        const r = 6;
-        for (let dy = -r; dy <= r; dy++) {
-          for (let dx = -r; dx <= r; dx++) {
-            if (dx*dx + dy*dy < r*r) {
-              const idx = (startX + dx) + (startY + dy) * gridW;
-              currentU[idx] = 0.5;
-              currentV[idx] = 0.25 + Math.random() * 0.4;
-            }
-          }
+    // Semilla perturbadora central
+    const cx = Math.floor(gridW / 2);
+    const cy = Math.floor(gridH / 2);
+    const rSeed = 20;
+    for (let y = cy - rSeed; y <= cy + rSeed; y++) {
+      for (let x = cx - rSeed; x <= cx + rSeed; x++) {
+        if (x >= 0 && x < gridW && y >= 0 && y < gridH) {
+          const idx = x + y * gridW;
+          currentU[idx] = 0.5;
+          currentV[idx] = 0.25 + Math.random() * 0.4;
         }
       }
     }
 
-    // Laplaciano de 9 puntos para resolver la difusión espacial
-    function laplacian(x: number, y: number, arr: Float32Array) {
-      let sum = 0;
-      const centerVal = arr[x + y * gridW];
-      
-      const left = arr[((x - 1 + gridW) % gridW) + y * gridW];
-      const right = arr[((x + 1) % gridW) + gridW * y];
-      const top = arr[x + (((y - 1 + gridH) % gridH) * gridW)];
-      const bottom = arr[x + (((y + 1) % gridH) * gridW)];
-      
-      const topLeft = arr[((x - 1 + gridW) % gridW) + (((y - 1 + gridH) % gridH) * gridW)];
-      const topRight = arr[((x + 1) % gridW) + (((y - 1 + gridH) % gridH) * gridW)];
-      const bottomLeft = arr[((x - 1 + gridW) % gridW) + (((y + 1) % gridH) * gridW)];
-      const bottomRight = arr[((x + 1) % gridW) + (((y + 1) % gridH) * gridW)];
+    // Adaptar tamaño físico del lienzo
+    let canvasW = canvas.width = window.innerWidth;
+    let canvasH = canvas.height = window.innerHeight;
 
-      sum += centerVal * -1.0;
-      sum += (left + right + top + bottom) * 0.2;
-      sum += (topLeft + topRight + bottomLeft + bottomRight) * 0.05;
-      
-      return sum;
-    }
+    const onResize = () => {
+      if (!canvas || !canvas.isConnected) {
+        window.removeEventListener('resize', onResize);
+        return;
+      }
+      canvasW = canvas.width = window.innerWidth;
+      canvasH = canvas.height = window.innerHeight;
+    };
+    window.addEventListener('resize', onResize);
 
-    // Un paso matemático del algoritmo Gray-Scott
+    // Bucle de simulación con guardia de desconexión del DOM
     function step() {
-      const subSteps = 4; // Iteraciones de física por frame para acelerar el crecimiento natural
-      for (let s = 0; s < subSteps; s++) {
-        for (let y = 0; y < gridH; y++) {
-          for (let x = 0; x < gridW; x++) {
-            const i = x + y * gridW;
-            const u = currentU[i];
-            const v = currentV[i];
-            
-            const lU = laplacian(x, y, currentU);
-            const lV = laplacian(x, y, currentV);
-            
-            const reaction = u * v * v;
-            
-            nextU[i] = u + (Du * lU - reaction + feed * (1.0 - u));
-            nextV[i] = v + (Dv * lV + reaction - (feed + kill) * v);
+      // --- DETECTOR ATÓMICO DE FUGAS DE ANIMACIÓN ---
+      if (!canvas || !canvas.isConnected) {
+        console.log("[TURING_DIAGNOSTIC] Canvas desmontado. Deteniendo bucle Gray-Scott.");
+        if (turingAnimationId !== null) {
+          cancelAnimationFrame(turingAnimationId);
+          turingAnimationId = null;
+        }
+        return;
+      }
 
-            if (nextU[i] < 0) nextU[i] = 0;
-            if (nextU[i] > 1) nextU[i] = 1;
-            if (nextV[i] < 0) nextV[i] = 0;
-            if (nextV[i] > 1) nextV[i] = 1;
+      // Realizar 8 iteraciones matemáticas de difusión por frame
+      for (let iter = 0; iter < 8; iter++) {
+        for (let y = 1; y < gridH - 1; y++) {
+          for (let x = 1; x < gridW - 1; x++) {
+            const idx = x + y * gridW;
+            const u = currentU[idx];
+            const v = currentV[idx];
+
+            // Operador Laplaciano de convolución discreta de 9 puntos
+            const lapU = (
+              currentU[idx - 1] + currentU[idx + 1] +
+              currentU[idx - gridW] + currentU[idx + gridW]
+            ) * 0.2 + (
+              currentU[idx - gridW - 1] + currentU[idx - gridW + 1] +
+              currentU[idx + gridW - 1] + currentU[idx + gridW + 1]
+            ) * 0.05 - u;
+
+            const lapV = (
+              currentV[idx - 1] + currentV[idx + 1] +
+              currentV[idx - gridW] + currentV[idx + gridW]
+            ) * 0.2 + (
+              currentV[idx - gridW - 1] + currentV[idx - gridW + 1] +
+              currentV[idx + gridW - 1] + currentV[idx + gridW + 1]
+            ) * 0.05 - v;
+
+            const uv2 = u * v * v;
+            nextU[idx] = u + (Da * lapU - uv2 + Feed * (1.0 - u));
+            nextV[idx] = v + (Db * lapV + uv2 - (Kill + Feed) * v);
           }
         }
-        
-        let temp = currentU; currentU = nextU; nextU = temp;
-        temp = currentV; currentV = nextV; nextV = temp;
-      }
-    }
-
-    const imgData = ctx.createImageData(gridW, gridH);
-    function draw() {
-      for (let i = 0; i < gridW * gridH; i++) {
-        const v = currentV[i];
-        const factor = Math.min(Math.max(v * 4.2, 0.0), 1.0); // Contraste óptico
-
-        // Mezcla interpolada entre el fondo beige y el patrón verde salvia
-        const r = Math.floor(colorBg.r + (colorPattern.r - colorBg.r) * factor);
-        const g = Math.floor(colorBg.g + (colorPattern.g - colorBg.g) * factor);
-        const b = Math.floor(colorBg.b + (colorPattern.b - colorBg.b) * factor);
-
-        const pxIdx = i * 4;
-        imgData.data[pxIdx] = r;
-        imgData.data[pxIdx + 1] = g;
-        imgData.data[pxIdx + 2] = b;
-        imgData.data[pxIdx + 3] = 255;
+        // Intercambiar buffers
+        const tempU = currentU; currentU = nextU; nextU = tempU;
+        const tempV = currentV; currentV = nextV; nextV = tempV;
       }
 
-      // Escalado suave bilineal por medio de un canvas temporal
+      // Renderizar matriz a baja resolución mediante escalado lineal suave
       const tempCanvas = document.createElement('canvas');
       tempCanvas.width = gridW;
       tempCanvas.height = gridH;
-      tempCanvas.getContext('2d')?.putImageData(imgData, 0, 0);
+      const tempCtx = tempCanvas.getContext('2d')!;
+      const imgData = tempCtx.createImageData(gridW, gridH);
 
-      ctx.imageSmoothingEnabled = true;
-      ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < gridW * gridH; i++) {
+        const u = currentU[i];
+        const v = currentV[i];
+        const pixelIdx = i * 4;
+        
+        // Mapeo cromático Verde Salvia (#4E5E52) sobre Beige basal
+        imgData.data[pixelIdx] = 78;     // R
+        imgData.data[pixelIdx + 1] = 94; // G
+        imgData.data[pixelIdx + 2] = 82; // B
+        imgData.data[pixelIdx + 3] = Math.floor(v * 255 * 1.6); // Canal Alpha proporcional al reactivo
+      }
+
+      tempCtx.putImageData(imgData, 0, 0);
+      ctx!.clearRect(0, 0, canvasW, canvasH);
+      ctx!.imageSmoothingEnabled = true;
+      ctx!.drawImage(tempCanvas, 0, 0, canvasW, canvasH);
+
+      turingAnimationId = requestAnimationFrame(step);
     }
 
-    function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-
-    // Inyectar reactivo químico al interactuar (Mouse / Touch)
-    function handleInteraction(clientX: number, clientY: number) {
+    // Escuchas interactivos auto-limpiables
+    const handleInteraction = (clientX: number, clientY: number) => {
       const gridX = Math.floor((clientX / window.innerWidth) * gridW);
       const gridY = Math.floor((clientY / window.innerHeight) * gridH);
+      const r = 20;
 
-      const r = 20; // Radio de perturbación
       for (let dy = -r; dy <= r; dy++) {
         for (let dx = -r; dx <= r; dx++) {
           const nx = gridX + dx;
           const ny = gridY + dy;
           if (nx >= 0 && nx < gridW && ny >= 0 && ny < gridH) {
-            if (dx*dx + dy*dy < r*r) {
+            if (dx * dx + dy * dy < r * r) {
               const idx = nx + ny * gridW;
-              currentU[idx] = 0.1;
-              currentV[idx] = 0.8 + Math.random() * 0.2; // Alta perturbación de reactivo
+              currentU[idx] = 0.2;
+              currentV[idx] = 0.7 + Math.random() * 0.3;
             }
           }
         }
       }
-    }
+    };
 
-    // El mouse altera el patrón directamente en la página principal
-    window.addEventListener('mousemove', (e) => {
-      if (Math.random() < 0.2) { // Controlamos la frecuencia para optimizar CPU
-        handleInteraction(e.clientX, e.clientY);
+    const onMouseMove = (e: MouseEvent) => {
+      if (!canvas.isConnected) {
+        window.removeEventListener('mousemove', onMouseMove);
+        return;
       }
-    });
+      if (Math.random() < 0.25) handleInteraction(e.clientX, e.clientY);
+    };
 
-    window.addEventListener('touchmove', (e) => {
-      if (e.touches[0] && Math.random() < 0.2) {
+    const onTouchMove = (e: TouchEvent) => {
+      if (!canvas.isConnected) {
+        window.removeEventListener('touchmove', onTouchMove);
+        return;
+      }
+      if (e.touches[0] && Math.random() < 0.25) {
         handleInteraction(e.touches[0].clientX, e.touches[0].clientY);
       }
-    });
+    };
 
-    window.addEventListener('resize', resize);
-    
-    resize();
-    resetSimulation();
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('touchmove', onTouchMove);
 
-    function loop() {
-      step();
-      draw();
-      requestAnimationFrame(loop);
-    }
-
-    loop();
+    step();
   }
 
-  // Ejecución en la carga y transiciones de Astro (ViewTransitions)
-  document.addEventListener('astro:page-load', initTuringBackground);
+  // Inicialización con Astro ViewTransitions
+  document.addEventListener('astro:page-load', () => {
+    if (turingAnimationId !== null) {
+      cancelAnimationFrame(turingAnimationId);
+      turingAnimationId = null;
+    }
+    initTuringBackground();
+  });
 </script>

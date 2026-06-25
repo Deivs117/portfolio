@@ -1,9 +1,12 @@
 ---
 import LayoutBase from '../layouts/LayoutBase.astro';
+import { Image } from 'astro:assets';
 
 // Importaciones dinámicas
 import imgPeter from '../assets/projects/peter.png';
+import imgIotCnc from '../assets/projects/iot-cnc.png';
 import imgSalli from '../assets/projects/salli.png';
+import imgNeuroEmotion from '../assets/projects/neuro-emotion.png';
 
 // =====================================================================
 // SISTEMA RECURSIVO DE PROYECTOS (CMS LOCAL)
@@ -18,7 +21,7 @@ const proyectosData = [
     fecha: "2026",
     rol: "Arquitecto de Control Autónomo",
     tags: ["ROS 2", "Edge AI", "C++", "Gazebo"],
-    imagenPlaceholder: `<img src={imgPeter} alt='Render de plataforma Peter en simulación' />`,
+    imagenObjeto: imgPeter,
     detallesHTML: `
       <h4 class="font-tech text-xl text-bio-green mb-3 border-b border-bio-text/10 pb-2">Resumen Ejecutivo y Liderazgo</h4>
       <p class="font-sans text-sm text-bio-text/80 leading-relaxed mb-6">
@@ -30,7 +33,7 @@ const proyectosData = [
         <li class="flex gap-3"><span class="text-bio-rose font-bold">●</span> <div><strong>Estabilidad Dinámica:</strong> Margen de error acotado a 0.54° (Roll) y 1.06° (Pitch) en terrenos irregulares.</div></li>
       </ul>
     `,
-    github: "#",
+    github: "https://github.com/sammcar/PETER_SIMULATION",
     video: "#"
   },
   {
@@ -40,7 +43,7 @@ const proyectosData = [
     fecha: "2025",
     rol: "Arquitecto de Sistemas & Firmware",
     tags: ["Azure IoT", "ESP32", "TinyML", "MQTT"],
-    imagenPlaceholder: "",
+    imagenObjeto: imgIotCnc,
     detallesHTML: `
       <h4 class="font-tech text-xl text-bio-green mb-3 border-b border-bio-text/10 pb-2">Arquitectura de Monitoreo</h4>
       <p class="font-sans text-sm text-bio-text/80 leading-relaxed mb-6">
@@ -52,7 +55,7 @@ const proyectosData = [
         <li class="flex gap-3"><span class="text-bio-blue font-bold">●</span> <div><strong>Alerting:</strong> Sistema anti-spam integrado con Telegram Bot API basado en ventanas temporales de Δt = 300s.</div></li>
       </ul>
     `,
-    github: "#",
+    github: "https://github.com/Deivs117/IoT_CNC_Monitoring",
     video: "#"
   },
   {
@@ -62,7 +65,7 @@ const proyectosData = [
     fecha: "2024",
     rol: "Líder de Sistemas & Ingeniería",
     tags: ["FreeRTOS", "ESP-IDF", "YOLOv8", "Modularity"],
-    imagenPlaceholder: `<img src={imgSalli} alt='Robot SALLI con diseño modular' />`,
+    imagenObjeto: imgSalli,
     detallesHTML: `
       <h4 class="font-tech text-xl text-bio-green mb-3 border-b border-bio-text/10 pb-2">Diseño y Firmware</h4>
       <p class="font-sans text-sm text-bio-text/80 leading-relaxed mb-6">
@@ -74,7 +77,7 @@ const proyectosData = [
         <li class="flex gap-3"><span class="text-bio-green font-bold">●</span> <div><strong>Sincronización:</strong> Intervalos de actualización de joints a 50 Hz con latencia de transporte < 15ms.</div></li>
       </ul>
     `,
-    github: "#",
+    github: "https://github.com/Deivs117/SALLI",
     video: "#"
   },
   {
@@ -84,7 +87,7 @@ const proyectosData = [
     fecha: "2025",
     rol: "Investigador IA & Computer Vision",
     tags: ["YOLOv8-cls", "PyTorch", "Deep Learning"],
-    imagenPlaceholder: "",
+    imagenObjeto: imgNeuroEmotion,
     detallesHTML: `
       <h4 class="font-tech text-xl text-bio-green mb-3 border-b border-bio-text/10 pb-2">Impacto en Salud Mental</h4>
       <p class="font-sans text-sm text-bio-text/80 leading-relaxed mb-6">
@@ -96,7 +99,7 @@ const proyectosData = [
         <li class="flex gap-3"><span class="text-bio-rose font-bold">●</span> <div><strong>Regularización:</strong> Eliminación de sesgos hacia clases mayoritarias mediante técnicas estrictas de aumento de datos.</div></li>
       </ul>
     `,
-    github: "#",
+    github: "https://github.com/Deivs117/AI-Driven-Children-s-Emotion-Recognition",
     video: "#"
   }
 ];
@@ -173,16 +176,22 @@ const proyectosData = [
       
       <!-- Track vertical de imágenes -->
       <div id="image-track" class="relative w-full h-full transition-transform duration-[900ms] ease-[cubic-bezier(0.87,0,0.13,1)]">
-        {proyectosData.map((proj, index) => (
-          <div class="absolute w-full h-full flex items-center justify-center p-8" style={`top: ${index * 100}%;`}>
-            <!-- Placeholder estético de la imagen en PNG -->
-            <div class="w-full h-full bg-bio-bg/80 border-2 border-dashed border-bio-text/20 rounded-xl flex flex-col items-center justify-center gap-4 group">
-              <svg class="w-12 h-12 text-bio-text/30 group-hover:text-bio-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-              <span class="font-code text-xs text-bio-text/50 text-center px-6">{proj.imagenPlaceholder}</span>
-            </div>
+      {proyectosData.map((proj, index) => (
+        <div class="absolute w-full h-full flex items-center justify-center p-8" style={`top: ${index * 100}%;`}>
+          <div class="w-full h-full bg-white/20 rounded-xl overflow-hidden flex items-center justify-center shadow-inner border border-bio-text/5">
+            
+            <Image 
+              src={proj.imagenObjeto} 
+              alt={proj.titulo}
+              width={700}
+              height={450}
+              class="object-cover w-full h-full filter contrast-[1.02] saturate-[0.98]"
+            />
+
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
+    </div>
     </div>
 
     <!-- CAPA DE DETALLES DEL PROYECTO (Sub-página inyectada) -->

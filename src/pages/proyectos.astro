@@ -2,201 +2,8 @@
 import LayoutBase from '../layouts/LayoutBase.astro';
 import { Image } from 'astro:assets';
 
-// Importación segura de recursos visuales desde src/assets/projects/
-import imgPeter from '../assets/projects/peter.png';
-import imgIotCnc from '../assets/projects/iot-cnc.png';
-import imgSalli from '../assets/projects/salli.png';
-import imgNeuroEmotion from '../assets/projects/neuro-emotion.png';
-
-// =====================================================================
-// SISTEMA RECURSIVO DE PROYECTOS (CMS LOCAL)
-// =====================================================================
-const proyectosData = [
-  {
-    id: "peter",
-    titulo: "Plataforma Híbrida Multimodal Peter",
-    subtitulo: "Arquitectura de control autónomo e IA Bioinspirada Embebida para locomoción híbrida (cuadrúpeda-rodante).",
-    fecha: "2026",
-    rol: "Arquitecto de Control Autónomo",
-    tags: ["ROS 2", "Edge AI", "C++", "Gazebo"],
-    imagenObjeto: imgPeter,
-    colorClase: "bio-rose",
-    colorHex: "#D8A499",
-    detallesHTML: `
-      <div class="space-y-6">
-        <div>
-          <h4 class="font-tech text-lg text-bio-green mb-2 border-b border-bio-text/10 pb-1 uppercase tracking-wider">Resumen Ejecutivo & Liderazgo</h4>
-          <p class="font-sans text-xs md:text-sm text-bio-text/80 leading-relaxed">
-            Conceptualización e ingeniería de una plataforma de locomoción multimodal híbrida. Ejecución de 60 ensayos continuos de validación con inyección de ruido estocástico uniforme ($S = 0 \\to 4$), logrando una tasa de éxito operativa del 100% en evasión de obstáculos vectoriales y consolidando la transición morfológica con una fiabilidad paramétrica del 95%.
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="p-4 bg-white/40 border border-bio-text/5 rounded-xl">
-            <span class="font-code text-[10px] text-bio-rose block uppercase">Métrica Clave // Latencia</span>
-            <span class="font-tech text-3xl font-bold text-bio-text">47 ms</span>
-            <p class="text-[10px] text-bio-text/60 mt-1 font-sans">Bucle cerrado de control de alta frecuencia sin cuellos de botella en cache.</p>
-          </div>
-          <div class="p-4 bg-white/40 border border-bio-text/5 rounded-xl">
-            <span class="font-code text-[10px] text-bio-green block uppercase">Precisión // Actitud</span>
-            <span class="font-tech text-3xl font-bold text-bio-text">± 0.54°</span>
-            <p class="text-[10px] text-bio-text/60 mt-1 font-sans">Error acotado de Roll RMS y ±1.06° de Pitch RMS sobre ruido topográfico.</p>
-          </div>
-        </div>
-
-        <div>
-          <h4 class="font-tech text-base text-bio-green mb-2 uppercase">Leyes de Control y Selección Neuronal</h4>
-          <p class="font-sans text-xs text-bio-text/75 leading-relaxed mb-2">
-            La resolución de conflictos entre estímulos se rige por ecuaciones diferenciales de integración con fugas (leaky-integrator) inspiradas en la topología de los ganglios basales para actualización de tasa neuronal:
-          </p>
-          <div class="p-3 bg-black/5 rounded-lg border border-bio-text/10 font-code text-xs text-bio-green text-center">
-            τ · (da_i / dt) = -a_i + max(0, Σ W_ij · a_j + I_i - θ)
-          </div>
-        </div>
-      </div>
-    `,
-    github: "#",
-    video: "#"
-  },
-  {
-    id: "iot-cnc",
-    titulo: "IoT CNC PCB Monitor",
-    subtitulo: "Plataforma de monitoreo industrial distribuida mediante Edge AI y orquestación Serverless.",
-    fecha: "2025",
-    rol: "Lead Systems Architect & Embedded Firmware Engineer",
-    tags: ["Azure IoT", "ESP32", "TinyML", "MQTT"],
-    imagenObjeto: imgIotCnc,
-    colorClase: "bio-blue",
-    colorHex: "#8FA9C4",
-    detallesHTML: `
-      <div class="space-y-6">
-        <div>
-          <h4 class="font-tech text-lg text-bio-green mb-2 border-b border-bio-text/10 pb-1 uppercase tracking-wider">Impacto Técnico & Cloud</h4>
-          <p class="font-sans text-xs md:text-sm text-bio-text/80 leading-relaxed">
-            Ingeniería de extremo a extremo de un sistema distribuido de análisis industrial. Diseñado mediante desacoplamiento estricto de microservicios con despliegues automatizados bajo el paradigma de Infraestructura como Código (IaC).
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="p-4 bg-white/40 border border-bio-text/5 rounded-xl">
-            <span class="font-code text-[10px] text-bio-blue block uppercase">Inferencia local // TinyML</span>
-            <span class="font-tech text-3xl font-bold text-bio-text">312 ms</span>
-            <p class="text-[10px] text-bio-text/60 mt-1 font-sans">Clasificación de topología de placa sobre matriz RGB565 con certeza P ≥ 0.94.</p>
-          </div>
-          <div class="p-4 bg-white/40 border border-bio-text/5 rounded-xl">
-            <span class="font-code text-[10px] text-bio-brown block uppercase">Políticas // Anomalias</span>
-            <span class="font-tech text-3xl font-bold text-bio-text">Δt = 300s</span>
-            <p class="text-[10px] text-bio-text/60 mt-1 font-sans">Ventana estricta de mitigación y cooldown para alertas críticas vía Telegram API.</p>
-          </div>
-        </div>
-
-        <div>
-          <h4 class="font-tech text-base text-bio-green mb-2 uppercase">Integridad Operacional</h4>
-          <p class="font-sans text-xs text-bio-text/75 leading-relaxed">
-            La integridad estructural se evalúa constantemente comparando métricas contra las restricciones estables de borde:
-          </p>
-          <div class="p-3 bg-black/5 rounded-lg border border-bio-text/10 font-code text-xs text-bio-green text-center">
-            T_min ≤ T ≤ T_max  ∧  H_min ≤ H ≤ H_max  ∧  S_vibration &lt; 0.80
-          </div>
-        </div>
-      </div>
-    `,
-    github: "#",
-    video: "#"
-  },
-  {
-    id: "salli",
-    titulo: "Robot SALLI",
-    subtitulo: "Plataforma robótica modular con locomoción biomimética de alta eficiencia.",
-    fecha: "2024",
-    rol: "Systems & Engineering Lead",
-    tags: ["FreeRTOS", "ESP-IDF", "YOLOv8", "Modularity"],
-    imagenObjeto: imgSalli,
-    colorClase: "bio-rose",
-    colorHex: "#D8A499",
-    detallesHTML: `
-      <div class="space-y-6">
-        <div>
-          <h4 class="font-tech text-lg text-bio-green mb-2 border-b border-bio-text/10 pb-1 uppercase tracking-wider">Logros de Sistemas & Diseño Mecánico</h4>
-          <p class="font-sans text-xs md:text-sm text-bio-text/80 leading-relaxed">
-            Dirección del ciclo de vida bajo lineamientos de calidad ISO 9001, reduciendo iteración de diseño en un 25%. Estructura mecánica modular "glue-less" de ensamble por cola de milano (dovetail), optimizada para impresión FDM.
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="p-4 bg-white/40 border border-bio-text/5 rounded-xl">
-            <span class="font-code text-[10px] text-bio-rose block uppercase">Frecuencia de Red // IDF</span>
-            <span class="font-tech text-3xl font-bold text-bio-text">50 Hz</span>
-            <p class="text-[10px] text-bio-text/60 mt-1 font-sans">Sincronización determinista de articulaciones con latencia de transporte &lt; 15 ms.</p>
-          </div>
-          <div class="p-4 bg-white/40 border border-bio-text/5 rounded-xl">
-            <span class="font-code text-[10px] text-bio-green block uppercase">Mantenibilidad // DownTime</span>
-            <span class="font-tech text-3xl font-bold text-bio-text">&lt; 5 min</span>
-            <p class="text-[10px] text-bio-text/60 mt-1 font-sans">Reparación física de módulos en campo asegurada por pernos mecánicos M3.</p>
-          </div>
-        </div>
-
-        <div>
-          <h4 class="font-tech text-base text-bio-green mb-2 uppercase">Inferencia en el Borde</h4>
-          <p class="font-sans text-xs text-bio-text/75 leading-relaxed">
-            Procesamiento y detección en tiempo real a bordo de nodos ESP32-CAM gracias a la cuantización de red y reducción de footprint de memoria:
-          </p>
-          <div class="p-3 bg-black/5 rounded-lg border border-bio-text/10 font-code text-xs text-bio-green text-center">
-            YOLOv8-Inference-Engine ~30 FPS sin Thermal Throttling
-          </div>
-        </div>
-      </div>
-    `,
-    github: "#",
-    video: "#"
-  },
-  {
-    id: "neuro-emotion",
-    titulo: "Children's Emotion Recognition System",
-    subtitulo: "Clasificación y regularización de expresiones faciales para registros clínicos de salud mental infantil.",
-    fecha: "2025",
-    rol: "Principal AI Research & Computer Vision Engineer",
-    tags: ["YOLOv8-cls", "PyTorch", "Deep Learning"],
-    imagenObjeto: imgNeuroEmotion,
-    colorClase: "bio-blue",
-    colorHex: "#8FA9C4",
-    detallesHTML: `
-      <div class="space-y-6">
-        <div>
-          <h4 class="font-tech text-lg text-bio-green mb-2 border-b border-bio-text/10 pb-1 uppercase tracking-wider">Arquitectura de Visión Computacional</h4>
-          <p class="font-sans text-xs md:text-sm text-bio-text/80 leading-relaxed">
-            Orquestación de un pipeline jerárquico que filtra segmentos demográficos en tiempo real (aislando la cohorte infantil) para optimizar el cómputo de inferencias en dispositivos clínicos embebidos.
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="p-4 bg-white/40 border border-bio-text/5 rounded-xl">
-            <span class="font-code text-[10px] text-bio-blue block uppercase">YOLOv8-cls vs ResNet18</span>
-            <span class="font-tech text-3xl font-bold text-bio-text">+16.3%</span>
-            <p class="text-[10px] text-bio-text/60 mt-1 font-sans">Superioridad estadística de precisión absoluta debido al mecanismo de atención interna.</p>
-          </div>
-          <div class="p-4 bg-white/40 border border-bio-text/5 rounded-xl">
-            <span class="font-code text-[10px] text-bio-brown block uppercase">Métrica Final // F1-Score</span>
-            <span class="font-tech text-3xl font-bold text-bio-text">0.706</span>
-            <p class="text-[10px] text-bio-text/60 mt-1 font-sans">Mitigación efectiva de sesgos y sobreajustes hacia expresiones mayoritarias.</p>
-          </div>
-        </div>
-
-        <div>
-          <h4 class="font-tech text-base text-bio-green mb-2 uppercase">Espacio Categórico de Variables Clínicas</h4>
-          <p class="font-sans text-xs text-bio-text/75 leading-relaxed">
-            Las geometrías faciales se mapean en un espacio categórico de 4 dimensiones correspondiente a variables estandarizadas de salud mental:
-          </p>
-          <div class="p-3 bg-black/5 rounded-lg border border-bio-text/10 font-code text-xs text-bio-green text-center">
-            Y = { Joy, Anger, Sadness, Neutral }
-          </div>
-        </div>
-      </div>
-    `,
-    github: "#",
-    video: "#"
-  }
-];
+// Importación modular y recursiva de los datos del proyecto
+import { proyectosData } from '../data/proyectos';
 ---
 
 <LayoutBase title="Proyectos de Ingeniería">
@@ -214,10 +21,10 @@ const proyectosData = [
     </div>
   </div>
 
-  <!-- TÍTULO GLOBAL -->
-  <div id="global-title" class="fixed top-8 left-6 md:left-12 z-40 opacity-0 transition-all duration-[1500ms] ease-[cubic-bezier(0.22,1,0.36,1)] transform translate-y-12 scale-110 pointer-events-none">
+  <!-- TÍTULO GLOBAL (Posicionamiento y z-index optimizados para no ser solapados por el Navbar) -->
+  <div id="global-title" class="fixed top-28 md:top-24 left-6 md:left-12 z-30 opacity-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] transform translate-y-0 pointer-events-none">
     <div class="flex items-center gap-3">
-      <span class="h-2 w-2 rounded-full bg-bio-rose animate-pulse"></span>
+      <span class="h-2 w-2 rounded-full dynamic-accent-bg animate-pulse"></span>
       <h1 class="font-tech text-xl md:text-3xl font-bold text-bio-text tracking-tight uppercase">
         Proyectos de Ingeniería
       </h1>
@@ -225,26 +32,33 @@ const proyectosData = [
     <p class="font-code text-[10px] text-bio-text/50 mt-1 ml-5 uppercase tracking-widest">Vitrina Tecnológica Interactiva</p>
   </div>
 
-  <!-- INTERFAZ PRINCIPAL DE PROYECTOS -->
-  <div id="main-interface" class="relative w-full h-[80vh] mt-24 opacity-0 transition-opacity duration-1000 flex items-center">
+  <!-- INTERFAZ PRINCIPAL DE PROYECTOS (Centrado verticalmente en el Viewport con Grid Seguro anti-solapamiento) -->
+  <div id="main-interface" class="relative w-full min-h-[calc(100vh-220px)] mt-28 md:mt-24 opacity-0 transition-opacity duration-1000 flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-0">
     
-    <!-- COLUMNA IZQUIERDA: Textos y Controladores del Carrusel -->
-    <div id="carousel-text-panel" class="w-full md:w-5/12 h-full flex flex-col justify-center px-4 md:px-12 z-20 transition-all duration-700 ease-in-out">
+    <!-- COLUMNA IZQUIERDA: Textos y Controladores del Carrusel (Establecido a un 42% estricto de pantalla en desktop) -->
+    <div id="carousel-text-panel" class="w-full md:w-[42%] flex flex-col justify-center px-4 md:px-12 z-20 transition-all duration-700 ease-in-out order-2 md:order-1">
       
       <!-- Contenedor dinámico de textos -->
-      <div class="relative w-full h-72">
+      <div class="relative w-full h-80">
         {proyectosData.map((proj, index) => (
-          <div id={`text-item-${index}`} class={`absolute inset-0 flex flex-col justify-center transition-all duration-700 ease-[cubic-bezier(0.87,0,0.13,1)] ${index === 0 ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-12 pointer-events-none'}`}>
-            <span class="font-code text-[10px] bg-bio-text/5 text-bio-green px-2 py-1 rounded w-max mb-3 border border-bio-text/10">{proj.fecha} // {proj.rol}</span>
+          <div 
+            id={`text-item-${index}`} 
+            class={`absolute inset-0 flex flex-col justify-center transition-all duration-700 ease-[cubic-bezier(0.87,0,0.13,1)] ${index === 0 ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-12 pointer-events-none'}`}
+            data-color-hex={proj.colorHex}
+          >
+            <!-- Tipografía de metadatos incrementada y acoplada dinámicamente -->
+            <span class="font-code text-xs md:text-sm tracking-widest font-bold dynamic-accent-text uppercase mb-3 block">
+              {proj.fecha} // {proj.rol}
+            </span>
             <h2 class="font-tech text-3xl md:text-4xl font-bold text-bio-text leading-tight mb-4">{proj.titulo}</h2>
             <p class="font-sans text-sm text-bio-text/70 leading-relaxed mb-8">{proj.subtitulo}</p>
             
             <button id={`cta-btn-${index}`} onclick={`abrirDetalle(${index})`} class="group relative w-max font-code text-xs font-bold text-bio-bg bg-bio-text px-6 py-3 rounded-xl overflow-hidden transition-all hover:scale-105 shadow-md">
               <span id={`cta-label-${index}`} class="relative z-10 flex items-center gap-2">
-                VER INVESTIGACIÓN Y MÉTRICAS 
+                VER MÁS INFORMACIÓN
                 <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
               </span>
-              <div class="absolute inset-0 bg-bio-green transform scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100 z-0"></div>
+              <div class="absolute inset-0 dynamic-accent-bg transform scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100 z-0"></div>
             </button>
           </div>
         ))}
@@ -258,21 +72,18 @@ const proyectosData = [
         </div>
         <div class="flex gap-2">
           {proyectosData.map((_, index) => (
-            <div id={`dot-${index}`} class={`w-1.5 h-12 rounded-full transition-all duration-500 ${index === 0 ? 'bg-bio-green' : 'bg-bio-text/10'}`}></div>
+            <div id={`dot-${index}`} class={`w-1.5 h-12 rounded-full transition-all duration-500 ${index === 0 ? 'dynamic-accent-bg' : 'bg-bio-text/10'}`}></div>
           ))}
         </div>
       </div>
     </div>
 
-    <!-- PANEL LATERAL: Composición Completa Full-Bleed -->
-    <!-- En Carrusel: Ocupa el centro-derecha. En Detalle: Ocupa la derecha con morfología estricta -->
-    <div id="image-morph-container" class="absolute right-0 top-1/2 -translate-y-1/2 w-full md:w-[58%] h-[65vh] md:h-[75vh] rounded-l-3xl overflow-hidden transition-all duration-[900ms] ease-[cubic-bezier(0.25,1,0.5,1)] z-10 border-l border-y border-bio-text/10 shadow-xl will-change-transform">
-      
+    <!-- PANEL LATERAL: Composición Completa Full-Bleed (Limitado al 52% en escritorio para no solapar el texto) -->
+    <div id="image-morph-container" class="relative w-full h-[35vh] md:absolute md:right-0 md:top-1/2 md:-translate-y-1/2 md:w-[52%] md:h-[75vh] rounded-2xl md:rounded-l-3xl overflow-hidden transition-all duration-[900ms] ease-[cubic-bezier(0.25,1,0.5,1)] z-10 border border-bio-text/10 md:border-l md:border-y shadow-xl will-change-transform order-1 md:order-2">
       <!-- Track vertical de imágenes -->
       <div id="image-track" class="relative w-full h-full transition-transform duration-[900ms] ease-[cubic-bezier(0.25,1,0.5,1)]">
         {proyectosData.map((proj, index) => (
           <div class="absolute w-full h-full" style={`top: ${index * 100}%;`}>
-            <!-- Imagen optimizada de Astro cubriendo todo el espectro -->
             <Image 
               src={proj.imagenObjeto} 
               alt={proj.titulo}
@@ -296,10 +107,8 @@ const proyectosData = [
 
       <!-- Contenedor scrollable de información técnica -->
       <div class="flex-grow overflow-y-auto pr-6 custom-scrollbar pb-12">
-        
         {proyectosData.map((proj, index) => (
           <div id={`detail-content-${index}`} class="hidden flex-col gap-6 animate-[fadeIn_0.5s_ease-out]">
-            
             <div>
               <h2 class="font-tech text-3xl font-bold text-bio-text mb-2">{proj.titulo}</h2>
               <p class="font-code text-[11px] text-bio-text/60 uppercase tracking-wide">{proj.rol} // {proj.fecha}</p>
@@ -328,10 +137,8 @@ const proyectosData = [
                 Ver Demostración
               </a>
             </div>
-
           </div>
         ))}
-
       </div>
     </div>
 
@@ -339,7 +146,27 @@ const proyectosData = [
 </LayoutBase>
 
 <style>
-  /* Scrollbar personalizado para el panel de detalles */
+  /* CONFIGURACIÓN Y DECLARACIÓN DE VARIABLES CSS DINÁMICAS */
+  :root {
+    --project-accent: #D8A499; /* Color por defecto al cargar (Peter - bio-rose) */
+  }
+
+  .dynamic-accent-text {
+    color: var(--project-accent);
+    transition: color 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .dynamic-accent-bg {
+    background-color: var(--project-accent);
+    transition: background-color 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .dynamic-accent-border {
+    border-color: var(--project-accent);
+    transition: border-color 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  /* Scrollbar personalizado */
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
   }
@@ -358,11 +185,13 @@ const proyectosData = [
 </style>
 
 <script>
+  import { proyectosData } from '../data/proyectos';
+
   // =====================================================================
   // LÓGICA DE NAVEGACIÓN Y CARRUSEL VERTICAL INFINITO
   // =====================================================================
   let currentIndex = 0;
-  const totalProjects = 4; // Peter, IoT, Salli, Neuro-Emotion
+  const totalProjects = proyectosData.length;
   
   let estadoActual = 'INTRO'; // INTRO -> CARRUSEL -> DETALLE
   let trackEl: HTMLElement, morphContainer: HTMLElement, textPanel: HTMLElement, detailPanel: HTMLElement;
@@ -371,6 +200,14 @@ const proyectosData = [
 
   async function sleep(ms: number) { return new Promise(r => setTimeout(r, ms)); }
   
+  // Sincroniza el color de acento dinámico de la variable CSS
+  function syncDynamicColors(index: number) {
+    const currentProj = proyectosData[index];
+    if (currentProj && currentProj.colorHex) {
+      document.documentElement.style.setProperty('--project-accent', currentProj.colorHex);
+    }
+  }
+
   // 1. Terminal Intro Typewriter Sequence
   async function runIntroSequence() {
     const textEl = document.getElementById('typewriter-text');
@@ -380,6 +217,9 @@ const proyectosData = [
     const mainUI = document.getElementById('main-interface');
     
     if(!textEl || !subEl || !introScreen || !globalTitle || !mainUI) return;
+
+    // Sincronizar el tema del primer proyecto al iniciar
+    syncDynamicColors(0);
 
     const msg1 = "> INICIANDO VITRINA DE INGENIERÍA...";
     let current = "";
@@ -428,12 +268,15 @@ const proyectosData = [
       oldText.classList.add('opacity-0', '-translate-y-12', 'pointer-events-none');
     }
     if(oldDot) {
-      oldDot.classList.remove('bg-bio-green');
+      oldDot.classList.remove('dynamic-accent-bg');
       oldDot.classList.add('bg-bio-text/10');
     }
 
     // Aritmética modular para carrusel infinito circular
     currentIndex = (currentIndex + dir + totalProjects) % totalProjects;
+
+    // Sincronizar la variable de color de acento del nuevo proyecto activo
+    syncDynamicColors(currentIndex);
 
     // Inyectar textos nuevos desde abajo
     const newText = document.getElementById(`text-item-${currentIndex}`);
@@ -447,7 +290,7 @@ const proyectosData = [
     }
     if(newDot) {
       newDot.classList.remove('bg-bio-text/10');
-      newDot.classList.add('bg-bio-green');
+      newDot.classList.add('dynamic-accent-bg');
     }
 
     // Mover track con translate acelerado por hardware
@@ -466,15 +309,22 @@ const proyectosData = [
     // Desactivar clicks durante la animación táctica de consola
     btnEl.style.pointerEvents = 'none';
 
-    // Animación interactiva de carga tipo terminal
-    const logs = ["> INJECTING LINK...", "> COMPILING METRICS...", "> OK"];
+    // Animación interactiva de carga tipo terminal (Hacker terminal style)
+    const logs = ["> INJECTING LINK...", "> COMPILING METRICS...", "> BUFFER_SUCCESS"];
     for (const log of logs) {
-      labelEl.innerHTML = `<span class="font-code text-[11px] text-bio-blue animate-pulse">${log}</span>`;
+      labelEl.innerHTML = `<span class="font-code text-[11px] dynamic-accent-text animate-pulse">${log}</span>`;
       await sleep(180);
     }
     
     estadoActual = 'DETALLE';
     
+    // OCULTAR EL TÍTULO GLOBAL PARA EVITAR SOLAPAMIENTO CON BOTÓN "VOLVER"
+    const globalTitle = document.getElementById('global-title');
+    if (globalTitle) {
+      globalTitle.classList.add('opacity-0', 'pointer-events-none', 'translate-y-[-12px]');
+      globalTitle.classList.remove('opacity-100');
+    }
+
     // Kill switch de Turing para liberar el 100% de la CPU/GPU
     isTuringRunning = false;
     const turingWrapper = document.getElementById('turing-wrapper');
@@ -488,8 +338,13 @@ const proyectosData = [
     textPanel.classList.remove('opacity-100');
     textPanel.classList.add('opacity-0', 'pointer-events-none');
 
+    // Optimizar para móviles: ocultar el contenedor de imagen en detail view para dar el espacio total a la ficha técnica
+    if (window.innerWidth < 768) {
+      morphContainer.classList.add('hidden');
+    }
+
     // Transición morphing FLIP de la imagen: Pasa a ocupar la derecha total sin contenedor
-    morphContainer.classList.remove('md:w-[58%]', 'md:right-12');
+    morphContainer.classList.remove('md:w-[52%]', 'rounded-2xl', 'md:rounded-l-3xl', 'md:border-l', 'md:border-y', 'border');
     morphContainer.classList.add('md:w-[36%]', 'right-0', 'h-screen', 'rounded-none', 'shadow-2xl');
 
     // Cargar contenido correspondiente
@@ -504,7 +359,7 @@ const proyectosData = [
     }
 
     // Restaurar etiqueta de botón para el próximo ciclo
-    labelEl.innerHTML = `VER INVESTIGACIÓN Y MÉTRICAS <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
+    labelEl.innerHTML = `VER MÁS INFORMACIÓN <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
     btnEl.style.pointerEvents = 'auto';
 
     // Desplegar panel lateral izquierdo de información técnica
@@ -518,14 +373,26 @@ const proyectosData = [
     if (estadoActual !== 'DETALLE') return;
     estadoActual = 'CARRUSEL';
 
+    // Restaurar el título global de forma fluida
+    const globalTitle = document.getElementById('global-title');
+    if (globalTitle) {
+      globalTitle.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-[-12px]');
+      globalTitle.classList.add('opacity-100');
+    }
+
     // Cerrar panel lateral izquierdo
     detailPanel.classList.remove('opacity-100', 'translate-x-0', 'pointer-events-auto');
     detailPanel.classList.add('opacity-0', '-translate-x-12', 'pointer-events-none');
 
+    // Mostrar el contenedor de la imagen si fue ocultado en móviles
+    if (window.innerWidth < 768) {
+      morphContainer.classList.remove('hidden');
+    }
+
     // Descomprimir imagen al carrusel central
     setTimeout(() => {
       morphContainer.classList.remove('md:w-[36%]', 'right-0', 'h-screen', 'rounded-none', 'shadow-2xl');
-      morphContainer.classList.add('md:w-[58%]', 'md:right-12');
+      morphContainer.classList.add('md:w-[52%]', 'rounded-2xl', 'md:rounded-l-3xl', 'md:border-l', 'md:border-y', 'border');
       
       textPanel.classList.remove('opacity-0', 'pointer-events-none');
       textPanel.classList.add('opacity-100');
@@ -540,7 +407,7 @@ const proyectosData = [
   };
 
   // =====================================================================
-  // MOTOR DE TURING AUTO-LIMPIABLE CON RESPETO A MEMORIA
+  // MOTOR DE TURING AUTO-LIMPIABLE CON DIMENSIONES DE 640x480 Y ALTA VISIBILIDAD
   // =====================================================================
   function initTuringBackground() {
     if(turingAnimId !== null) return; 
@@ -550,6 +417,7 @@ const proyectosData = [
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Dimensiones internas de 640 x 480 para cálculo matricial
     const gridW = 640;
     const gridH = 480;
 
@@ -558,35 +426,38 @@ const proyectosData = [
     let nextU = new Float32Array(gridW * gridH);
     let nextV = new Float32Array(gridW * gridH);
 
-    // Semilla de perturbación aleatoria única
-    for (let s = 0; s < 8; s++) {
-      const cx = Math.floor(Math.random() * (gridW - 10)) + 5;
-      const cy = Math.floor(Math.random() * (gridH - 10)) + 5;
-      for (let dy = -4; dy <= 4; dy++) {
-        for (let dx = -4; dx <= 4; dx++) {
-          if (dx*dx + dy*dy < 16) {
-            U[(cx+dx) + (cy+dy)*gridW] = 0.5;
-            V[(cx+dx) + (cy+dy)*gridW] = 0.25 + Math.random()*0.3;
+    // Semilla de perturbación de Turing de mayor tamaño y densidad
+    for (let s = 0; s < 12; s++) {
+      const cx = Math.floor(Math.random() * (gridW - 40)) + 20;
+      const cy = Math.floor(Math.random() * (gridH - 40)) + 20;
+      const r = 18; 
+      for (let dy = -r; dy <= r; dy++) {
+        for (let dx = -r; dx <= r; dx++) {
+          if (dx*dx + dy*dy < r*r) {
+            const idx = (cx+dx) + (cy+dy)*gridW;
+            U[idx] = 0.5;
+            V[idx] = 0.25 + Math.random()*0.35;
           }
         }
       }
     }
 
-    const Feed = 0.0367;
-    const Kill = 0.0649;
-    
+    const Feed = 0.035;
+    const Kill = 0.060;
+    const Du = 0.18;  
+    const Dv = 0.09;  
+
     let canvasW = canvas.width = window.innerWidth;
     let canvasH = canvas.height = window.innerHeight;
 
     function stepTuring() {
-      // Condición estricta de salida: Pestaña cerrada o detalle abierto
       if (!isTuringRunning || !canvas.isConnected) {
         if(turingAnimId) cancelAnimationFrame(turingAnimId);
         turingAnimId = null;
         return;
       }
 
-      for (let iter = 0; iter < 5; iter++) {
+      for (let iter = 0; iter < 4; iter++) {
         for (let y = 1; y < gridH - 1; y++) {
           for (let x = 1; x < gridW - 1; x++) {
             const i = x + y * gridW;
@@ -597,8 +468,8 @@ const proyectosData = [
             const lapV = (V[i-1] + V[i+1] + V[i-gridW] + V[i+gridW])*0.2 + (V[i-gridW-1] + V[i-gridW+1] + V[i+gridW-1] + V[i+gridW+1])*0.05 - v;
             
             const uvv = u * v * v;
-            nextU[i] = u + (0.2 * lapU - uvv + Feed * (1 - u));
-            nextV[i] = v + (0.1 * lapV + uvv - (Kill + Feed) * v);
+            nextU[i] = u + (Du * lapU - uvv + Feed * (1 - u));
+            nextV[i] = v + (Dv * lapV + uvv - (Kill + Feed) * v);
           }
         }
         let tempU = U; U = nextU; nextU = tempU;
@@ -606,19 +477,22 @@ const proyectosData = [
       }
 
       const tCanvas = document.createElement('canvas');
-      tCanvas.width = gridW; tCanvas.height = gridH;
+      tCanvas.width = gridW; 
+      tCanvas.height = gridH;
       const tCtx = tCanvas.getContext('2d')!;
       const imgD = tCtx.createImageData(gridW, gridH);
       
       for (let i = 0; i < gridW * gridH; i++) {
         const val = V[i];
         const p = i * 4;
-        imgD.data[p] = 78;   // R (#4E5E52)
+        
+        imgD.data[p] = 78;   // R
         imgD.data[p+1] = 94; // G
         imgD.data[p+2] = 82; // B
-        imgD.data[p+3] = Math.floor(val * 255 * 2.8); // Opacidad
+        imgD.data[p+3] = Math.floor(val * 255 * 3.6); 
       }
       tCtx.putImageData(imgD, 0, 0);
+      
       ctx!.clearRect(0, 0, canvasW, canvasH);
       ctx!.imageSmoothingEnabled = true;
       ctx!.drawImage(tCanvas, 0, 0, canvasW, canvasH);
@@ -639,7 +513,7 @@ const proyectosData = [
     stepTuring();
   }
 
-  // Escuchas del Ciclo de Vida Nativos de Astro
+  // Escuchas del Ciclo de Vida Nativos de Astro (ViewTransitions friendly)
   document.addEventListener('astro:page-load', () => {
     if (window.location.pathname.includes('/proyectos')) {
       currentIndex = 0;

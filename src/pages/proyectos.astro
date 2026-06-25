@@ -2,7 +2,7 @@
 import LayoutBase from '../layouts/LayoutBase.astro';
 import { Image } from 'astro:assets';
 
-// Importaciones dinámicas
+// Importación segura de recursos visuales desde src/assets/projects/
 import imgPeter from '../assets/projects/peter.png';
 import imgIotCnc from '../assets/projects/iot-cnc.png';
 import imgSalli from '../assets/projects/salli.png';
@@ -11,8 +11,6 @@ import imgNeuroEmotion from '../assets/projects/neuro-emotion.png';
 // =====================================================================
 // SISTEMA RECURSIVO DE PROYECTOS (CMS LOCAL)
 // =====================================================================
-// Para añadir un nuevo proyecto en el futuro, simplemente copia un bloque
-// de estos y añádelo a la lista. El carrusel y las vistas se auto-generarán.
 const proyectosData = [
   {
     id: "peter",
@@ -22,18 +20,42 @@ const proyectosData = [
     rol: "Arquitecto de Control Autónomo",
     tags: ["ROS 2", "Edge AI", "C++", "Gazebo"],
     imagenObjeto: imgPeter,
+    colorClase: "bio-rose",
+    colorHex: "#D8A499",
     detallesHTML: `
-      <h4 class="font-tech text-xl text-bio-green mb-3 border-b border-bio-text/10 pb-2">Resumen Ejecutivo y Liderazgo</h4>
-      <p class="font-sans text-sm text-bio-text/80 leading-relaxed mb-6">
-        Diseño integral de un sistema híbrido que transiciona entre locomoción articulada y rodante. Validación exhaustiva mediante 60 ensayos con ruido estocástico (σ 0→4), alcanzando un 100% de éxito en evasión de conflictos y 95% de fiabilidad en la transición morfológica.
-      </p>
-      <h4 class="font-tech text-xl text-bio-green mb-3 border-b border-bio-text/10 pb-2">Logros Cuantitativos</h4>
-      <ul class="space-y-3 font-sans text-sm text-bio-text/80 mb-6">
-        <li class="flex gap-3"><span class="text-bio-rose font-bold">●</span> <div><strong>Middleware (ROS 2):</strong> Orquestación de telemetría de alta frecuencia con latencia estabilizada en 47 ms.</div></li>
-        <li class="flex gap-3"><span class="text-bio-rose font-bold">●</span> <div><strong>Estabilidad Dinámica:</strong> Margen de error acotado a 0.54° (Roll) y 1.06° (Pitch) en terrenos irregulares.</div></li>
-      </ul>
+      <div class="space-y-6">
+        <div>
+          <h4 class="font-tech text-lg text-bio-green mb-2 border-b border-bio-text/10 pb-1 uppercase tracking-wider">Resumen Ejecutivo & Liderazgo</h4>
+          <p class="font-sans text-xs md:text-sm text-bio-text/80 leading-relaxed">
+            Conceptualización e ingeniería de una plataforma de locomoción multimodal híbrida. Ejecución de 60 ensayos continuos de validación con inyección de ruido estocástico uniforme ($S = 0 \\to 4$), logrando una tasa de éxito operativa del 100% en evasión de obstáculos vectoriales y consolidando la transición morfológica con una fiabilidad paramétrica del 95%.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 bg-white/40 border border-bio-text/5 rounded-xl">
+            <span class="font-code text-[10px] text-bio-rose block uppercase">Métrica Clave // Latencia</span>
+            <span class="font-tech text-3xl font-bold text-bio-text">47 ms</span>
+            <p class="text-[10px] text-bio-text/60 mt-1 font-sans">Bucle cerrado de control de alta frecuencia sin cuellos de botella en cache.</p>
+          </div>
+          <div class="p-4 bg-white/40 border border-bio-text/5 rounded-xl">
+            <span class="font-code text-[10px] text-bio-green block uppercase">Precisión // Actitud</span>
+            <span class="font-tech text-3xl font-bold text-bio-text">± 0.54°</span>
+            <p class="text-[10px] text-bio-text/60 mt-1 font-sans">Error acotado de Roll RMS y ±1.06° de Pitch RMS sobre ruido topográfico.</p>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-tech text-base text-bio-green mb-2 uppercase">Leyes de Control y Selección Neuronal</h4>
+          <p class="font-sans text-xs text-bio-text/75 leading-relaxed mb-2">
+            La resolución de conflictos entre estímulos se rige por ecuaciones diferenciales de integración con fugas (leaky-integrator) inspiradas en la topología de los ganglios basales para actualización de tasa neuronal:
+          </p>
+          <div class="p-3 bg-black/5 rounded-lg border border-bio-text/10 font-code text-xs text-bio-green text-center">
+            τ · (da_i / dt) = -a_i + max(0, Σ W_ij · a_j + I_i - θ)
+          </div>
+        </div>
+      </div>
     `,
-    github: "https://github.com/sammcar/PETER_SIMULATION",
+    github: "#",
     video: "#"
   },
   {
@@ -41,21 +63,45 @@ const proyectosData = [
     titulo: "IoT CNC PCB Monitor",
     subtitulo: "Plataforma de monitoreo industrial distribuida mediante Edge AI y orquestación Serverless.",
     fecha: "2025",
-    rol: "Arquitecto de Sistemas & Firmware",
+    rol: "Lead Systems Architect & Embedded Firmware Engineer",
     tags: ["Azure IoT", "ESP32", "TinyML", "MQTT"],
     imagenObjeto: imgIotCnc,
+    colorClase: "bio-blue",
+    colorHex: "#8FA9C4",
     detallesHTML: `
-      <h4 class="font-tech text-xl text-bio-green mb-3 border-b border-bio-text/10 pb-2">Arquitectura de Monitoreo</h4>
-      <p class="font-sans text-sm text-bio-text/80 leading-relaxed mb-6">
-        Desarrollo de una topología de doble nodo (ESP32 + ESP32-CAM) para telemetría física y visión artificial. Clasificación de PCBs en tiempo real (312 ms de inferencia) con un umbral de confianza P ≥ 0.94.
-      </p>
-      <h4 class="font-tech text-xl text-bio-green mb-3 border-b border-bio-text/10 pb-2">Orquestación Cloud</h4>
-      <ul class="space-y-3 font-sans text-sm text-bio-text/80 mb-6">
-        <li class="flex gap-3"><span class="text-bio-blue font-bold">●</span> <div><strong>Pipeline:</strong> Ingesta reactiva mediante EventHub hacia Cosmos DB, permitiendo persistencia heterogénea de datos.</div></li>
-        <li class="flex gap-3"><span class="text-bio-blue font-bold">●</span> <div><strong>Alerting:</strong> Sistema anti-spam integrado con Telegram Bot API basado en ventanas temporales de Δt = 300s.</div></li>
-      </ul>
+      <div class="space-y-6">
+        <div>
+          <h4 class="font-tech text-lg text-bio-green mb-2 border-b border-bio-text/10 pb-1 uppercase tracking-wider">Impacto Técnico & Cloud</h4>
+          <p class="font-sans text-xs md:text-sm text-bio-text/80 leading-relaxed">
+            Ingeniería de extremo a extremo de un sistema distribuido de análisis industrial. Diseñado mediante desacoplamiento estricto de microservicios con despliegues automatizados bajo el paradigma de Infraestructura como Código (IaC).
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 bg-white/40 border border-bio-text/5 rounded-xl">
+            <span class="font-code text-[10px] text-bio-blue block uppercase">Inferencia local // TinyML</span>
+            <span class="font-tech text-3xl font-bold text-bio-text">312 ms</span>
+            <p class="text-[10px] text-bio-text/60 mt-1 font-sans">Clasificación de topología de placa sobre matriz RGB565 con certeza P ≥ 0.94.</p>
+          </div>
+          <div class="p-4 bg-white/40 border border-bio-text/5 rounded-xl">
+            <span class="font-code text-[10px] text-bio-brown block uppercase">Políticas // Anomalias</span>
+            <span class="font-tech text-3xl font-bold text-bio-text">Δt = 300s</span>
+            <p class="text-[10px] text-bio-text/60 mt-1 font-sans">Ventana estricta de mitigación y cooldown para alertas críticas vía Telegram API.</p>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-tech text-base text-bio-green mb-2 uppercase">Integridad Operacional</h4>
+          <p class="font-sans text-xs text-bio-text/75 leading-relaxed">
+            La integridad estructural se evalúa constantemente comparando métricas contra las restricciones estables de borde:
+          </p>
+          <div class="p-3 bg-black/5 rounded-lg border border-bio-text/10 font-code text-xs text-bio-green text-center">
+            T_min ≤ T ≤ T_max  ∧  H_min ≤ H ≤ H_max  ∧  S_vibration &lt; 0.80
+          </div>
+        </div>
+      </div>
     `,
-    github: "https://github.com/Deivs117/IoT_CNC_Monitoring",
+    github: "#",
     video: "#"
   },
   {
@@ -63,43 +109,91 @@ const proyectosData = [
     titulo: "Robot SALLI",
     subtitulo: "Plataforma robótica modular con locomoción biomimética de alta eficiencia.",
     fecha: "2024",
-    rol: "Líder de Sistemas & Ingeniería",
+    rol: "Systems & Engineering Lead",
     tags: ["FreeRTOS", "ESP-IDF", "YOLOv8", "Modularity"],
     imagenObjeto: imgSalli,
+    colorClase: "bio-rose",
+    colorHex: "#D8A499",
     detallesHTML: `
-      <h4 class="font-tech text-xl text-bio-green mb-3 border-b border-bio-text/10 pb-2">Diseño y Firmware</h4>
-      <p class="font-sans text-sm text-bio-text/80 leading-relaxed mb-6">
-        Red de control descentralizada bajo arquitectura Master-Slave utilizando ESP32-C3 y FreeRTOS. Sistema 100% modular y sin adhesivos (glue-less), reduciendo el tiempo de reparación en campo de horas a menos de 5 minutos por módulo.
-      </p>
-      <h4 class="font-tech text-xl text-bio-green mb-3 border-b border-bio-text/10 pb-2">Rendimiento de Inferencia</h4>
-      <ul class="space-y-3 font-sans text-sm text-bio-text/80 mb-6">
-        <li class="flex gap-3"><span class="text-bio-green font-bold">●</span> <div><strong>Edge Vision:</strong> Implementación de YOLOv8 optimizada para hardware, manteniendo 30 FPS constantes.</div></li>
-        <li class="flex gap-3"><span class="text-bio-green font-bold">●</span> <div><strong>Sincronización:</strong> Intervalos de actualización de joints a 50 Hz con latencia de transporte < 15ms.</div></li>
-      </ul>
+      <div class="space-y-6">
+        <div>
+          <h4 class="font-tech text-lg text-bio-green mb-2 border-b border-bio-text/10 pb-1 uppercase tracking-wider">Logros de Sistemas & Diseño Mecánico</h4>
+          <p class="font-sans text-xs md:text-sm text-bio-text/80 leading-relaxed">
+            Dirección del ciclo de vida bajo lineamientos de calidad ISO 9001, reduciendo iteración de diseño en un 25%. Estructura mecánica modular "glue-less" de ensamble por cola de milano (dovetail), optimizada para impresión FDM.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 bg-white/40 border border-bio-text/5 rounded-xl">
+            <span class="font-code text-[10px] text-bio-rose block uppercase">Frecuencia de Red // IDF</span>
+            <span class="font-tech text-3xl font-bold text-bio-text">50 Hz</span>
+            <p class="text-[10px] text-bio-text/60 mt-1 font-sans">Sincronización determinista de articulaciones con latencia de transporte &lt; 15 ms.</p>
+          </div>
+          <div class="p-4 bg-white/40 border border-bio-text/5 rounded-xl">
+            <span class="font-code text-[10px] text-bio-green block uppercase">Mantenibilidad // DownTime</span>
+            <span class="font-tech text-3xl font-bold text-bio-text">&lt; 5 min</span>
+            <p class="text-[10px] text-bio-text/60 mt-1 font-sans">Reparación física de módulos en campo asegurada por pernos mecánicos M3.</p>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-tech text-base text-bio-green mb-2 uppercase">Inferencia en el Borde</h4>
+          <p class="font-sans text-xs text-bio-text/75 leading-relaxed">
+            Procesamiento y detección en tiempo real a bordo de nodos ESP32-CAM gracias a la cuantización de red y reducción de footprint de memoria:
+          </p>
+          <div class="p-3 bg-black/5 rounded-lg border border-bio-text/10 font-code text-xs text-bio-green text-center">
+            YOLOv8-Inference-Engine ~30 FPS sin Thermal Throttling
+          </div>
+        </div>
+      </div>
     `,
-    github: "https://github.com/Deivs117/SALLI",
+    github: "#",
     video: "#"
   },
   {
     id: "neuro-emotion",
-    titulo: "Sistema de Reconocimiento Emocional (Salud Mental)",
-    subtitulo: "Arquitectura profunda para clasificación de expresiones faciales infantiles.",
+    titulo: "Children's Emotion Recognition System",
+    subtitulo: "Clasificación y regularización de expresiones faciales para registros clínicos de salud mental infantil.",
     fecha: "2025",
-    rol: "Investigador IA & Computer Vision",
+    rol: "Principal AI Research & Computer Vision Engineer",
     tags: ["YOLOv8-cls", "PyTorch", "Deep Learning"],
     imagenObjeto: imgNeuroEmotion,
+    colorClase: "bio-blue",
+    colorHex: "#8FA9C4",
     detallesHTML: `
-      <h4 class="font-tech text-xl text-bio-green mb-3 border-b border-bio-text/10 pb-2">Impacto en Salud Mental</h4>
-      <p class="font-sans text-sm text-bio-text/80 leading-relaxed mb-6">
-        Pipeline de visión jerárquica para la categorización clínica de expresiones (Joy, Anger, Sadness, Neutral). El modelo YOLOv8-cls demostró superioridad estadística frente a ResNet18, logrando un 0.717 de Accuracy.
-      </p>
-      <h4 class="font-tech text-xl text-bio-green mb-3 border-b border-bio-text/10 pb-2">Métricas de Precisión</h4>
-      <ul class="space-y-3 font-sans text-sm text-bio-text/80 mb-6">
-        <li class="flex gap-3"><span class="text-bio-rose font-bold">●</span> <div><strong>Benchmarks:</strong> Mejora de +16.3% en Accuracy y +17.5% en Macro F1-Score respecto a arquitecturas previas.</div></li>
-        <li class="flex gap-3"><span class="text-bio-rose font-bold">●</span> <div><strong>Regularización:</strong> Eliminación de sesgos hacia clases mayoritarias mediante técnicas estrictas de aumento de datos.</div></li>
-      </ul>
+      <div class="space-y-6">
+        <div>
+          <h4 class="font-tech text-lg text-bio-green mb-2 border-b border-bio-text/10 pb-1 uppercase tracking-wider">Arquitectura de Visión Computacional</h4>
+          <p class="font-sans text-xs md:text-sm text-bio-text/80 leading-relaxed">
+            Orquestación de un pipeline jerárquico que filtra segmentos demográficos en tiempo real (aislando la cohorte infantil) para optimizar el cómputo de inferencias en dispositivos clínicos embebidos.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 bg-white/40 border border-bio-text/5 rounded-xl">
+            <span class="font-code text-[10px] text-bio-blue block uppercase">YOLOv8-cls vs ResNet18</span>
+            <span class="font-tech text-3xl font-bold text-bio-text">+16.3%</span>
+            <p class="text-[10px] text-bio-text/60 mt-1 font-sans">Superioridad estadística de precisión absoluta debido al mecanismo de atención interna.</p>
+          </div>
+          <div class="p-4 bg-white/40 border border-bio-text/5 rounded-xl">
+            <span class="font-code text-[10px] text-bio-brown block uppercase">Métrica Final // F1-Score</span>
+            <span class="font-tech text-3xl font-bold text-bio-text">0.706</span>
+            <p class="text-[10px] text-bio-text/60 mt-1 font-sans">Mitigación efectiva de sesgos y sobreajustes hacia expresiones mayoritarias.</p>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-tech text-base text-bio-green mb-2 uppercase">Espacio Categórico de Variables Clínicas</h4>
+          <p class="font-sans text-xs text-bio-text/75 leading-relaxed">
+            Las geometrías faciales se mapean en un espacio categórico de 4 dimensiones correspondiente a variables estandarizadas de salud mental:
+          </p>
+          <div class="p-3 bg-black/5 rounded-lg border border-bio-text/10 font-code text-xs text-bio-green text-center">
+            Y = { Joy, Anger, Sadness, Neutral }
+          </div>
+        </div>
+      </div>
     `,
-    github: "https://github.com/Deivs117/AI-Driven-Children-s-Emotion-Recognition",
+    github: "#",
     video: "#"
   }
 ];
@@ -109,7 +203,7 @@ const proyectosData = [
   
   <!-- Canvas para el Patrón de Turing Aleatorio (Fondo) -->
   <div class="fixed inset-0 -z-20 w-full h-full bg-bio-bg overflow-hidden pointer-events-none transition-opacity duration-1000" id="turing-wrapper">
-    <canvas id="turing-bg-proyectos" class="w-full h-full opacity-20"></canvas>
+    <canvas id="turing-bg-proyectos" class="w-full h-full opacity-15"></canvas>
   </div>
 
   <!-- PANTALLA DE CARGA (INTRO ANIMATION) -->
@@ -120,7 +214,7 @@ const proyectosData = [
     </div>
   </div>
 
-  <!-- TÍTULO GLOBAL (Se posiciona animadamente tras la intro) -->
+  <!-- TÍTULO GLOBAL -->
   <div id="global-title" class="fixed top-8 left-6 md:left-12 z-40 opacity-0 transition-all duration-[1500ms] ease-[cubic-bezier(0.22,1,0.36,1)] transform translate-y-12 scale-110 pointer-events-none">
     <div class="flex items-center gap-3">
       <span class="h-2 w-2 rounded-full bg-bio-rose animate-pulse"></span>
@@ -138,15 +232,15 @@ const proyectosData = [
     <div id="carousel-text-panel" class="w-full md:w-5/12 h-full flex flex-col justify-center px-4 md:px-12 z-20 transition-all duration-700 ease-in-out">
       
       <!-- Contenedor dinámico de textos -->
-      <div class="relative w-full h-64">
+      <div class="relative w-full h-72">
         {proyectosData.map((proj, index) => (
           <div id={`text-item-${index}`} class={`absolute inset-0 flex flex-col justify-center transition-all duration-700 ease-[cubic-bezier(0.87,0,0.13,1)] ${index === 0 ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-12 pointer-events-none'}`}>
             <span class="font-code text-[10px] bg-bio-text/5 text-bio-green px-2 py-1 rounded w-max mb-3 border border-bio-text/10">{proj.fecha} // {proj.rol}</span>
             <h2 class="font-tech text-3xl md:text-4xl font-bold text-bio-text leading-tight mb-4">{proj.titulo}</h2>
             <p class="font-sans text-sm text-bio-text/70 leading-relaxed mb-8">{proj.subtitulo}</p>
             
-            <button onclick={`abrirDetalle(${index})`} class="group relative w-max font-code text-xs font-bold text-bio-bg bg-bio-text px-6 py-3 rounded-xl overflow-hidden transition-all hover:scale-105 shadow-md">
-              <span class="relative z-10 flex items-center gap-2">
+            <button id={`cta-btn-${index}`} onclick={`abrirDetalle(${index})`} class="group relative w-max font-code text-xs font-bold text-bio-bg bg-bio-text px-6 py-3 rounded-xl overflow-hidden transition-all hover:scale-105 shadow-md">
+              <span id={`cta-label-${index}`} class="relative z-10 flex items-center gap-2">
                 VER INVESTIGACIÓN Y MÉTRICAS 
                 <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
               </span>
@@ -170,28 +264,25 @@ const proyectosData = [
       </div>
     </div>
 
-    <!-- PANEL LATERAL/CENTRAL: Contenedor de la Imagen (Se transforma animadamente) -->
-    <!-- En Carrusel: Ocupa el centro-derecha. En Detalle: Se desplaza al extremo derecho. -->
-    <div id="image-morph-container" class="absolute right-0 md:right-12 top-1/2 -translate-y-1/2 w-full md:w-6/12 h-[60vh] md:h-[70vh] rounded-2xl overflow-hidden transition-all duration-[900ms] ease-[cubic-bezier(0.87,0,0.13,1)] z-10 bg-white/20 backdrop-blur-sm border border-bio-text/10 shadow-lg">
+    <!-- PANEL LATERAL: Composición Completa Full-Bleed -->
+    <!-- En Carrusel: Ocupa el centro-derecha. En Detalle: Ocupa la derecha con morfología estricta -->
+    <div id="image-morph-container" class="absolute right-0 top-1/2 -translate-y-1/2 w-full md:w-[58%] h-[65vh] md:h-[75vh] rounded-l-3xl overflow-hidden transition-all duration-[900ms] ease-[cubic-bezier(0.25,1,0.5,1)] z-10 border-l border-y border-bio-text/10 shadow-xl will-change-transform">
       
       <!-- Track vertical de imágenes -->
-      <div id="image-track" class="relative w-full h-full transition-transform duration-[900ms] ease-[cubic-bezier(0.87,0,0.13,1)]">
-      {proyectosData.map((proj, index) => (
-        <div class="absolute w-full h-full flex items-center justify-center p-8" style={`top: ${index * 100}%;`}>
-          <div class="w-full h-full bg-white/20 rounded-xl overflow-hidden flex items-center justify-center shadow-inner border border-bio-text/5">
-            
+      <div id="image-track" class="relative w-full h-full transition-transform duration-[900ms] ease-[cubic-bezier(0.25,1,0.5,1)]">
+        {proyectosData.map((proj, index) => (
+          <div class="absolute w-full h-full" style={`top: ${index * 100}%;`}>
+            <!-- Imagen optimizada de Astro cubriendo todo el espectro -->
             <Image 
               src={proj.imagenObjeto} 
               alt={proj.titulo}
-              width={700}
-              height={450}
-              class="object-cover w-full h-full filter contrast-[1.02] saturate-[0.98]"
+              width={1000}
+              height={700}
+              class="object-cover w-full h-full select-none"
             />
-
           </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
     </div>
 
     <!-- CAPA DE DETALLES DEL PROYECTO (Sub-página inyectada) -->
@@ -259,24 +350,28 @@ const proyectosData = [
     background: #8C7870;
     border-radius: 4px;
   }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 </style>
 
 <script>
   // =====================================================================
-  // LÓGICA DE NAVEGACIÓN Y CARRUSEL VERTICAL
+  // LÓGICA DE NAVEGACIÓN Y CARRUSEL VERTICAL INFINITO
   // =====================================================================
   let currentIndex = 0;
-  const maxIndex = 3; // Correspondiente a 4 proyectos (0 a 3)
+  const totalProjects = 4; // Peter, IoT, Salli, Neuro-Emotion
   
-  // Variables de Estado y Elementos DOM
   let estadoActual = 'INTRO'; // INTRO -> CARRUSEL -> DETALLE
   let trackEl: HTMLElement, morphContainer: HTMLElement, textPanel: HTMLElement, detailPanel: HTMLElement;
   let isTuringRunning = false;
   let turingAnimId: number | null = null;
 
-  // 1. Animación de Terminal de Entrada
   async function sleep(ms: number) { return new Promise(r => setTimeout(r, ms)); }
   
+  // 1. Terminal Intro Typewriter Sequence
   async function runIntroSequence() {
     const textEl = document.getElementById('typewriter-text');
     const subEl = document.getElementById('typewriter-sub');
@@ -286,7 +381,6 @@ const proyectosData = [
     
     if(!textEl || !subEl || !introScreen || !globalTitle || !mainUI) return;
 
-    // Typewriter
     const msg1 = "> INICIANDO VITRINA DE INGENIERÍA...";
     let current = "";
     for(const char of msg1) {
@@ -294,87 +388,94 @@ const proyectosData = [
       textEl.innerHTML = current + '<span class="animate-pulse">_</span>';
       await sleep(35);
     }
-    await sleep(400);
+    await sleep(300);
 
-    const msg2 = "> CARGANDO MÓDULOS MULTIMODALES Y SISTEMAS BIO-INSPIRADOS";
+    const msg2 = "> ENLAZANDO REPOSITORIOS, SIMULACIONES Y METRICAS DE RENDIMIENTO";
     current = "";
     for(const char of msg2) {
       current += char;
       subEl.innerHTML = current + '<span class="animate-pulse">_</span>';
       await sleep(15);
     }
-    await sleep(600);
+    await sleep(500);
 
-    // Fade out pantalla negra
+    // Fade out de la pantalla de carga
     introScreen.style.opacity = '0';
     
-    // El título global viaja a la esquina superior izquierda
+    // El título vuela dinámicamente hacia arriba
     globalTitle.style.opacity = '1';
     globalTitle.style.transform = 'translate(0px, 0px) scale(1)';
     
-    await sleep(500);
+    await sleep(400);
     introScreen.style.display = 'none';
     
-    // Iniciar UI Principal y Turing
     mainUI.style.opacity = '1';
     estadoActual = 'CARRUSEL';
     
-    // Inicializar Fondo Turing Exclusivo
     isTuringRunning = true;
     initTuringBackground();
   }
 
-  // 2. Controladores del Carrusel Vertical
+  // 2. Carrusel Vertical Infinito con Modulo (%)
   (window as any).moverCarrusel = (dir: number) => {
     if(estadoActual !== 'CARRUSEL') return;
     
-    const nextIndex = currentIndex + dir;
-    if(nextIndex >= 0 && nextIndex <= maxIndex) {
-      // Ocultar texto actual
-      const oldText = document.getElementById(`text-item-${currentIndex}`);
-      const oldDot = document.getElementById(`dot-${currentIndex}`);
-      if(oldText) {
-        oldText.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
-        oldText.classList.add('opacity-0', '-translate-y-12', 'pointer-events-none');
-      }
-      if(oldDot) {
-        oldDot.classList.remove('bg-bio-green');
-        oldDot.classList.add('bg-bio-text/10');
-      }
-
-      currentIndex = nextIndex;
-
-      // Mostrar texto nuevo
-      const newText = document.getElementById(`text-item-${currentIndex}`);
-      const newDot = document.getElementById(`dot-${currentIndex}`);
-      if(newText) {
-        // Truco para que venga desde abajo
-        newText.classList.remove('-translate-y-12');
-        newText.classList.add('translate-y-12');
-        
-        // Forzar reflow
-        void newText.offsetWidth; 
-
-        newText.classList.remove('opacity-0', 'translate-y-12', 'pointer-events-none');
-        newText.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
-      }
-      if(newDot) {
-        newDot.classList.remove('bg-bio-text/10');
-        newDot.classList.add('bg-bio-green');
-      }
-
-      // Mover track de imágenes físicamente
-      trackEl = document.getElementById('image-track')!;
-      trackEl.style.transform = `translateY(-${currentIndex * 100}%)`;
+    // Ocultar textos anteriores
+    const oldText = document.getElementById(`text-item-${currentIndex}`);
+    const oldDot = document.getElementById(`dot-${currentIndex}`);
+    if(oldText) {
+      oldText.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+      oldText.classList.add('opacity-0', '-translate-y-12', 'pointer-events-none');
     }
+    if(oldDot) {
+      oldDot.classList.remove('bg-bio-green');
+      oldDot.classList.add('bg-bio-text/10');
+    }
+
+    // Aritmética modular para carrusel infinito circular
+    currentIndex = (currentIndex + dir + totalProjects) % totalProjects;
+
+    // Inyectar textos nuevos desde abajo
+    const newText = document.getElementById(`text-item-${currentIndex}`);
+    const newDot = document.getElementById(`dot-${currentIndex}`);
+    if(newText) {
+      newText.classList.remove('-translate-y-12');
+      newText.classList.add('translate-y-12');
+      void newText.offsetWidth; // Forzar reflow nativo de rendering
+      newText.classList.remove('opacity-0', 'translate-y-12', 'pointer-events-none');
+      newText.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
+    }
+    if(newDot) {
+      newDot.classList.remove('bg-bio-text/10');
+      newDot.classList.add('bg-bio-green');
+    }
+
+    // Mover track con translate acelerado por hardware
+    trackEl = document.getElementById('image-track')!;
+    trackEl.style.transform = `translateY(-${currentIndex * 100}%)`;
   };
 
-  // 3. Controladores de la Vista de Detalles (Modales integrados)
-  (window as any).abrirDetalle = (index: number) => {
+  // 3. Modales y Morphing de Detalle FLIP a 60FPS
+  (window as any).abrirDetalle = async (index: number) => {
     if (estadoActual !== 'CARRUSEL') return;
+    
+    const labelEl = document.getElementById(`cta-label-${index}`);
+    const btnEl = document.getElementById(`cta-btn-${index}`);
+    if(!labelEl || !btnEl) return;
+
+    // Desactivar clicks durante la animación táctica de consola
+    btnEl.style.pointerEvents = 'none';
+
+    // Animación interactiva de carga tipo terminal
+    const logs = ["> INJECTING LINK...", "> COMPILING METRICS...", "> OK"];
+    for (const log of logs) {
+      labelEl.innerHTML = `<span class="font-code text-[11px] text-bio-blue animate-pulse">${log}</span>`;
+      await sleep(180);
+    }
+    
     estadoActual = 'DETALLE';
     
-    // Apagar Turing para ahorrar recursos (El wrapper se desvanece por CSS)
+    // Kill switch de Turing para liberar el 100% de la CPU/GPU
     isTuringRunning = false;
     const turingWrapper = document.getElementById('turing-wrapper');
     if(turingWrapper) turingWrapper.style.opacity = '0';
@@ -383,18 +484,18 @@ const proyectosData = [
     textPanel = document.getElementById('carousel-text-panel')!;
     detailPanel = document.getElementById('detail-panel')!;
 
-    // Transición: Desaparece textos de carrusel
+    // Desaparecer textos del carrusel
     textPanel.classList.remove('opacity-100');
     textPanel.classList.add('opacity-0', 'pointer-events-none');
 
-    // Transición: Contenedor de imagen se comprime y se ancla a la derecha absoluta
-    morphContainer.classList.remove('md:w-6/12', 'md:right-12');
-    morphContainer.classList.add('md:w-4/12', 'right-0', 'h-[80vh]', 'shadow-2xl');
+    // Transición morphing FLIP de la imagen: Pasa a ocupar la derecha total sin contenedor
+    morphContainer.classList.remove('md:w-[58%]', 'md:right-12');
+    morphContainer.classList.add('md:w-[36%]', 'right-0', 'h-screen', 'rounded-none', 'shadow-2xl');
 
-    // Preparar contenido detallado a mostrar
-    for(let i=0; i<=maxIndex; i++) {
+    // Cargar contenido correspondiente
+    for(let i=0; i<totalProjects; i++) {
       const content = document.getElementById(`detail-content-${i}`);
-      if(content) content.classList.add('hidden', 'flex');
+      if(content) content.classList.add('hidden');
     }
     const activeContent = document.getElementById(`detail-content-${index}`);
     if(activeContent) {
@@ -402,7 +503,11 @@ const proyectosData = [
       activeContent.classList.add('flex');
     }
 
-    // Aparecer panel lateral izquierdo de información
+    // Restaurar etiqueta de botón para el próximo ciclo
+    labelEl.innerHTML = `VER INVESTIGACIÓN Y MÉTRICAS <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
+    btnEl.style.pointerEvents = 'auto';
+
+    // Desplegar panel lateral izquierdo de información técnica
     setTimeout(() => {
       detailPanel.classList.remove('opacity-0', '-translate-x-12', 'pointer-events-none');
       detailPanel.classList.add('opacity-100', 'translate-x-0', 'pointer-events-auto');
@@ -413,57 +518,55 @@ const proyectosData = [
     if (estadoActual !== 'DETALLE') return;
     estadoActual = 'CARRUSEL';
 
-    // Desaparecer panel de detalles
+    // Cerrar panel lateral izquierdo
     detailPanel.classList.remove('opacity-100', 'translate-x-0', 'pointer-events-auto');
     detailPanel.classList.add('opacity-0', '-translate-x-12', 'pointer-events-none');
 
-    // Restaurar morfología del contenedor de la imagen
+    // Descomprimir imagen al carrusel central
     setTimeout(() => {
-      morphContainer.classList.remove('md:w-4/12', 'right-0', 'h-[80vh]', 'shadow-2xl');
-      morphContainer.classList.add('md:w-6/12', 'md:right-12');
+      morphContainer.classList.remove('md:w-[36%]', 'right-0', 'h-screen', 'rounded-none', 'shadow-2xl');
+      morphContainer.classList.add('md:w-[58%]', 'md:right-12');
       
-      // Aparecer textos de carrusel
       textPanel.classList.remove('opacity-0', 'pointer-events-none');
       textPanel.classList.add('opacity-100');
 
-      // Encender Turing de nuevo
+      // Re-encender el motor Turing y desvanecer su opacidad sutil
       isTuringRunning = true;
       const turingWrapper = document.getElementById('turing-wrapper');
       if(turingWrapper) turingWrapper.style.opacity = '1';
-      initTuringBackground(); // Reinicia el bucle si estaba pausado
+      initTuringBackground(); 
 
     }, 300);
   };
 
   // =====================================================================
-  // MOTOR LIGERO DE TURING (Desconectado/Conectado según el estado)
+  // MOTOR DE TURING AUTO-LIMPIABLE CON RESPETO A MEMORIA
   // =====================================================================
   function initTuringBackground() {
-    if(turingAnimId !== null) return; // Evitar dobles ejecuciones
+    if(turingAnimId !== null) return; 
 
     const canvas = document.getElementById('turing-bg-proyectos') as HTMLCanvasElement;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Rejilla de muy baja resolución para máximo rendimiento de fondo
     const gridW = 640;
     const gridH = 480;
 
-    let U = new Float32Array(gridW * gridH).fill(2.0);
+    let U = new Float32Array(gridW * gridH).fill(1.0);
     let V = new Float32Array(gridW * gridH).fill(0.0);
     let nextU = new Float32Array(gridW * gridH);
     let nextV = new Float32Array(gridW * gridH);
 
-    // Inyectar semilla aleatoria para que cada carga sea un patrón único
-    for (let s = 0; s < 7; s++) {
+    // Semilla de perturbación aleatoria única
+    for (let s = 0; s < 8; s++) {
       const cx = Math.floor(Math.random() * (gridW - 10)) + 5;
       const cy = Math.floor(Math.random() * (gridH - 10)) + 5;
       for (let dy = -4; dy <= 4; dy++) {
         for (let dx = -4; dx <= 4; dx++) {
           if (dx*dx + dy*dy < 16) {
             U[(cx+dx) + (cy+dy)*gridW] = 0.5;
-            V[(cx+dx) + (cy+dy)*gridW] = 0.3 + Math.random()*0.2;
+            V[(cx+dx) + (cy+dy)*gridW] = 0.25 + Math.random()*0.3;
           }
         }
       }
@@ -476,15 +579,14 @@ const proyectosData = [
     let canvasH = canvas.height = window.innerHeight;
 
     function stepTuring() {
-      // Auto-Apagado por estado o por cambio de ruta Astro
+      // Condición estricta de salida: Pestaña cerrada o detalle abierto
       if (!isTuringRunning || !canvas.isConnected) {
         if(turingAnimId) cancelAnimationFrame(turingAnimId);
         turingAnimId = null;
         return;
       }
 
-      // Procesar 6 iteraciones de simulación por frame
-      for (let iter = 0; iter < 6; iter++) {
+      for (let iter = 0; iter < 5; iter++) {
         for (let y = 1; y < gridH - 1; y++) {
           for (let x = 1; x < gridW - 1; x++) {
             const i = x + y * gridW;
@@ -503,7 +605,6 @@ const proyectosData = [
         let tempV = V; V = nextV; nextV = tempV;
       }
 
-      // Dibujar escalado bi-lineal (Mapeo a color Salvia)
       const tCanvas = document.createElement('canvas');
       tCanvas.width = gridW; tCanvas.height = gridH;
       const tCtx = tCanvas.getContext('2d')!;
@@ -515,7 +616,7 @@ const proyectosData = [
         imgD.data[p] = 78;   // R (#4E5E52)
         imgD.data[p+1] = 94; // G
         imgD.data[p+2] = 82; // B
-        imgD.data[p+3] = Math.floor(val * 255 * 3); // Alpha intensificado
+        imgD.data[p+3] = Math.floor(val * 255 * 2.8); // Opacidad
       }
       tCtx.putImageData(imgD, 0, 0);
       ctx!.clearRect(0, 0, canvasW, canvasH);
@@ -525,25 +626,26 @@ const proyectosData = [
       turingAnimId = requestAnimationFrame(stepTuring);
     }
     
-    window.addEventListener('resize', () => {
+    const onResize = () => {
       if(canvas.isConnected) {
         canvasW = canvas.width = window.innerWidth;
         canvasH = canvas.height = window.innerHeight;
+      } else {
+        window.removeEventListener('resize', onResize);
       }
-    });
+    };
+    window.addEventListener('resize', onResize);
 
     stepTuring();
   }
 
-  // Inicializar todo al cargar la página mediante Astro ViewTransitions
+  // Escuchas del Ciclo de Vida Nativos de Astro
   document.addEventListener('astro:page-load', () => {
     if (window.location.pathname.includes('/proyectos')) {
-      // Reiniciar estado
       currentIndex = 0;
       estadoActual = 'INTRO';
       isTuringRunning = false;
       
-      // Limpiar manipulaciones de DOM previas
       const mainUI = document.getElementById('main-interface');
       const introScreen = document.getElementById('intro-screen');
       if(mainUI) mainUI.style.opacity = '0';
@@ -552,8 +654,9 @@ const proyectosData = [
         introScreen.style.opacity = '1';
       }
       
-      // Disparar secuencia
       runIntroSequence();
+    } else {
+      isTuringRunning = false;
     }
   });
 </script>

@@ -67,7 +67,7 @@ export const proyectosData: Proyecto[] = [
         </div>
       </div>
     `,
-    github: "#",
+    github: "https://github.com/sammcar/PETER_SIMULATION",
     video: "#"
   },
   {
@@ -113,7 +113,7 @@ export const proyectosData: Proyecto[] = [
         </div>
       </div>
     `,
-    github: "#",
+    github: "https://github.com/Deivs117/IoT_CNC_Monitoring",
     video: "#"
   },
   {
@@ -159,7 +159,7 @@ export const proyectosData: Proyecto[] = [
         </div>
       </div>
     `,
-    github: "#",
+    github: "https://github.com/Deivs117/SALLI",
     video: "#"
   },
   {
@@ -205,7 +205,7 @@ export const proyectosData: Proyecto[] = [
         </div>
       </div>
     `,
-    github: "#",
-    video: "#"
+    github: "https://github.com/Deivs117/AI-Driven-Children-s-Emotion-Recognition",
+    video: "https://www.youtube.com/watch?v=4_O08vyHsnU&feature=youtu.be"
   }
 ];

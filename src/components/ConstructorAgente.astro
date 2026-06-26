@@ -1,0 +1,220 @@
+---
+// Componente del Agente Constructor Interactivo - Físicas de Salto Corregidas
+---
+
+<div 
+  id="constructor-agent" 
+  class="agent-container"
+  title="¡Presióname o usa A/D/W para controlarme!"
+>
+  <div id="constructor-sprite" class="sprite sprite-idle"></div>
+</div>
+
+<style>
+  /* --- CONFIGURACIÓN FÍSICA --- */
+  .agent-container {
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    width: 48px;
+    height: 48px;
+    cursor: grab;
+    will-change: left, bottom;
+    z-index: 30;
+  }
+
+  .agent-container:active {
+    cursor: grabbing;
+  }
+
+  /* --- RENDIMIENTO PIXEL-ART CORREGIDO --- */
+  .sprite {
+    width: 48px;
+    height: 48px;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    background-repeat: no-repeat;
+    background-position: 0px 0px;
+  }
+
+  /* --- CICLOS DE ANIMACIÓN CON RESOLUCIÓN REAL CORREGIDA --- */
+  .sprite-idle {
+    background-image: url('/portfolio/PlayerIdle.png');
+    background-size: 240px 48px; /* 5 frames (80x16 x3) */
+    animation: play-idle 0.8s steps(5) infinite;
+  }
+
+  .sprite-walk {
+    background-image: url('/portfolio/PlayerWalk.png');
+    background-size: 384px 48px; /* 8 frames (128x16 x3) */
+    animation: play-walk 0.8s steps(8) infinite;
+  }
+
+  .sprite-jump {
+    background-image: url('/portfolio/PlayerJump.png');
+    /* 💡 LA CLAVE: Escalamos el ancho total real de 112px al triple -> 336px. */
+    /* El alto de 48px al triple -> 144px para mantener la proporción nativa perfecta. */
+    background-size: 336px 144px; 
+    /* Cortamos en 3 pasos exactos para tus 3 claquetas */
+    animation: play-jump 0.4s steps(3) forwards; 
+  }
+
+  /* --- KEYFRAMES CORREGIDOS AL PIXEL --- */
+  @keyframes play-idle {
+    from { background-position: 0px 0px; }
+    to { background-position: -240px 0px; }
+  }
+
+  @keyframes play-walk {
+    from { background-position: 0px 0px; }
+    to { background-position: -384px 0px; }
+  }
+
+  /* 💡 Desplazamos el fondo horizontalmente en múltiplos exactos de la celda de salto escalada */
+  @keyframes play-jump {
+    from { background-position: 0px 0px; }
+    to { background-position: -288px 0px; } /* 3 frames de 96px de ventana visible (32px x 3) */
+  }
+
+  .facing-left {
+    transform: scaleX(-1);
+  }
+</style>
+
+<script>
+  let agent: HTMLElement | null = null;
+  let sprite: HTMLElement | null = null;
+
+  let xPos = 10; 
+  let yPos = 0;  
+  let velocityY = 0; 
+  
+  // FÍSICAS REAJUSTADAS SUAVES (Punto 3 - Tus valores personalizados)
+  const gravity = 0.25;      
+  const jumpForce = 4.5;    
+
+  let isWalking = false;
+  let isJumping = false;
+  let direction = 1; 
+  let keysPressed: Record<string, boolean> = {};
+  let canJumpAgain = true; // Candado para evitar el bucle infinito de saltos
+
+  function initConstructorAgent() {
+    agent = document.getElementById('constructor-agent');
+    sprite = document.getElementById('constructor-sprite');
+
+    if (!agent || !sprite) return;
+
+    agent.removeEventListener('click', triggerJump);
+    agent.addEventListener('click', triggerJump);
+
+    window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
+    window.removeEventListener('keyup', handleKeyUp);
+    window.addEventListener('keyup', handleKeyUp);
+
+    updatePhysics();
+  }
+
+  function triggerJump() {
+    if (isJumping) return;
+    isJumping = true;
+    velocityY = jumpForce;
+    setSpriteState('jump');
+  }
+
+  function handleKeyDown(e: KeyboardEvent) {
+    const key = e.key.toLowerCase();
+    keysPressed[key] = true;
+
+    if (['a', 'd', 'w', 'arrowleft', 'arrowright', 'arrowup', ' '].includes(key)) {
+      if (document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+      }
+    }
+
+    // DISPARADOR ÚNICO DE SALTO
+    if (['w', 'arrowup', ' '].includes(key)) {
+      if (canJumpAgain && !isJumping) {
+        canJumpAgain = false; // Bloqueamos hasta que suelte la tecla
+        triggerJump();
+      }
+    }
+  }
+
+  function handleKeyUp(e: KeyboardEvent) {
+    const key = e.key.toLowerCase();
+    keysPressed[key] = false;
+
+    // Al soltar la tecla de salto, habilitamos que pueda volver a saltar
+    if (['w', 'arrowup', ' '].includes(key)) {
+      canJumpAgain = true;
+    }
+  }
+
+  function setSpriteState(state: 'idle' | 'walk' | 'jump') {
+    if (!sprite) return;
+    sprite.className = `sprite sprite-${state}`;
+    if (direction === -1) {
+      sprite.classList.add('facing-left');
+    }
+  }
+
+  function updatePhysics() {
+    if (!agent || !sprite || !agent.isConnected) return;
+
+    let moving = false;
+
+    // Movimiento Horizontal (Tus valores y mapeo de dirección corregidos para el asset mirando a la izquierda)
+    if (keysPressed['d'] || keysPressed['arrowright']) {
+      direction = -1;
+      xPos = Math.min(92, xPos + 0.25); 
+      moving = true;
+    } else if (keysPressed['a'] || keysPressed['arrowleft']) {
+      direction = 1;
+      xPos = Math.max(0, xPos - 0.25);
+      moving = true;
+    }
+
+    // Procesar Físicas del Salto
+    if (isJumping) {
+    //   yPos += velocityY*0.1;
+    //   velocityY -= gravity; // Aplicar gravedad gradual
+
+      // Detectar colisión con el suelo
+      if (yPos <= 0) {
+        yPos = 0;
+        isJumping = false;
+        velocityY = 0;
+        setSpriteState(moving ? 'walk' : 'idle');
+      } else {
+        setSpriteState('jump');
+      }
+    } else {
+      // Control de estados base
+      if (moving && !isWalking) {
+        isWalking = true;
+        setSpriteState('walk');
+      } else if (!moving && isWalking) {
+        isWalking = false;
+        setSpriteState('idle');
+      } else if (moving) {
+        if (direction === -1) {
+          sprite.classList.add('facing-left');
+        } else {
+          sprite.classList.remove('facing-left');
+        }
+      }
+    }
+
+    // Inyección de coordenadas en el DOM
+    agent.style.left = `${xPos}%`;
+    agent.style.bottom = `${yPos}px`;
+
+    requestAnimationFrame(updatePhysics);
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    initConstructorAgent();
+  });
+</script>

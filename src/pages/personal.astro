@@ -1,12 +1,380 @@
 ---
 import LayoutBase from '../layouts/LayoutBase.astro';
+
+// Estructura de datos local para tus hobbies y roadmap personal (alejado de lo corporativo)
+const roadmapHobbies = [
+  {
+    fase: "01",
+    titulo: "Sintetizador Eurorack DIY",
+    descripcion: "Construcción física de un oscilador analógico controlado por voltaje (VCO) utilizando chips operacionales y ruteo de baquelitas.",
+    estado: "En Proceso"
+  },
+  {
+    fase: "02",
+    titulo: "Álbum Lo-Fi Generativo",
+    descripcion: "Composición de un EP de música experimental usando algoritmos de Markov en Python para dictar las progresiones de acordes.",
+    estado: "Planificado"
+  }
+];
 ---
 
-<LayoutBase title="Personal | Portfolio">
-  <section class="flex flex-col items-center justify-center min-h-[80vh] px-6 text-center">
-    <h1 class="text-4xl font-bold text-cyan-400 mb-4">Espacio Personal</h1>
-    <p class="text-gray-400 max-w-xl">
-      Un espacio dedicado a mis intereses personales, medios y aficiones fuera de la ingeniería.
-    </p>
-  </section>
+<LayoutBase title="El Sótano Creativo">
+  
+  <!-- Canvas decorativo propio para la sección personal (Más caótico, con estelas de color) -->
+  <div class="fixed inset-0 -z-20 w-full h-full bg-bio-bg overflow-hidden pointer-events-none">
+    <div class="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#121314_1.5px,transparent_1.5px)] [background-size:24px_24px]"></div>
+  </div>
+
+  <div class="space-y-16 animate-[fadeIn_0.6s_ease-out]">
+    
+    <!-- CABECERA: El Manifiesto del Caos Creativo -->
+    <header class="max-w-3xl space-y-4">
+      <div class="inline-flex items-center gap-2 px-3 py-1 bg-bio-rose/10 text-bio-rose rounded-full border border-bio-rose/20">
+        <span class="h-1.5 w-1.5 rounded-full bg-bio-green animate-pulse"></span>
+        <span class="font-code text-[10px] font-bold tracking-wider uppercase">El Sótano de Deiv // Hobbies & Caos</span>
+      </div>
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-tech text-bio-text leading-none uppercase">
+        Donde las matemáticas <br />
+        <span class="text-bio-rose underline decoration-bio-blue decoration-wavy underline-offset-4">se vuelven arte.</span>
+      </h1>
+      <p class="text-sm md:text-base text-bio-text/75 leading-relaxed font-sans max-w-2xl">
+        Esta sección es mi rincón de recreo. Aquí no hay optimizaciones industriales, microservicios ni pipelines corporativos. Este espacio está reservado para la exploración pura: desde el comportamiento hipnótico de atractores matemáticos tridimensionales hasta la calidez ruidosa de la síntesis de audio analógica. Bienvenidos a mi patio de juegos.
+      </p>
+    </header>
+
+    <!-- FILA DE INTERACTIVOS: Sintetizador + Atractor de Caos -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- BLOQUE 1: El Sintetizador Monofónico (Web Audio API Nactiva) -->
+      <div class="lg:col-span-5 bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-bio-text/10 shadow-sm flex flex-col justify-between min-h-[420px]">
+        <div>
+          <div class="flex justify-between items-center border-b border-bio-text/10 pb-3 mb-4">
+            <span class="font-code text-[10px] text-bio-green font-bold">// MODULE // LFO_SYNTH_01</span>
+            <span class="text-[9px] font-code bg-bio-rose/20 text-bio-rose px-2 py-0.5 rounded font-bold">READY</span>
+          </div>
+          
+          <h3 class="font-tech text-lg text-bio-text mb-1">Oscilador Monofónico</h3>
+          <p class="text-xs text-bio-text/60 font-sans mb-6">Generador de audio interactivo. Elige un oscilador, presiona las teclas y crea frecuencias.</p>
+
+          <!-- Selectores de forma de onda (Estilo perilla/módulo) -->
+          <div class="grid grid-cols-4 gap-2 mb-6 text-center">
+            {['sine', 'square', 'sawtooth', 'triangle'].map((wave) => (
+              <button 
+                onclick={`setOscWave('${wave}')`}
+                id={`btn-wave-${wave}`}
+                class={`py-2 rounded-lg font-code text-[10px] border transition-all uppercase ${
+                  wave === 'sine' 
+                    ? 'bg-bio-green text-white border-bio-green font-bold shadow-sm' 
+                    : 'border-bio-text/10 hover:bg-bio-text/5 text-bio-text/70'
+                }`}
+              >
+                {wave === 'sine' ? 'Seno' : wave === 'square' ? 'Cuadrada' : wave === 'sawtooth' ? 'Sierra' : 'Triang'}
+              </button>
+            ))}
+          </div>
+
+          <!-- Teclado de piano estilizado (C4 a C5) -->
+          <div class="flex justify-between gap-1 h-32 bg-bio-bg/20 p-2 rounded-xl border border-bio-text/10 relative">
+            <button onclick="playNote(261.63, 'C4')" class="piano-key flex-grow bg-white hover:bg-neutral-100 active:bg-neutral-200 border border-bio-text/10 rounded-md transition-all shadow-sm flex items-end justify-center pb-2 font-code text-[9px] text-bio-text/40">Do</button>
+            <button onclick="playNote(293.66, 'D4')" class="piano-key flex-grow bg-white hover:bg-neutral-100 active:bg-neutral-200 border border-bio-text/10 rounded-md transition-all shadow-sm flex items-end justify-center pb-2 font-code text-[9px] text-bio-text/40">Re</button>
+            <button onclick="playNote(329.63, 'E4')" class="piano-key flex-grow bg-white hover:bg-neutral-100 active:bg-neutral-200 border border-bio-text/10 rounded-md transition-all shadow-sm flex items-end justify-center pb-2 font-code text-[9px] text-bio-text/40">Mi</button>
+            <button onclick="playNote(349.23, 'F4')" class="piano-key flex-grow bg-white hover:bg-neutral-100 active:bg-neutral-200 border border-bio-text/10 rounded-md transition-all shadow-sm flex items-end justify-center pb-2 font-code text-[9px] text-bio-text/40">Fa</button>
+            <button onclick="playNote(392.00, 'G4')" class="piano-key flex-grow bg-white hover:bg-neutral-100 active:bg-neutral-200 border border-bio-text/10 rounded-md transition-all shadow-sm flex items-end justify-center pb-2 font-code text-[9px] text-bio-text/40">Sol</button>
+            <button onclick="playNote(440.00, 'A4')" class="piano-key flex-grow bg-white hover:bg-neutral-100 active:bg-neutral-200 border border-bio-text/10 rounded-md transition-all shadow-sm flex items-end justify-center pb-2 font-code text-[9px] text-bio-text/40">La</button>
+            <button onclick="playNote(493.88, 'B4')" class="piano-key flex-grow bg-white hover:bg-neutral-100 active:bg-neutral-200 border border-bio-text/10 rounded-md transition-all shadow-sm flex items-end justify-center pb-2 font-code text-[9px] text-bio-text/40">Si</button>
+            <button onclick="playNote(523.25, 'C5')" class="piano-key flex-grow bg-white hover:bg-neutral-100 active:bg-neutral-200 border border-bio-text/10 rounded-md transition-all shadow-sm flex items-end justify-center pb-2 font-code text-[9px] text-bio-text/40">Do+</button>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center border-t border-bio-text/10 pt-3 mt-4 text-[8px] font-code text-bio-text/40">
+          <span id="synth-frequency">Frecuencia: -- Hz</span>
+          <span>Oscillator: WebAudio API</span>
+        </div>
+      </div>
+
+      <!-- BLOQUE 2: El Atractor de Lorenz Caótico en Canvas (Arte Matemático Interactiva) -->
+      <div class="lg:col-span-7 bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-bio-text/10 shadow-sm flex flex-col justify-between min-h-[420px] relative overflow-hidden">
+        <div>
+          <div class="flex justify-between items-center border-b border-bio-text/10 pb-3 mb-4">
+            <span class="font-code text-[10px] text-bio-blue font-bold">// RENDER // CHAOS_ATTRACTOR_3D</span>
+            <span class="text-[9px] font-code text-bio-text/50">DRAG_TO_ROTATE</span>
+          </div>
+
+          <h3 class="font-tech text-lg text-bio-text mb-1">Arte Generativo: Atractor de Lorenz</h3>
+          <p class="text-xs text-bio-text/60 font-sans mb-4">Sigue de cerca las ecuaciones de la teoría del caos. Haz clic y arrastra sobre el lienzo para girar el sistema en 3D.</p>
+        </div>
+
+        <!-- Canvas de Lorenz -->
+        <div class="relative w-full h-[220px] bg-[#121314] rounded-2xl overflow-hidden shadow-inner group">
+          <canvas id="lorenz-canvas" class="w-full h-full block cursor-grab active:cursor-grabbing"></canvas>
+          <button onclick="resetLorenz()" class="absolute top-3 right-3 p-1.5 bg-white/10 hover:bg-white/20 text-white/80 rounded-md text-[9px] font-code border border-white/10 transition-colors">Re-sembrar</button>
+        </div>
+
+        <div class="flex justify-between items-center text-[8px] font-code text-bio-text/40 mt-3 border-t border-bio-text/10 pt-3">
+          <span>ρ = 28.0 (RHO)</span>
+          <span>σ = 10.0 (SIGMA)</span>
+          <span>β = 8/3 (BETA)</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- SECCIÓN: EL FUTURO DE MIS HOBBIES / ROADMAP -->
+    <section class="relative w-full max-w-5xl mx-auto border-t border-bio-text/10 pt-12" id="hobbies-roadmap">
+      
+      <!-- Encabezado de la Sección -->
+      <div class="flex flex-col mb-12">
+        <span class="font-code text-[10px] text-bio-rose uppercase tracking-widest font-bold">// Lab Experimental</span>
+        <h3 class="font-tech text-2xl md:text-3xl font-bold text-bio-text uppercase mt-2">
+          Hitos de Creación Libre
+        </h3>
+        <p class="font-sans text-xs md:text-sm text-bio-text/60 mt-2 max-w-xl">
+          Evolución programada de mis proyectos personales no comerciales. Arte, síntesis modular de sonido y simulaciones físicas puras.
+        </p>
+      </div>
+
+      <!-- Grid de Progresión -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {roadmapHobbies.map((fase) => (
+          <div class="p-6 bg-bio-text/5 border border-bio-text/10 rounded-2xl flex flex-col justify-between group transition-all hover:border-bio-text/20 shadow-sm relative overflow-hidden">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="font-code text-xs font-bold text-bio-rose tracking-wider">PROJECT_{fase.fase}</span>
+                <span class="font-code text-[9px] bg-white/80 border border-bio-text/10 text-bio-green px-2 py-0.5 rounded-md font-bold uppercase">
+                  {fase.estado}
+                </span>
+              </div>
+              <h4 class="font-tech text-lg font-bold text-bio-text mb-2">{fase.titulo}</h4>
+              <p class="font-sans text-xs text-bio-text/75 leading-relaxed">{fase.descripcion}</p>
+            </div>
+            
+            <!-- Contenedor para el Sprite en el futuro -->
+            <div class="mt-6 pt-4 border-t border-bio-text/5 flex items-center justify-end min-h-[4rem]" data-sprite-placeholder>
+              <div class="h-8 w-8 rounded-full border border-bio-text/10 flex items-center justify-center bg-white text-xs select-none pointer-events-none opacity-30">🛠️</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+    </section>
+
+  </div>
 </LayoutBase>
+
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<script is:inline>
+  // =====================================================================
+  // AUDIO INTERACTIVO: SINTETIZADOR DE AUDIO (WEB AUDIO API)
+  // =====================================================================
+  let audioCtx = null;
+  let activeWaveType = 'sine';
+
+  function setOscWave(wave) {
+    activeWaveType = wave;
+    ['sine', 'square', 'sawtooth', 'triangle'].forEach(w => {
+      const btn = document.getElementById(`btn-wave-${w}`);
+      if(btn) {
+        btn.className = `py-2 rounded-lg font-code text-[10px] border transition-all uppercase ${
+          w === wave 
+            ? 'bg-bio-green text-white border-bio-green font-bold shadow-sm' 
+            : 'border-bio-text/10 hover:bg-bio-text/5 text-bio-text/70'
+        }`;
+      }
+    });
+  }
+
+  function playNote(freq, noteName) {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    
+    // Configuración del sintetizador
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    
+    osc.type = activeWaveType;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    
+    // Envolvente de volumen (Attack Decay Sustain Release) rápida para evitar clics de bocina
+    gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05); // Ataque
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.2); // Caída
+
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    osc.start();
+    osc.stop(audioCtx.currentTime + 1.2);
+
+    // Actualizar visualización técnica
+    const freqDisplay = document.getElementById('synth-frequency');
+    if (freqDisplay) freqDisplay.innerText = `Frecuencia: ${freq} Hz [${noteName}]`;
+  }
+</script>
+
+<script>
+  // =====================================================================
+  // ATRACTOR DE LORENZ INTERACTIVO EN 3D
+  // =====================================================================
+  let lorenzAnimationId: number | null = null;
+  let isRunning = false;
+  
+  function initLorenzAttractor() {
+    const canvas = document.getElementById('lorenz-canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let W = canvas.width = canvas.parentElement!.clientWidth;
+    let H = canvas.height = canvas.parentElement!.clientHeight;
+
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.scale(dpr, dpr);
+
+    // Coeficientes estándar de la Teoría del Caos
+    const sigma = 10.0;
+    const rho = 28.0;
+    const beta = 8.0 / 3.0;
+
+    // Estado físico
+    let x = 0.1, y = 0.0, z = 0.0;
+    let dt = 0.005;
+
+    // Almacenamiento de puntos proyectados para el dibujo continuo
+    interface Point3D { x: number; y: number; z: number; }
+    let points: Point3D[] = [];
+    const maxPoints = 800;
+
+    // Coordenadas de rotación espacial de cámara
+    let angleX = 0.4;
+    let angleY = 0.5;
+    let isDragging = false;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+
+    // Reiniciar simulación caótica con semilla estocástica
+    (window as any).resetLorenz = () => {
+      points = [];
+      x = 0.1 + Math.random() * 0.1;
+      y = Math.random() * 0.1;
+      z = Math.random() * 0.1;
+    };
+
+    // Listeners del mouse para arrastrar y rotar la órbita caótica en 3D
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - lastMouseX;
+      const dy = e.clientY - lastMouseY;
+      angleY += dx * 0.007;
+      angleX += dy * 0.007;
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+    });
+
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    function renderLorenz() {
+      if (!canvas || !canvas.isConnected || !isRunning) {
+        if(lorenzAnimationId) cancelAnimationFrame(lorenzAnimationId);
+        lorenzAnimationId = null;
+        return;
+      }
+
+      // 4 pasos de cálculo numérico por frame para suavizar las líneas
+      for (let i = 0; i < 4; i++) {
+        const dx = sigma * (y - x) * dt;
+        const dy = (x * (rho - z) - y) * dt;
+        const dz = (x * y - beta * z) * dt;
+        x += dx;
+        y += dy;
+        z += dz;
+
+        points.push({ x, y, z });
+        if (points.length > maxPoints) points.shift();
+      }
+
+      ctx!.fillStyle = '#121314';
+      ctx!.fillRect(0, 0, W, H);
+
+      // Dibujar la trayectoria con proyección tridimensional manual
+      ctx!.beginPath();
+      ctx!.lineWidth = 1.4;
+      ctx!.strokeStyle = 'rgba(143, 169, 196, 0.85)'; // Azul Glaciar
+
+      const scale = Math.min(W, H) * 0.105;
+      const cosY = Math.cos(angleY);
+      const sinY = Math.sin(angleY);
+      const cosX = Math.cos(angleX);
+      const sinX = Math.sin(angleX);
+
+      points.forEach((p, idx) => {
+        // Matriz de rotación en 3D
+        let x1 = p.x * cosY - p.y * sinY;
+        let y1 = p.x * sinY + p.y * cosY;
+        let z1 = p.z;
+
+        let y2 = y1 * cosX - z1 * sinX;
+        let z2 = y1 * sinX + z1 * cosX;
+
+        // Proyectar al espacio del canvas centrado
+        const px = W / 2 + x1 * scale;
+        const py = H / 2 + y2 * scale + 15; 
+
+        if (idx === 0) {
+          ctx!.moveTo(px, py);
+        } else {
+          // Gradiente de color en las estelas basado en el progreso
+          ctx!.strokeStyle = `hsla(${200 + (idx / points.length) * 140}, 60%, 75%, ${0.1 + (idx / points.length) * 0.9})`;
+          ctx!.lineTo(px, py);
+          ctx!.stroke();
+          ctx!.beginPath();
+          ctx!.moveTo(px, py);
+        }
+      });
+
+      lorenzAnimationId = requestAnimationFrame(renderLorenz);
+    }
+
+    const onResize = () => {
+      if (!canvas || !canvas.isConnected) return;
+      W = canvas.width = canvas.parentElement!.clientWidth;
+      H = canvas.height = canvas.parentElement!.clientHeight;
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      ctx!.scale(dpr, dpr);
+    };
+    window.addEventListener('resize', onResize);
+
+    renderLorenz();
+  }
+
+  // Escuchas del ciclo de vida de Astro ViewTransitions
+  document.addEventListener('astro:page-load', () => {
+    if (window.location.pathname.includes('/personal')) {
+      isRunning = true;
+      setTimeout(() => {
+        if(isRunning) initLorenzAttractor();
+      }, 100);
+    } else {
+      isRunning = false;
+      if (lorenzAnimationId !== null) {
+        cancelAnimationFrame(lorenzAnimationId);
+        lorenzAnimationId = null;
+      }
+    }
+  });
+</script>

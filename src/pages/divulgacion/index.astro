@@ -1,12 +1,65 @@
 ---
 import LayoutBase from '../../layouts/LayoutBase.astro';
+import ConstructorAgente from '../../components/ConstructorAgente.astro';
+
+// Estructura de datos local para el Roadmap de la sección Divulgación
+const roadmapDivulgacion = [
+  {
+    fase: "01",
+    titulo: "Base de Datos de Artículos",
+    descripcion: "Despliegue de un CMS local basado en Markdown para archivar e indexar investigaciones en robótica y Edge AI.",
+    estado: "Diseño"
+  },
+  {
+    fase: "02",
+    titulo: "Motor de Búsqueda Semántica",
+    descripcion: "Integración de un buscador contextual basado en embeddings de Inteligencia Artificial para consultas técnicas rápidas.",
+    estado: "Planificado"
+  }
+];
 ---
 
-<LayoutBase title="Divulgación | Portfolio">
-  <section class="flex flex-col items-center justify-center min-h-[80vh] px-6 text-center">
-    <h1 class="text-4xl font-bold text-cyan-400 mb-4">Divulgación Científica</h1>
-    <p class="text-gray-400 max-w-xl">
-      Artículos, recursos educativos y contenido de divulgación sobre ciencia e ingeniería.
-    </p>
+<LayoutBase title="Divulgación Científica // Academia">
+  <section class="relative w-full max-w-5xl mx-auto px-6 mt-24 mb-16" id="divulgacion-roadmap">
+    <div class="border-t border-bio-text/10 pt-12">
+      
+      <div class="flex flex-col mb-12">
+        <span class="font-code text-[10px] text-bio-blue uppercase tracking-widest font-bold">// Repositorio de Conocimiento</span>
+        <h3 class="font-tech text-2xl md:text-3xl font-bold text-bio-text uppercase mt-2">
+          Expansión de la Divulgación
+        </h3>
+        <p class="font-sans text-xs md:text-sm text-bio-text/60 mt-2 max-w-xl">
+          Plan de despliegue para la distribución pública de documentación académica, papers analíticos e ingeniería de código abierto.
+        </p>
+      </div>
+
+      <!-- RIEL DE DESPLAZAMIENTO DEL CONSTRUCTOR (Estrategia C - Riel superior) -->
+      <div class="relative w-full h-16 mb-4 overflow-visible border-b border-bio-text/5">
+        <ConstructorAgente />
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {roadmapDivulgacion.map((fase) => (
+          <div class="p-6 bg-bio-text/5 border border-bio-text/10 rounded-2xl flex flex-col justify-between group transition-all hover:border-bio-text/20 shadow-sm relative overflow-hidden">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="font-code text-xs font-bold text-bio-blue tracking-wider">STAGE_{fase.fase}</span>
+                <span class="font-code text-[9px] bg-white/80 border border-bio-text/10 text-bio-brown px-2 py-0.5 rounded-md font-bold uppercase">
+                  {fase.estado}
+                </span>
+              </div>
+              <h4 class="font-tech text-lg font-bold text-bio-text mb-2">{fase.titulo}</h4>
+              <p class="font-sans text-xs text-bio-text/75 leading-relaxed">{fase.descripcion}</p>
+            </div>
+            
+            <div class="mt-6 pt-4 border-t border-bio-text/5 flex items-center justify-end min-h-[4rem]" data-sprite-placeholder>
+              <!-- Sprite estático decorativo de respaldo interno -->
+              <div class="h-8 w-8 rounded-full border border-bio-text/10 flex items-center justify-center bg-white text-xs select-none pointer-events-none opacity-30">🛠️</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+    </div>
   </section>
 </LayoutBase>

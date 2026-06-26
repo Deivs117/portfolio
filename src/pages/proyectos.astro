@@ -2,7 +2,7 @@
 import LayoutBase from '../layouts/LayoutBase.astro';
 import { Image } from 'astro:assets';
 
-// Importación modular y recursiva de los datos del proyecto
+// Importación modular de los datos del proyecto
 import { proyectosData } from '../data/proyectos';
 ---
 
@@ -21,7 +21,7 @@ import { proyectosData } from '../data/proyectos';
     </div>
   </div>
 
-  <!-- TÍTULO GLOBAL (Posicionamiento y z-index optimizados para no ser solapados por el Navbar) -->
+  <!-- TÍTULO GLOBAL -->
   <div id="global-title" class="fixed top-28 md:top-24 left-6 md:left-12 z-30 opacity-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] transform translate-y-0 pointer-events-none">
     <div class="flex items-center gap-3">
       <span class="h-2 w-2 rounded-full dynamic-accent-bg animate-pulse"></span>
@@ -32,10 +32,10 @@ import { proyectosData } from '../data/proyectos';
     <p class="font-code text-[10px] text-bio-text/50 mt-1 ml-5 uppercase tracking-widest">Vitrina Tecnológica Interactiva</p>
   </div>
 
-  <!-- INTERFAZ PRINCIPAL DE PROYECTOS (Centrado verticalmente en el Viewport con Grid Seguro anti-solapamiento) -->
+  <!-- INTERFAZ PRINCIPAL DE PROYECTOS -->
   <div id="main-interface" class="relative w-full min-h-[calc(100vh-220px)] mt-28 md:mt-24 opacity-0 transition-opacity duration-1000 flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-0">
     
-    <!-- COLUMNA IZQUIERDA: Textos y Controladores del Carrusel (Establecido a un 42% estricto de pantalla en desktop) -->
+    <!-- COLUMNA IZQUIERDA: Textos y Controladores del Carrusel -->
     <div id="carousel-text-panel" class="w-full md:w-[42%] flex flex-col justify-center px-4 md:px-12 z-20 transition-all duration-700 ease-in-out order-2 md:order-1">
       
       <!-- Contenedor dinámico de textos -->
@@ -43,44 +43,44 @@ import { proyectosData } from '../data/proyectos';
         {proyectosData.map((proj, index) => (
           <div 
             id={`text-item-${index}`} 
-            class={`absolute inset-0 flex flex-col justify-center transition-all duration-700 ease-[cubic-bezier(0.87,0,0.13,1)] ${index === 0 ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-12 pointer-events-none'}`}
+            class={`absolute inset-0 flex flex-col transition-all duration-700 ease-[cubic-bezier(0.87,0,0.13,1)] ${index === 0 ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-12 pointer-events-none'}`}
             data-color-hex={proj.colorHex}
           >
-            <!-- Tipografía de metadatos incrementada y acoplada dinámicamente -->
             <span class="font-code text-xs md:text-sm tracking-widest font-bold dynamic-accent-text uppercase mb-3 block">
               {proj.fecha} // {proj.rol}
             </span>
             <h2 class="font-tech text-3xl md:text-4xl font-bold text-bio-text leading-tight mb-4">{proj.titulo}</h2>
             <p class="font-sans text-sm text-bio-text/70 leading-relaxed mb-8">{proj.subtitulo}</p>
-            
-            <button id={`cta-btn-${index}`} onclick={`abrirDetalle(${index})`} class="group relative w-max font-code text-xs font-bold text-bio-bg bg-bio-text px-6 py-3 rounded-xl overflow-hidden transition-all hover:scale-105 shadow-md">
-              <span id={`cta-label-${index}`} class="relative z-10 flex items-center gap-2">
-                VER MÁS INFORMACIÓN
-                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-              </span>
-              <div class="absolute inset-0 dynamic-accent-bg transform scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100 z-0"></div>
-            </button>
           </div>
         ))}
       </div>
 
-      <!-- Navegación del Carrusel Vertical -->
-      <div class="flex items-center gap-4 mt-8">
-        <div class="flex flex-col gap-2">
-          <button onclick="moverCarrusel(-1)" class="p-2 rounded-full border border-bio-text/20 text-bio-text/50 hover:text-bio-text hover:border-bio-text transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg></button>
-          <button onclick="moverCarrusel(1)" class="p-2 rounded-full border border-bio-text/20 text-bio-text/50 hover:text-bio-text hover:border-bio-text transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
-        </div>
-        <div class="flex gap-2">
-          {proyectosData.map((_, index) => (
-            <div id={`dot-${index}`} class={`w-1.5 h-12 rounded-full transition-all duration-500 ${index === 0 ? 'dynamic-accent-bg' : 'bg-bio-text/10'}`}></div>
-          ))}
+      <!-- Controladores y Botón Estático CTA Unificado (Punto 2) -->
+      <div class="flex flex-col gap-6 mt-4">
+        <button id="static-cta-btn" onclick="dispararDetalleActual()" class="group relative w-max font-code text-xs font-bold text-bio-bg bg-bio-text px-6 py-3 rounded-xl overflow-hidden transition-all hover:scale-105 shadow-md">
+          <span id="static-cta-label" class="relative z-10 flex items-center gap-2">
+            VER MÁS INFORMACIÓN
+            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </span>
+          <div class="absolute inset-0 dynamic-accent-bg transform scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100 z-0"></div>
+        </button>
+
+        <div class="flex items-center gap-4">
+          <div class="flex flex-col gap-2">
+            <button onclick="moverCarrusel(-1)" class="p-2 rounded-full border border-bio-text/20 text-bio-text/50 hover:text-bio-text hover:border-bio-text transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg></button>
+            <button onclick="moverCarrusel(1)" class="p-2 rounded-full border border-bio-text/20 text-bio-text/50 hover:text-bio-text hover:border-bio-text transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
+          </div>
+          <div class="flex gap-2">
+            {proyectosData.map((_, index) => (
+              <div id={`dot-${index}`} class={`w-1.5 h-12 rounded-full transition-all duration-500 ${index === 0 ? 'dynamic-accent-bg' : 'bg-bio-text/10'}`}></div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- PANEL LATERAL: Composición Completa Full-Bleed (Limitado al 52% en escritorio para no solapar el texto) -->
+    <!-- PANEL LATERAL: Composición Completa Full-Bleed -->
     <div id="image-morph-container" class="relative w-full h-[35vh] md:absolute md:right-0 md:top-1/2 md:-translate-y-1/2 md:w-[52%] md:h-[75vh] rounded-2xl md:rounded-l-3xl overflow-hidden transition-all duration-[900ms] ease-[cubic-bezier(0.25,1,0.5,1)] z-10 border border-bio-text/10 md:border-l md:border-y shadow-xl will-change-transform order-1 md:order-2">
-      <!-- Track vertical de imágenes -->
       <div id="image-track" class="relative w-full h-full transition-transform duration-[900ms] ease-[cubic-bezier(0.25,1,0.5,1)]">
         {proyectosData.map((proj, index) => (
           <div class="absolute w-full h-full" style={`top: ${index * 100}%;`}>
@@ -96,16 +96,14 @@ import { proyectosData } from '../data/proyectos';
       </div>
     </div>
 
-    <!-- CAPA DE DETALLES DEL PROYECTO (Sub-página inyectada) -->
+    <!-- CAPA DE DETALLES DEL PROYECTO -->
     <div id="detail-panel" class="absolute left-0 top-0 w-full md:w-7/12 h-full bg-bio-bg z-30 opacity-0 pointer-events-none transition-all duration-700 ease-in-out transform -translate-x-12 flex flex-col">
       
-      <!-- Botón Volver -->
       <button onclick="cerrarDetalle()" class="w-max mb-8 flex items-center gap-2 font-code text-xs font-bold text-bio-text hover:text-bio-green transition-colors px-4 py-2 border border-bio-text/10 rounded-lg bg-white/50 hover:bg-white shadow-sm">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         VOLVER AL EXPLORADOR
       </button>
 
-      <!-- Contenedor scrollable de información técnica -->
       <div class="flex-grow overflow-y-auto pr-6 custom-scrollbar pb-12">
         {proyectosData.map((proj, index) => (
           <div id={`detail-content-${index}`} class="hidden flex-col gap-6 animate-[fadeIn_0.5s_ease-out]">
@@ -114,7 +112,6 @@ import { proyectosData } from '../data/proyectos';
               <p class="font-code text-[11px] text-bio-text/60 uppercase tracking-wide">{proj.rol} // {proj.fecha}</p>
             </div>
 
-            <!-- Etiquetas Stack Tecnológico -->
             <div class="flex flex-wrap gap-2 mb-4">
               {proj.tags.map(tag => (
                 <span class="font-code text-[10px] bg-bio-blue/10 text-bio-blue border border-bio-blue/20 px-2 py-1 rounded font-bold">
@@ -123,19 +120,22 @@ import { proyectosData } from '../data/proyectos';
               ))}
             </div>
 
-            <!-- Inyección de HTML dinámico del MarkDown -->
             <div class="prose prose-sm prose-p:font-sans prose-headings:font-tech text-bio-text bg-white/50 p-6 rounded-2xl border border-bio-text/5 shadow-sm" set:html={proj.detallesHTML} />
 
-            <!-- Enlaces Interactivos -->
+            <!-- Renderizado Condicional Automático (Punto 1) -->
             <div class="flex gap-4 mt-4">
-              <a href={proj.github} class="flex items-center gap-2 px-4 py-2 bg-[#121314] text-white rounded-lg font-code text-xs font-bold transition-transform hover:scale-105">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
-                Repositorio GitHub
-              </a>
-              <a href={proj.video} class="flex items-center gap-2 px-4 py-2 border border-[#121314] text-[#121314] rounded-lg font-code text-xs font-bold hover:bg-[#121314] hover:text-white transition-all">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Ver Demostración
-              </a>
+              {proj.github !== "#" && (
+                <a href={proj.github} class="flex items-center gap-2 px-4 py-2 bg-[#121314] text-white rounded-lg font-code text-xs font-bold transition-transform hover:scale-105">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
+                  Repositorio GitHub
+                </a>
+              )}
+              {proj.video !== "#" && (
+                <a href={proj.video} class="flex items-center gap-2 px-4 py-2 border border-[#121314] text-[#121314] rounded-lg font-code text-xs font-bold hover:bg-[#121314] hover:text-white transition-all">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  Ver Demostración
+                </a>
+              )}
             </div>
           </div>
         ))}
@@ -146,27 +146,21 @@ import { proyectosData } from '../data/proyectos';
 </LayoutBase>
 
 <style>
-  /* CONFIGURACIÓN Y DECLARACIÓN DE VARIABLES CSS DINÁMICAS */
   :root {
-    --project-accent: #D8A499; /* Color por defecto al cargar (Peter - bio-rose) */
+    --project-accent: #D8A499;
   }
-
   .dynamic-accent-text {
     color: var(--project-accent);
     transition: color 0.6s cubic-bezier(0.25, 1, 0.5, 1);
   }
-
   .dynamic-accent-bg {
     background-color: var(--project-accent);
     transition: background-color 0.6s cubic-bezier(0.25, 1, 0.5, 1);
   }
-
   .dynamic-accent-border {
     border-color: var(--project-accent);
     transition: border-color 0.6s cubic-bezier(0.25, 1, 0.5, 1);
   }
-
-  /* Scrollbar personalizado */
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
   }
@@ -177,7 +171,6 @@ import { proyectosData } from '../data/proyectos';
     background: #8C7870;
     border-radius: 4px;
   }
-  
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: translateY(0); }
@@ -187,20 +180,15 @@ import { proyectosData } from '../data/proyectos';
 <script>
   import { proyectosData } from '../data/proyectos';
 
-  // =====================================================================
-  // LÓGICA DE NAVEGACIÓN Y CARRUSEL VERTICAL INFINITO
-  // =====================================================================
   let currentIndex = 0;
   const totalProjects = proyectosData.length;
-  
-  let estadoActual = 'INTRO'; // INTRO -> CARRUSEL -> DETALLE
+  let estadoActual = 'INTRO'; 
   let trackEl: HTMLElement, morphContainer: HTMLElement, textPanel: HTMLElement, detailPanel: HTMLElement;
   let isTuringRunning = false;
   let turingAnimId: number | null = null;
 
   async function sleep(ms: number) { return new Promise(r => setTimeout(r, ms)); }
   
-  // Sincroniza el color de acento dinámico de la variable CSS
   function syncDynamicColors(index: number) {
     const currentProj = proyectosData[index];
     if (currentProj && currentProj.colorHex) {
@@ -208,7 +196,7 @@ import { proyectosData } from '../data/proyectos';
     }
   }
 
-  // 1. Terminal Intro Typewriter Sequence
+  // 3. Persistencia de Animación Inicial vía SessionStorage
   async function runIntroSequence() {
     const textEl = document.getElementById('typewriter-text');
     const subEl = document.getElementById('typewriter-sub');
@@ -218,8 +206,18 @@ import { proyectosData } from '../data/proyectos';
     
     if(!textEl || !subEl || !introScreen || !globalTitle || !mainUI) return;
 
-    // Sincronizar el tema del primer proyecto al iniciar
     syncDynamicColors(0);
+
+    if (sessionStorage.getItem('proyectos_intro_visto') === 'true') {
+      introScreen.style.display = 'none';
+      globalTitle.style.opacity = '1';
+      globalTitle.style.transform = 'translate(0px, 0px) scale(1)';
+      mainUI.style.opacity = '1';
+      estadoActual = 'CARRUSEL';
+      isTuringRunning = true;
+      initTuringBackground();
+      return;
+    }
 
     const msg1 = "> INICIANDO VITRINA DE INGENIERÍA...";
     let current = "";
@@ -239,10 +237,7 @@ import { proyectosData } from '../data/proyectos';
     }
     await sleep(500);
 
-    // Fade out de la pantalla de carga
     introScreen.style.opacity = '0';
-    
-    // El título vuela dinámicamente hacia arriba
     globalTitle.style.opacity = '1';
     globalTitle.style.transform = 'translate(0px, 0px) scale(1)';
     
@@ -251,16 +246,15 @@ import { proyectosData } from '../data/proyectos';
     
     mainUI.style.opacity = '1';
     estadoActual = 'CARRUSEL';
+    sessionStorage.setItem('proyectos_intro_visto', 'true');
     
     isTuringRunning = true;
     initTuringBackground();
   }
 
-  // 2. Carrusel Vertical Infinito con Modulo (%)
   (window as any).moverCarrusel = (dir: number) => {
     if(estadoActual !== 'CARRUSEL') return;
     
-    // Ocultar textos anteriores
     const oldText = document.getElementById(`text-item-${currentIndex}`);
     const oldDot = document.getElementById(`dot-${currentIndex}`);
     if(oldText) {
@@ -272,19 +266,15 @@ import { proyectosData } from '../data/proyectos';
       oldDot.classList.add('bg-bio-text/10');
     }
 
-    // Aritmética modular para carrusel infinito circular
     currentIndex = (currentIndex + dir + totalProjects) % totalProjects;
-
-    // Sincronizar la variable de color de acento del nuevo proyecto activo
     syncDynamicColors(currentIndex);
 
-    // Inyectar textos nuevos desde abajo
     const newText = document.getElementById(`text-item-${currentIndex}`);
     const newDot = document.getElementById(`dot-${currentIndex}`);
     if(newText) {
       newText.classList.remove('-translate-y-12');
       newText.classList.add('translate-y-12');
-      void newText.offsetWidth; // Forzar reflow nativo de rendering
+      void newText.offsetWidth; 
       newText.classList.remove('opacity-0', 'translate-y-12', 'pointer-events-none');
       newText.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
     }
@@ -293,23 +283,23 @@ import { proyectosData } from '../data/proyectos';
       newDot.classList.add('dynamic-accent-bg');
     }
 
-    // Mover track con translate acelerado por hardware
     trackEl = document.getElementById('image-track')!;
     trackEl.style.transform = `translateY(-${currentIndex * 100}%)`;
   };
 
-  // 3. Modales y Morphing de Detalle FLIP a 60FPS
+  (window as any).dispararDetalleActual = () => {
+    (window as any).abrirDetalle(currentIndex);
+  };
+
   (window as any).abrirDetalle = async (index: number) => {
     if (estadoActual !== 'CARRUSEL') return;
     
-    const labelEl = document.getElementById(`cta-label-${index}`);
-    const btnEl = document.getElementById(`cta-btn-${index}`);
+    const labelEl = document.getElementById('static-cta-label');
+    const btnEl = document.getElementById('static-cta-btn');
     if(!labelEl || !btnEl) return;
 
-    // Desactivar clicks durante la animación táctica de consola
     btnEl.style.pointerEvents = 'none';
 
-    // Animación interactiva de carga tipo terminal (Hacker terminal style)
     const logs = ["> INJECTING LINK...", "> COMPILING METRICS...", "> BUFFER_SUCCESS"];
     for (const log of logs) {
       labelEl.innerHTML = `<span class="font-code text-[11px] dynamic-accent-text animate-pulse">${log}</span>`;
@@ -318,14 +308,12 @@ import { proyectosData } from '../data/proyectos';
     
     estadoActual = 'DETALLE';
     
-    // OCULTAR EL TÍTULO GLOBAL PARA EVITAR SOLAPAMIENTO CON BOTÓN "VOLVER"
     const globalTitle = document.getElementById('global-title');
     if (globalTitle) {
       globalTitle.classList.add('opacity-0', 'pointer-events-none', 'translate-y-[-12px]');
       globalTitle.classList.remove('opacity-100');
     }
 
-    // Kill switch de Turing para liberar el 100% de la CPU/GPU
     isTuringRunning = false;
     const turingWrapper = document.getElementById('turing-wrapper');
     if(turingWrapper) turingWrapper.style.opacity = '0';
@@ -334,20 +322,16 @@ import { proyectosData } from '../data/proyectos';
     textPanel = document.getElementById('carousel-text-panel')!;
     detailPanel = document.getElementById('detail-panel')!;
 
-    // Desaparecer textos del carrusel
     textPanel.classList.remove('opacity-100');
     textPanel.classList.add('opacity-0', 'pointer-events-none');
 
-    // Optimizar para móviles: ocultar el contenedor de imagen en detail view para dar el espacio total a la ficha técnica
     if (window.innerWidth < 768) {
       morphContainer.classList.add('hidden');
     }
 
-    // Transición morphing FLIP de la imagen: Pasa a ocupar la derecha total sin contenedor
     morphContainer.classList.remove('md:w-[52%]', 'rounded-2xl', 'md:rounded-l-3xl', 'md:border-l', 'md:border-y', 'border');
     morphContainer.classList.add('md:w-[36%]', 'right-0', 'h-screen', 'rounded-none', 'shadow-2xl');
 
-    // Cargar contenido correspondiente
     for(let i=0; i<totalProjects; i++) {
       const content = document.getElementById(`detail-content-${i}`);
       if(content) content.classList.add('hidden');
@@ -358,11 +342,9 @@ import { proyectosData } from '../data/proyectos';
       activeContent.classList.add('flex');
     }
 
-    // Restaurar etiqueta de botón para el próximo ciclo
     labelEl.innerHTML = `VER MÁS INFORMACIÓN <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
     btnEl.style.pointerEvents = 'auto';
 
-    // Desplegar panel lateral izquierdo de información técnica
     setTimeout(() => {
       detailPanel.classList.remove('opacity-0', '-translate-x-12', 'pointer-events-none');
       detailPanel.classList.add('opacity-100', 'translate-x-0', 'pointer-events-auto');
@@ -373,23 +355,19 @@ import { proyectosData } from '../data/proyectos';
     if (estadoActual !== 'DETALLE') return;
     estadoActual = 'CARRUSEL';
 
-    // Restaurar el título global de forma fluida
     const globalTitle = document.getElementById('global-title');
     if (globalTitle) {
       globalTitle.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-[-12px]');
       globalTitle.classList.add('opacity-100');
     }
 
-    // Cerrar panel lateral izquierdo
     detailPanel.classList.remove('opacity-100', 'translate-x-0', 'pointer-events-auto');
     detailPanel.classList.add('opacity-0', '-translate-x-12', 'pointer-events-none');
 
-    // Mostrar el contenedor de la imagen si fue ocultado en móviles
     if (window.innerWidth < 768) {
       morphContainer.classList.remove('hidden');
     }
 
-    // Descomprimir imagen al carrusel central
     setTimeout(() => {
       morphContainer.classList.remove('md:w-[36%]', 'right-0', 'h-screen', 'rounded-none', 'shadow-2xl');
       morphContainer.classList.add('md:w-[52%]', 'rounded-2xl', 'md:rounded-l-3xl', 'md:border-l', 'md:border-y', 'border');
@@ -397,18 +375,24 @@ import { proyectosData } from '../data/proyectos';
       textPanel.classList.remove('opacity-0', 'pointer-events-none');
       textPanel.classList.add('opacity-100');
 
-      // Re-encender el motor Turing y desvanecer su opacidad sutil
       isTuringRunning = true;
       const turingWrapper = document.getElementById('turing-wrapper');
       if(turingWrapper) turingWrapper.style.opacity = '1';
       initTuringBackground(); 
-
     }, 300);
   };
 
-  // =====================================================================
-  // MOTOR DE TURING AUTO-LIMPIABLE CON DIMENSIONES DE 640x480 Y ALTA VISIBILIDAD
-  // =====================================================================
+  // 4. Controlador de Navegación Global mediante Teclas WASD y Flechas
+  window.addEventListener('keydown', (e) => {
+    if (estadoActual !== 'CARRUSEL') return;
+    const key = e.key.toLowerCase();
+    if (key === 'arrowup' || key === 'w' || key === 'arrowleft' || key === 'a') {
+      (window as any).moverCarrusel(-1);
+    } else if (key === 'arrowdown' || key === 's' || key === 'arrowright' || key === 'd') {
+      (window as any).moverCarrusel(1);
+    }
+  });
+
   function initTuringBackground() {
     if(turingAnimId !== null) return; 
 
@@ -417,7 +401,6 @@ import { proyectosData } from '../data/proyectos';
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Dimensiones internas de 640 x 480 para cálculo matricial
     const gridW = 640;
     const gridH = 480;
 
@@ -426,7 +409,6 @@ import { proyectosData } from '../data/proyectos';
     let nextU = new Float32Array(gridW * gridH);
     let nextV = new Float32Array(gridW * gridH);
 
-    // Semilla de perturbación de Turing de mayor tamaño y densidad
     for (let s = 0; s < 12; s++) {
       const cx = Math.floor(Math.random() * (gridW - 40)) + 20;
       const cy = Math.floor(Math.random() * (gridH - 40)) + 20;
@@ -485,10 +467,9 @@ import { proyectosData } from '../data/proyectos';
       for (let i = 0; i < gridW * gridH; i++) {
         const val = V[i];
         const p = i * 4;
-        
-        imgD.data[p] = 78;   // R
-        imgD.data[p+1] = 94; // G
-        imgD.data[p+2] = 82; // B
+        imgD.data[p] = 78;   
+        imgD.data[p+1] = 94; 
+        imgD.data[p+2] = 82; 
         imgD.data[p+3] = Math.floor(val * 255 * 3.6); 
       }
       tCtx.putImageData(imgD, 0, 0);
@@ -513,7 +494,6 @@ import { proyectosData } from '../data/proyectos';
     stepTuring();
   }
 
-  // Escuchas del Ciclo de Vida Nativos de Astro (ViewTransitions friendly)
   document.addEventListener('astro:page-load', () => {
     if (window.location.pathname.includes('/proyectos')) {
       currentIndex = 0;
@@ -524,8 +504,12 @@ import { proyectosData } from '../data/proyectos';
       const introScreen = document.getElementById('intro-screen');
       if(mainUI) mainUI.style.opacity = '0';
       if(introScreen) {
-        introScreen.style.display = 'flex';
-        introScreen.style.opacity = '1';
+        if (sessionStorage.getItem('proyectos_intro_visto') === 'true') {
+          introScreen.style.display = 'none';
+        } else {
+          introScreen.style.display = 'flex';
+          introScreen.style.opacity = '1';
+        }
       }
       
       runIntroSequence();

@@ -1,0 +1,58 @@
+name: Desplegar Portafolio a GitHub Pages
+
+on:
+  # Se dispara automáticamente cuando subes cambios a la rama principal (main)
+  push:
+    branches: [ main ]
+  
+  # Permite ejecutar este pipeline manualmente desde la pestaña de Actions en GitHub
+  workflow_dispatch:
+
+# Configuración de permisos necesarios para que GitHub Actions publique la web estática
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Evita colisiones si realizas múltiples pushes seguidos, cancelando despliegues obsoletos
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Compilar Astro
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del Repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js (v20 para máxima compatibilidad)
+        uses: actions/setup-node@v4
+        with:
+          node-size: 20
+          cache: 'npm'
+
+      - name: Instalar Dependencias del Proyecto
+        run: npm ci
+
+      - name: Compilar Sitio Estático (Astro Build)
+        run: npm run build
+
+      - name: Preparar Artifact de Despliegue para Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Astro por defecto compila toda la web final dentro de la carpeta 'dist'
+          path: dist/
+
+  deploy:
+    name: Desplegar en GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publicar en los Servidores de GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

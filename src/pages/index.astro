@@ -25,13 +25,19 @@ import SimuladorCuantica from '../components/SimuladorCuantica.astro';
         </div>
         
         <h1 class="text-4xl md:text-5xl lg:text-6xl tracking-tight text-bio-text font-tech leading-none">
-          No soy un Da Vinci, <br class="hidden md:inline" />
-          no soy un Picasso, <br />
-          <span class="text-bio-green underline decoration-bio-rose decoration-wavy underline-offset-4">pero soy feliz creando.</span>
+          Tecnología con propósito <br />
+          <span class="font-tech text-bio-green">interfaces con sentido.</span>
         </h1>
         
         <p class="text-base md:text-lg text-bio-text/85 leading-relaxed font-sans max-w-2xl">
-          Como <span class="font-bold text-bio-green">Ingeniero Mecatrónico especialista en Inteligencia Artificial</span>, mi núcleo profesional radica en el diseño de sistemas dinámicos de control, automatización industrial y robótica autónoma. No concibo la ingeniería como una estructura rígida y fría; para mí, el <span class="font-bold text-bio-blue">desarrollo Frontend</span> es mi pincel tecnológico. Es el espacio donde convergen la matemática y la estética para dar color, movimiento y un sentido intuitivo a las ideas complejas.
+          Soy David Caicedo Samboni, aunque en el laboratorio me conocen como Deiv. Como <span class="font-bold text-bio-green">Ingeniero Mecatrónico especialista en Inteligencia Artificial</span>, mi mundo se divide entre el rigor de los sistemas dinámicos y la libertad del diseño. Para mí, la ingeniería no es una estructura rígida; es la base sobre la cual construyo experiencias. Por eso, trato el <span class="font-bold text-bio-blue">desarrollo Frontend</span> como mi pincel tecnológico: el espacio donde la matemática pura se convierte en interfaces vivas, intuitivas y, sobre todo, funcionales.
+          
+          <br /><br />
+
+          <span class="font-tech text-base md:text-lg text-bio-text">
+              No soy Da Vinci, no soy Picasso, 
+              <span class="text-bio-green underline decoration-bio-rose decoration-wavy underline-offset-4">pero soy feliz creando.</span>
+          </span>
         </p>
 
         <div class="border-l-3 border-bio-rose pl-4 py-1.5 bg-white/30 backdrop-blur-sm rounded-r-xl max-w-xl">
@@ -40,16 +46,144 @@ import SimuladorCuantica from '../components/SimuladorCuantica.astro';
           </p>
         </div>
 
-        <div class="flex flex-wrap gap-4 pt-2">
-          <a href="/portfolio/proyectos/" class="px-5 py-3 bg-bio-green hover:bg-bio-green/90 text-bio-bg font-code text-xs font-bold rounded-xl shadow-md hover:scale-[1.02] transition-all flex items-center gap-2">
-            Ver mis Proyectos
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-          </a>
-          <a href="/portfolio/divulgacion/" class="px-5 py-3 border border-bio-text/20 hover:bg-bio-text/5 text-bio-text font-code text-xs font-bold rounded-xl transition-all">
-            Divulgación Científica
-          </a>
+        <div class="flex flex-col gap-4 w-full md:w-auto">
+          <div class="flex flex-wrap gap-4 items-center">
+            
+            <!-- BOTÓN PRINCIPAL: ¡PONGÁMONOS EN CONTACTO! + DROPDOWN INTERACTIVO -->
+            <div class="relative inline-block text-left" id="contact-dropdown-container">
+              <button 
+                onclick="toggleContactDropdown()" 
+                class="px-5 py-3 bg-bio-rose hover:bg-bio-rose/90 text-white font-code text-xs font-bold rounded-xl shadow-md hover:scale-[1.02] transition-all flex items-center gap-2 uppercase tracking-wider"
+                id="btn-dropdown-trigger"
+              >
+                <span>¡Pongámonos en contacto!</span>
+                <svg id="dropdown-arrow" class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </button>
+
+              <!-- MENÚ DESPLEGABLE DE TELEMETRÍA DE CONTACTO -->
+              <div 
+                id="contact-menu" 
+                class="absolute left-0 mt-2 w-130 md:w-200 bg-white/95 backdrop-blur-md border border-bio-text/10 rounded-2xl shadow-xl opacity-0 pointer-events-none scale-95 transition-all duration-300 z-50 p-4 space-y-3 font-code text-xs text-bio-text"
+              >
+                <div class="border-b border-bio-text/5 pb-2 mb-2">
+                  <span class="text-[10px] text-bio-green block font-bold uppercase tracking-widest">// Identidad de Enlace</span>
+                </div>
+
+                <!-- Canales de Comunicación Directa -->
+                <div class="space-y-2">
+                  <!-- Email -->
+                  <div class="flex items-center justify-between p-2 bg-bio-bg/50 rounded-lg group border border-bio-text/5">
+                    <a href="mailto:davidcaicedosamboni@gmail.com" class="hover:text-bio-rose transition-colors truncate pr-2 w-48">
+                      davidcaicedosamboni@gmail.com
+                    </a>
+                    <button onclick="copiarTexto('davidcaicedosamboni@gmail.com', this)" class="text-bio-green hover:text-bio-text p-1 rounded hover:bg-bio-text/5 transition-all" title="Copiar Correo">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                    </button>
+                  </div>
+
+                  <!-- WhatsApp / Teléfono -->
+                  <div class="flex items-center justify-between p-2 bg-bio-bg/50 rounded-lg group border border-bio-text/5">
+                    <a href="https://wa.me/573103319477" target="_blank" rel="noopener noreferrer" class="hover:text-bio-rose transition-colors">
+                      +57 310 331 9477
+                    </a>
+                    <button onclick="copiarTexto('+573103319477', this)" class="text-bio-green hover:text-bio-text p-1 rounded hover:bg-bio-text/5 transition-all" title="Copiar Teléfono">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                    </button>
+                  </div>
+
+                  <!-- GitHub -->
+                  <div class="flex items-center justify-between p-2 bg-bio-bg/50 rounded-lg group border border-bio-text/5">
+                    <a href="https://github.com/Deivs117" target="_blank" rel="noopener noreferrer" class="hover:text-bio-rose transition-colors">
+                      Git: Deivs117
+                    </a>
+                    <button onclick="copiarTexto('Deivs117', this)" class="text-bio-green hover:text-bio-text p-1 rounded hover:bg-bio-text/5 transition-all" title="Copiar Usuario">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                    </button>
+                  </div>
+
+                  <!-- LinkedIn -->
+                  <div class="flex items-center justify-between p-2 bg-bio-bg/50 rounded-lg group border border-bio-text/5">
+                    <a href="https://www.linkedin.com/in/david-caicedo-samboni-flux-solutions" target="_blank" rel="noopener noreferrer" class="hover:text-bio-rose transition-colors truncate pr-2 w-48">
+                      LinkedIn Profile
+                    </a>
+                    <button onclick="copiarTexto('https://www.linkedin.com/in/david-caicedo-samboni-flux-solutions', this)" class="text-bio-green hover:text-bio-text p-1 rounded hover:bg-bio-text/5 transition-all" title="Copiar Enlace">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- BOTÓN 2: VER MIS PROYECTOS -->
+            <a href="/portfolio/proyectos/" class="px-5 py-3 bg-bio-green hover:bg-bio-green/90 text-bio-bg font-code text-xs font-bold rounded-xl shadow-md hover:scale-[1.02] transition-all flex items-center gap-2 uppercase tracking-wide">
+              Ver mis Proyectos
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </a>
+
+            <!-- BOTÓN 3: DIVULGACIÓN (DESHABILITADO) -->
+            <div class="group relative px-5 py-3 border border-bio-text/10 bg-bio-text/5 text-bio-text/40 font-code text-xs font-bold rounded-xl cursor-not-allowed flex items-center transition-all uppercase tracking-wide">
+              Divulgación Científica
+              <span class="absolute -top-3 -right-2 bg-bio-rose text-[8px] text-white px-1.5 py-0.5 rounded shadow-sm uppercase tracking-wider font-bold">
+                En construcción
+              </span>
+            </div>
+          </div>
         </div>
+
       </div>
+
+      <script is:inline>
+        // Manejo del estado Abierto/Cerrado del Dropdown de Contacto
+        function toggleContactDropdown() {
+          const menu = document.getElementById('contact-menu');
+          const arrow = document.getElementById('dropdown-arrow');
+          if (!menu || !arrow) return;
+
+          const isOpen = menu.classList.contains('opacity-100');
+
+          if (isOpen) {
+            menu.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto');
+            menu.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+            arrow.classList.remove('rotate-180');
+          } else {
+            menu.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+            menu.classList.add('opacity-100', 'scale-100', 'pointer-events-auto');
+            arrow.classList.add('rotate-180');
+          }
+        }
+
+        // Utilidad nativa de portapapeles con retroalimentación visual táctica
+        function copiarTexto(texto, elemento) {
+          navigator.clipboard.writeText(texto).then(() => {
+            const svgOriginal = elemento.innerHTML;
+            // Inyectar estado [OK] temporalmente en el icono
+            elemento.innerHTML = `<span class="text-[9px] text-bio-rose font-bold uppercase animate-pulse">Copied!</span>`;
+            elemento.style.pointerEvents = 'none';
+            
+            setTimeout(() => {
+              elemento.innerHTML = svgOriginal;
+              elemento.style.pointerEvents = 'auto';
+            }, 1200);
+          }).catch(err => {
+            console.error('Error al copiar el flujo de datos: ', err);
+          });
+        }
+
+        // Cerrar el menú automáticamente si el usuario hace clic fuera de su contenedor físico
+        window.addEventListener('click', function(e) {
+          const container = document.getElementById('contact-dropdown-container');
+          const menu = document.getElementById('contact-menu');
+          const arrow = document.getElementById('dropdown-arrow');
+          
+          if (container && !container.contains(e.target) && menu && menu.classList.contains('opacity-100')) {
+            menu.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto');
+            menu.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+            if (arrow) arrow.classList.remove('rotate-180');
+          }
+        });
+      </script>
 
       <!-- Bloque Derecho: Consola de Telemetría sin espacios vacíos (4 Columnas) -->
       <div class="lg:col-span-4 bg-white/60 backdrop-blur-md p-6 rounded-2xl border border-bio-text/10 shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[350px]">
@@ -80,10 +214,19 @@ import SimuladorCuantica from '../components/SimuladorCuantica.astro';
     <section id="tablero-aprendiz" class="space-y-8 relative z-20 bg-bio-bg border-t border-bio-text/10 pt-16 pb-12 w-full">
       <div class="max-w-4xl space-y-2">
         <h2 class="text-3xl font-tech text-bio-text tracking-tight">El Tablero del Aprendiz</h2>
-        <p class="text-sm md:text-base text-bio-text/70 font-sans">
-          La ingeniería se comprende construyéndola. Presiona cualquiera de los tres paneles de descripción horizontal para desplegar su laboratorio de simulación interactiva en tiempo real.
+        <p class="text-sm md:text-base text-bio-text/70 font-sans leading-relaxed">
+          Este espacio es en honor a la filosofía del constante cuestionamiento y la evolución técnica; el verdadero ingeniero nunca deja de aprender. Los primeros dos paneles horizontales se conectan directamente con mis aptitudes profesionales principales: 
+          <span class="font-code font-bold text-bio-green underline decoration-bio-rose decoration-wavy underline-offset-4 block md:inline mt-2 md:mt-0">
+            el control de sistemas dinámicos y la Inteligencia Artificial aplicada.
+          </span>
         </p>
       </div>
+      <div class="border-l-3 border-bio-rose pl-4 py-1.5 bg-white/30 backdrop-blur-sm rounded-r-xl max-w-xl">
+          <p class="text-xs md:text-sm italic text-bio-brown font-medium leading-relaxed">
+          La ingeniería se comprende construyéndola: presiona cualquiera de los tres paneles de descripción para desplegar su laboratorio de simulación interactiva en tiempo real.
+          </p>
+      </div>
+      
 
       <!-- 1. BLOQUE DE PANELES DE DESCRIPCIÓN EN GRID HORIZONTAL (Columna al lado de columna) -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -244,8 +387,7 @@ import SimuladorCuantica from '../components/SimuladorCuantica.astro';
       "> enlace estático completado."
     ];
 
-    const profileData = `> Nombre: David Caicedo Samboni (21 años)
-> Profesión: Ingeniero Mecatrónico
+    const profileData = `> Profesión: Ingeniero Mecatrónico
 > Especialidad: Inteligencia Artificial
 > Habilidades Físicas: Automatización, Robótica, Control
 > Habilidades Lógicas: Deep Learning, Simulaciones EDO
